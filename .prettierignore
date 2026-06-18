@@ -1,0 +1,15 @@
+pnpm-lock.yaml
+
+node_modules
+dist
+build
+.turbo
+.next
+out
+
+*.log
+.eslintcache
+.pnpm-debug.log
+
+*.mp4
+*.png

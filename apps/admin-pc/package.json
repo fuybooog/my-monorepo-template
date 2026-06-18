@@ -1,0 +1,35 @@
+{
+  "name": "@repo/pc",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\""
+  },
+  "dependencies": {
+    "@repo/api": "workspace:*",
+    "@repo/types": "workspace:*",
+    "antd": "^6.4.4",
+    "form-render": "^2.5.6",
+    "json-schema-to-ts": "^3.1.1",
+    "rc-picker": "^4.11.3",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.17.0",
+    "table-render": "^2.1.4",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@types/node": "^24.12.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.12"
+  }
+}

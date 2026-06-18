@@ -1,0 +1,869 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/auth/passwordLogin": {
+      "post": {
+        "operationId": "AuthController_passwordLogin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/LoginResponseDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "密码登录",
+        "tags": ["鉴权模块"]
+      }
+    },
+    "/auth/phoneLogin": {
+      "post": {
+        "operationId": "AuthController_phoneLogin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhoneLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["鉴权模块"]
+      }
+    },
+    "/auth/currentLogin": {
+      "get": {
+        "operationId": "AuthController_currentLogin",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CurrentLoginResponseDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["鉴权模块"]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "退出登录",
+        "tags": ["鉴权模块"]
+      }
+    },
+    "/common/get": {
+      "get": {
+        "operationId": "CommonController_readData",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Common"]
+      }
+    },
+    "/common/update": {
+      "post": {
+        "operationId": "CommonController_writeData",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCommonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["Common"]
+      }
+    },
+    "/user": {
+      "get": {
+        "operationId": "SystemUserController_pageOptionUser",
+        "parameters": [
+          {
+            "name": "keyword",
+            "required": true,
+            "in": "query",
+            "description": "关键字，可输入姓名，手机号，身份证等",
+            "schema": {
+              "example": "张三",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fields",
+            "required": true,
+            "in": "query",
+            "description": "返回的字段，默认是id，userName",
+            "schema": {
+              "example": "testId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "分页成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/PaginatedResult"
+                            },
+                            {
+                              "properties": {
+                                "list": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/components/schemas/SystemUserPageResp"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "分页查询用户列表(可选字段)",
+        "tags": ["SystemUser"]
+      },
+      "post": {
+        "operationId": "SystemUserController_createUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemUserCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SystemUserResp"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "创建用户",
+        "tags": ["SystemUser"]
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "operationId": "SystemUserController_findUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SystemUserResp"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "按id查询用户",
+        "tags": ["SystemUser"]
+      },
+      "put": {
+        "operationId": "SystemUserController_updateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemUserUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SystemUserResp"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "修改用户",
+        "tags": ["SystemUser"]
+      },
+      "delete": {
+        "operationId": "SystemUserController_removeUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "删除用户",
+        "tags": ["SystemUser"]
+      }
+    },
+    "/user/batch/query": {
+      "post": {
+        "operationId": "SystemUserController_findUserListByIds",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SystemUserResp"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "按ids查询用户",
+        "tags": ["SystemUser"]
+      }
+    },
+    "/user/batch/delete": {
+      "post": {
+        "operationId": "SystemUserController_batchRemoveUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/BatchResp"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "批量删除用户",
+        "tags": ["SystemUser"]
+      }
+    },
+    "/user/{id}/status": {
+      "post": {
+        "operationId": "SystemUserController_updateUserStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "修改用户状态",
+        "tags": ["SystemUser"]
+      }
+    },
+    "/user/batch/status": {
+      "post": {
+        "operationId": "SystemUserController_batchUpdateUserStatus",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchUpdateStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/BatchResp"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "批量修改用户状态",
+        "tags": ["SystemUser"]
+      }
+    },
+    "/user/template": {
+      "get": {
+        "operationId": "SystemUserController_downloadUserTemplate",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "下载导入模板",
+        "tags": ["SystemUser"]
+      }
+    },
+    "/user/import": {
+      "post": {
+        "operationId": "SystemUserController_importUser",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "导入数据",
+        "tags": ["SystemUser"]
+      }
+    },
+    "/user/export": {
+      "post": {
+        "operationId": "SystemUserController_exportUser",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "导出数据",
+        "tags": ["SystemUser"]
+      }
+    }
+  },
+  "info": {
+    "title": "BACKED API",
+    "description": "",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "ResponseHeadDto": {
+        "type": "object",
+        "properties": {
+          "errCode": {
+            "type": "number",
+            "description": "错误码，0 代表成功",
+            "example": 0
+          },
+          "errMsg": {
+            "type": "string",
+            "description": "错误信息描述",
+            "example": "success"
+          }
+        },
+        "required": ["errCode", "errMsg"]
+      },
+      "ApiResponseDto": {
+        "type": "object",
+        "properties": {
+          "head": {
+            "$ref": "#/components/schemas/ResponseHeadDto"
+          }
+        },
+        "required": ["head"]
+      },
+      "LoginResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "用户ID",
+            "example": "testId"
+          },
+          "userName": {
+            "type": "string",
+            "description": "用户名",
+            "example": "testName"
+          },
+          "roles": {
+            "description": "角色列表",
+            "example": "[\"admin\"]",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["id", "userName", "roles"]
+      },
+      "PasswordLoginDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["password", "phone"],
+            "description": "登录类型"
+          },
+          "userName": {
+            "type": "string",
+            "description": "用户名"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码"
+          }
+        },
+        "required": ["type", "userName", "password"]
+      },
+      "PhoneLoginDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["password", "phone"]
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "code": {
+            "type": "string",
+            "description": "验证码"
+          }
+        },
+        "required": ["type", "phone", "code"]
+      },
+      "CurrentLoginResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "用户ID",
+            "example": "testId"
+          },
+          "userName": {
+            "type": "string",
+            "description": "用户名",
+            "example": "testName"
+          },
+          "roles": {
+            "description": "用户角色列表",
+            "example": "[\"admin\"]",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissions": {
+            "description": "用户权限列表",
+            "example": "[\"sys:user:delete\"]",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["id", "userName", "roles", "permissions"]
+      },
+      "UpdateCommonDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "PaginatedResult": {
+        "type": "object",
+        "properties": {}
+      },
+      "SystemUserPageResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "用户ID",
+            "example": "testId"
+          },
+          "userName": {
+            "type": "string",
+            "description": "用户名",
+            "example": "testName"
+          },
+          "age": {
+            "type": "string",
+            "description": "年龄",
+            "example": "1岁5月"
+          }
+        },
+        "required": ["id", "userName", "age"]
+      },
+      "SystemUserResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "用户ID",
+            "example": "testId"
+          },
+          "userName": {
+            "type": "string",
+            "description": "用户名",
+            "example": "testName"
+          },
+          "age": {
+            "type": "string",
+            "description": "年龄",
+            "example": "1岁5月"
+          }
+        },
+        "required": ["id", "userName", "age"]
+      },
+      "BatchDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "SystemUserCreateDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "SystemUserUpdateDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "状态，1：启用，0：禁用",
+            "example": "1岁5月"
+          }
+        },
+        "required": ["status"]
+      },
+      "BatchResp": {
+        "type": "object",
+        "properties": {}
+      },
+      "BatchUpdateStatusDto": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+}

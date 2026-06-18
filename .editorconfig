@@ -1,0 +1,10 @@
+# http://editorconfig.org
+root = true
+
+[*]
+indent_style = space          # 统一用空格缩进
+indent_size = 2               # 一个缩进 = 2个空格
+end_of_line = lf              # 统一换行符为 LF (防止跨平台协作/部署报错)
+charset = utf-8               # 文件编码 UTF-8
+trim_trailing_whitespace = true # 自动清除行尾空格
+insert_final_newline = true   # 文件末尾自动留一空行

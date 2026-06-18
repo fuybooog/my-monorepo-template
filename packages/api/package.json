@@ -1,0 +1,11 @@
+{
+  "name": "@repo/api",
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "vite": "^8.0.16"
+  }
+}
