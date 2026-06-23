@@ -1,15 +1,17 @@
-import { Entity, ManyToMany, JoinTable } from "typeorm";
-import { SystemUserGenerated } from '@/modules/user/entities/system-user.generated';
-import { SystemRoleGenerated } from '@/modules/role/entities/system-role.generated';
+import { Entity, ManyToMany, JoinTable, Column } from 'typeorm'
+import { SystemUserGenerated } from '@/modules/user/entities/system-user.generated'
+import { SystemRole } from '@/modules/role/entities/system-role.entity'
 
-@Entity("system_role")
+@Entity('system_user')
 export class SystemUser extends SystemUserGenerated {
-  
-  @ManyToMany(() => SystemRoleGenerated)
+  @ManyToMany(() => SystemRole, { createForeignKeyConstraints: false })
   @JoinTable({
-    name: "system_user_role",
-    joinColumn: { name: "user_id", referencedColumnName: "id" },
-    inverseJoinColumn: { name: "role_id", referencedColumnName: "id" }
+    name: 'system_user_role',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
   })
-  roles!: SystemRoleGenerated[];
+  roles!: SystemRole[]
+
+  @Column('varchar', { name: 'password', nullable: true, length: 255, select: false })
+  declare password: string | null
 }

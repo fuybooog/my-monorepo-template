@@ -10,7 +10,7 @@ import { SharedMysqlModule } from './utils/database/shared-mysql.module'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
     }),
     BusinessModule,
     SharedRedisModule,

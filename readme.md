@@ -42,3 +42,10 @@ pnpm add form-render
 - 修改 关键字 **_ update _**
 - 删除 关键字 **_ delete _**
 - 详情 关键字 **_ detail _**
+
+### 复制测试数据库
+
+```
+mysql -u root -p -e "CREATE DATABASE mydb_test CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+mysqldump -u root -p mydb | mysql -u root -p mydb_test
+```

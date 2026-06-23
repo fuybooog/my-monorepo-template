@@ -163,25 +163,15 @@
     },
     "/user": {
       "get": {
-        "operationId": "SystemUserController_pageOptionUser",
+        "operationId": "SystemUserController_pageUser",
         "parameters": [
           {
-            "name": "keyword",
+            "name": "userName",
             "required": true,
             "in": "query",
-            "description": "关键字，可输入姓名，手机号，身份证等",
+            "description": "用户姓名",
             "schema": {
               "example": "张三",
-              "type": "string"
-            }
-          },
-          {
-            "name": "fields",
-            "required": true,
-            "in": "query",
-            "description": "返回的字段，默认是id，userName",
-            "schema": {
-              "example": "testId",
               "type": "string"
             }
           }
@@ -205,6 +195,21 @@
                             },
                             {
                               "properties": {
+                                "total": {
+                                  "type": "number",
+                                  "description": "总条数",
+                                  "example": 100
+                                },
+                                "page": {
+                                  "type": "number",
+                                  "description": "当前页码",
+                                  "example": 1
+                                },
+                                "pageSize": {
+                                  "type": "number",
+                                  "description": "每页条数",
+                                  "example": 10
+                                },
                                 "list": {
                                   "type": "array",
                                   "items": {
@@ -223,7 +228,7 @@
             }
           }
         },
-        "summary": "分页查询用户列表(可选字段)",
+        "summary": "分页查询用户列表",
         "tags": ["SystemUser"]
       },
       "post": {
@@ -266,6 +271,89 @@
         "tags": ["SystemUser"]
       }
     },
+    "/user/option": {
+      "get": {
+        "operationId": "SystemUserController_pageOptionUser",
+        "parameters": [
+          {
+            "name": "keyword",
+            "required": true,
+            "in": "query",
+            "description": "关键字，可输入姓名，手机号，身份证等",
+            "schema": {
+              "example": "张三",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fields",
+            "required": false,
+            "in": "query",
+            "description": "返回的字段，默认是id,username",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "分页成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/PaginatedResult"
+                            },
+                            {
+                              "properties": {
+                                "total": {
+                                  "type": "number",
+                                  "description": "总条数",
+                                  "example": 100
+                                },
+                                "page": {
+                                  "type": "number",
+                                  "description": "当前页码",
+                                  "example": 1
+                                },
+                                "pageSize": {
+                                  "type": "number",
+                                  "description": "每页条数",
+                                  "example": 10
+                                },
+                                "list": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/components/schemas/SystemUserPageResp"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "分页查询用户列表(可选字段)",
+        "tags": ["SystemUser"]
+      }
+    },
     "/user/{id}": {
       "get": {
         "operationId": "SystemUserController_findUserById",
@@ -275,7 +363,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
@@ -313,7 +401,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
@@ -361,7 +449,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
@@ -485,7 +573,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
@@ -799,43 +887,53 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
+            "type": "number",
             "description": "用户ID",
-            "example": "testId"
+            "example": 123
           },
           "userName": {
             "type": "string",
             "description": "用户名",
             "example": "testName"
           },
-          "age": {
+          "mobile": {
             "type": "string",
-            "description": "年龄",
-            "example": "1岁5月"
+            "description": "手机号",
+            "example": "13511112222"
+          },
+          "birth": {
+            "type": "string",
+            "description": "生日",
+            "example": "1991-01-01"
           }
         },
-        "required": ["id", "userName", "age"]
+        "required": ["id", "userName", "mobile", "birth"]
       },
       "SystemUserResp": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
+            "type": "number",
             "description": "用户ID",
-            "example": "testId"
+            "example": 123
           },
           "userName": {
             "type": "string",
             "description": "用户名",
             "example": "testName"
           },
-          "age": {
+          "mobile": {
             "type": "string",
-            "description": "年龄",
-            "example": "1岁5月"
+            "description": "手机号",
+            "example": "13511112222"
+          },
+          "birth": {
+            "type": "string",
+            "description": "生日",
+            "example": "1991-01-01"
           }
         },
-        "required": ["id", "userName", "age"]
+        "required": ["id", "userName", "mobile", "birth"]
       },
       "BatchDto": {
         "type": "object",
@@ -851,7 +949,7 @@
           "status": {
             "type": "string",
             "description": "状态，1：启用，0：禁用",
-            "example": "1岁5月"
+            "example": "1"
           }
         },
         "required": ["status"]

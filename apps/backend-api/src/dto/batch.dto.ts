@@ -1,10 +1,14 @@
+import { ToNumericArray } from '@/decorators/to-numeric-array.decrator'
+
 export class BatchDto {
-  ids: string
+  @ToNumericArray()
+  ids: number[]
 }
 export class BatchUpdateStatusDto {
-  ids: string
+  @ToNumericArray()
+  ids: number[]
   status: string
 }
 export class BatchResp {
-  notFoundIds?: string
+  notFoundIds?: number[]
 }

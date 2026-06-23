@@ -1,14 +1,13 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
-@Index("id_UNIQUE", ["id"], { unique: true })
-@Entity("system_role_resource", { schema: "mydb" })
+@Entity('system_role_resource', { schema: 'mydb' })
 export class SystemRoleResource {
-  @PrimaryGeneratedColumn({ type: "int", name: "id" })
-  id: number;
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  id: number
 
-  @Column("varchar", { name: "role_id", nullable: true, length: 45 })
-  roleId: string | null;
+  @Column('int', { name: 'role_id', nullable: true })
+  roleId: number | null
 
-  @Column("varchar", { name: "resource_id", nullable: true, length: 45 })
-  resourceId: string | null;
+  @Column('int', { name: 'resource_id', nullable: true })
+  resourceId: number | null
 }
