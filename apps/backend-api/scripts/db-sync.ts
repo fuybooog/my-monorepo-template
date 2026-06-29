@@ -2,9 +2,10 @@ import { execFileSync } from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as dotenv from 'dotenv'
+import { toKebabCase, toPascalCase } from './utils'
 
 const MODULE_MAPPING: Record<string, string> = {
-  system_value_set: 'valueSet',
+  system_value_set: 'value-set',
   system_user: 'user',
   system_role: 'role',
   system_resource: 'resource',
@@ -84,10 +85,21 @@ async function run() {
     // 缝合 banner 和原本的代码内容
     content = banner + content
 
+    // 🎯 利用正则从代码中的 @Entity("table_name") 提取出物理表名
+    const match = content.match(/@Entity\("([^"]+)"/)
+    if (!match) continue
+    const tableName = match[1]
+
+    // 查找映射关系
+    const moduleName = MODULE_MAPPING[tableName]
+
+    const kebabName = toKebabCase(moduleName)
+    const pascalName = toPascalCase(kebabName)
+
     const classNameMatch = content.match(/export class ([a-zA-Z0-9_]+)/)
     if (classNameMatch) {
       const originalClassName = classNameMatch[1] // 例如: SystemRole
-      const generatedClassName = `${originalClassName}Generated` // 例如: SystemRoleGenerated
+      const generatedClassName = `${pascalName}Generated` // 例如: SystemRoleGenerated
 
       // 全局替换类名声明
       content = content.replace(
@@ -96,13 +108,6 @@ async function run() {
       )
     }
 
-    // 🎯 利用正则从代码中的 @Entity("table_name") 提取出物理表名
-    const match = content.match(/@Entity\("([^"]+)"/)
-    if (!match) continue
-    const tableName = match[1]
-
-    // 查找映射关系
-    const moduleName = MODULE_MAPPING[tableName]
     if (!moduleName) {
       console.warn(
         `⚠️ 找不到表 [${tableName}] 的模块映射，跳过自动分发，你可以去临时目录手动处理。`,
@@ -110,15 +115,10 @@ async function run() {
       continue
     }
 
-    // 🎯 转换文件名为 NestJS 规范的 kebab-case (例如: SysUser.ts -> sys-user.entity.ts)
-    const kebabName = file
-      .replace('.ts', '')
-      .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-      .toLowerCase()
     const targetFileName = `${kebabName}.generated.ts`
 
     // 目标业务目录：src/modules/${moduleName}/entities/
-    const targetDir = path.join(MODULES_DIR, moduleName, 'entities')
+    const targetDir = path.join(MODULES_DIR, kebabName, 'entities')
 
     // 如果目标业务目录不存在则创建
     if (!fs.existsSync(targetDir)) {
@@ -127,8 +127,22 @@ async function run() {
 
     const targetPath = path.join(targetDir, targetFileName)
 
-    // 物理移动（覆盖）过去
     fs.writeFileSync(targetPath, content, 'utf-8')
+    const entityTargetPath = path.join(targetDir, `${kebabName}.entity.ts`)
+    const entityContent = `import { Entity } from 'typeorm'
+import { ${pascalName}Generated } from '@/modules/${kebabName}/entities/${kebabName}.generated'
+
+@Entity('${tableName}')
+export class ${pascalName} extends ${pascalName}Generated {
+}
+`
+    // 如果已存在禁止覆盖，请手动确认
+    if (!fs.existsSync(entityTargetPath)) {
+      fs.writeFileSync(entityTargetPath, entityContent, 'utf-8')
+    } else {
+      console.log(`${kebabName}.entity.ts 已存在，不会重新覆盖，请确认！`)
+    }
+
     console.log(
       `✅ 表 [${tableName}] -> 成功分发至 [modules/${moduleName}/entities/${targetFileName}]`,
     )

@@ -1,0 +1,52 @@
+/**
+ * FBI WARNING
+ * 该文件由脚本 db-sync.ts 自动生成，请勿手动修改！
+ * 如有字段变更，请修改数据库表结构后，重新运行 pnpm db:sync 命令触发覆盖。
+ */
+
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
+
+@Index('id_UNIQUE', ['id'], { unique: true })
+@Index('role_name_UNIQUE', ['roleName'], { unique: true })
+@Index('IDX_dd20796fc381f5b9e73bb093a4', ['roleName'], { unique: true })
+@Index('role_code_UNIQUE', ['roleCode'], { unique: true })
+@Index('IDX_cd5fa36c162068fe234656a7f0', ['roleCode'], { unique: true })
+@Entity('system_role', { schema: 'mydb' })
+export class RoleGenerated {
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id', comment: '角色id' })
+  id: number
+
+  @Column('varchar', {
+    name: 'role_name',
+    unique: true,
+    comment: '角色名称',
+    length: 45,
+  })
+  roleName: string
+
+  @Column('varchar', {
+    name: 'role_code',
+    unique: true,
+    comment: '角色编码',
+    length: 45,
+  })
+  roleCode: string
+
+  @Column('varchar', {
+    name: 'status',
+    nullable: true,
+    comment: '状态：0-禁用，1-启用',
+    length: 2,
+  })
+  status: string | null
+
+  @Column('datetime', {
+    name: 'created_at',
+    nullable: true,
+    comment: '创建时间',
+  })
+  createdAt: Date | null
+
+  @Column('datetime', { name: 'updated_at', nullable: true })
+  updatedAt: Date | null
+}

@@ -1,15 +1,7 @@
 import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator'
 import { getMetadataArgsStorage } from 'typeorm'
-import { SystemUser } from '../entities/system-user.entity'
-
-const isTargetOrParent = (target: any) => {
-  let current = target
-  while (current) {
-    if (current === SystemUser) return true
-    current = Object.getPrototypeOf(current)
-  }
-  return false
-}
+import { User } from '../entities/user.entity'
+import { isTargetOrParent } from '@/utils/fns'
 
 export function IsUserFields(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
@@ -32,11 +24,11 @@ export function IsUserFields(validationOptions?: ValidationOptions) {
           // };
 
           const columns = storage.columns
-            .filter((col) => isTargetOrParent(col.target))
+            .filter((col) => isTargetOrParent(col.target, User))
             .map((col) => col.propertyName)
 
           const generations = storage.generations
-            .filter((gen) => isTargetOrParent(gen.target))
+            .filter((gen) => isTargetOrParent(gen.target, User))
             .map((gen) => gen.propertyName)
 
           const allowedFields = Array.from(new Set([...columns, ...generations]))

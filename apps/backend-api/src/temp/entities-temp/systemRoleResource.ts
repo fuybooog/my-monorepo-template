@@ -1,13 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, Index } from 'typeorm'
 
+@Index('IDX_00d11014c51586ea70e8f95d02', ['roleId'], {})
+@Index('IDX_9544b133c690b6fc0227923f64', ['resourceId'], {})
 @Entity('system_role_resource', { schema: 'mydb' })
 export class SystemRoleResource {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: number
+  @Column('int', { primary: true, name: 'role_id' })
+  roleId: number
 
-  @Column('int', { name: 'role_id', nullable: true })
-  roleId: number | null
-
-  @Column('int', { name: 'resource_id', nullable: true })
-  resourceId: number | null
+  @Column('int', { primary: true, name: 'resource_id' })
+  resourceId: number
 }

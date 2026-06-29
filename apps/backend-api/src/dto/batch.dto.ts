@@ -9,6 +9,6 @@ export class BatchUpdateStatusDto {
   ids: number[]
   status: string
 }
-export class BatchResp {
+export class BatchRespDto {
   notFoundIds?: number[]
 }
