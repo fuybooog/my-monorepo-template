@@ -82,3 +82,29 @@ export const ApiSuccessPageResponse = <TModel extends Type<any>>(model: TModel) 
     }),
   )
 }
+/**
+ * 成功返回布尔值的响应装饰器
+ * 适用于查重、确认等只返回 true/false 的场景
+ */
+export const ApiSuccessBooleanResponse = () => {
+  return applyDecorators(
+    ApiExtraModels(ApiResponseDto),
+    ApiOkResponse({
+      description: '成功响应（返回布尔值）',
+      schema: {
+        allOf: [
+          { $ref: getSchemaPath(ApiResponseDto) },
+          {
+            properties: {
+              data: {
+                type: 'boolean',
+                description: '校验结果：true 代表通过/唯一，false 代表失败/重复',
+                example: true,
+              },
+            },
+          },
+        ],
+      },
+    }),
+  )
+}

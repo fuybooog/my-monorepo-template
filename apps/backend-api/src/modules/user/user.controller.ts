@@ -1,37 +1,39 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common'
+import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post, Query } from '@nestjs/common'
 import { UserService } from '@/modules/user/user.service'
 import { UserPageRespDto } from '@/modules/user/dto/user.page.resp.dto'
 import { UserPageDto } from '@/modules/user/dto/user.page.dto'
 import { UserPageOptionDto } from '@/modules/user/dto/user.page.option.dto'
 import { UserRespDto } from '@/modules/user/dto/user.resp.dto'
 import { UserListRespDto } from '@/modules/user/dto/user.list.resp.dto'
-import { UserCreateDto } from '@/modules/user/dto/user.create.resp.dto'
-import { UserUpdateDto } from '@/modules/user/dto/user.update.resp.dto'
+import { UserCreateDto } from '@/modules/user/dto/user.create.dto'
+import { UserUpdateDto } from '@/modules/user/dto/user.update.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
 import { ApiOperation } from '@nestjs/swagger'
-import { ApiSuccessPageResponse, ApiSuccessResponse } from '@/decorators/api-response.decorator'
+import {
+  ApiSuccessBooleanResponse,
+  ApiSuccessPageResponse,
+  ApiSuccessResponse,
+} from '@/decorators/api-response.decorator'
 import { BatchDto, BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
+import { UserCheckUniqueDto } from './dto/user.check.unique.dto'
+import { UpdateStatusDto } from '@/dto/update-status.dto'
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('')
+  @Get('page')
   @ApiOperation({ summary: '分页查询用户列表' })
   @ApiSuccessPageResponse(UserPageRespDto)
   async pageUser(@Query() query: UserPageDto): Promise<PaginatedResult<UserPageRespDto>> {
     return await this.userService.pageUser(query)
+  }
+
+  @Post('schema-generator-holder-page-user')
+  @HttpCode(200)
+  @ApiOperation({ summary: '请勿调用，用于生成前端DTO', deprecated: true })
+  async _pageUser(@Body() _body: UserPageDto) {
+    return null
   }
 
   @Get('option')
@@ -43,42 +45,46 @@ export class UserController {
     return await this.userService.pageOptionUser(query)
   }
 
-  @Get(':id')
+  @Post('schema-generator-holder-page-option-user')
+  @HttpCode(200)
+  @ApiOperation({ summary: '请勿调用，用于生成前端DTO', deprecated: true })
+  async _pageOptionUser(@Body() _body: UserPageOptionDto) {
+    return null
+  }
+
+  @Get('find/:id')
   @ApiOperation({ summary: '按id查询用户' })
   @ApiSuccessResponse(UserRespDto)
   async findUserById(@Param('id', ParseIntPipe) id: number): Promise<UserRespDto | null> {
     const user = await this.userService.findUserById(id)
-    if (!user) {
-      throw new NotFoundException('未找到资源')
-    }
     return user
   }
 
-  @Post('batch/query')
+  @Get('batch/query')
   @ApiOperation({ summary: '按ids查询用户' })
-  @ApiSuccessResponse(UserRespDto)
-  async findUserListByIds(@Body() body: BatchDto): Promise<UserListRespDto | null> {
-    return await this.userService.findUserListByIds(body.ids)
+  @ApiSuccessResponse(UserListRespDto)
+  async findUserListByIds(@Query() query: BatchDto): Promise<UserListRespDto | null> {
+    return await this.userService.findUserListByIds(query.ids)
   }
 
-  @Post('')
+  @Post('create')
   @ApiOperation({ summary: '创建用户' })
   @ApiSuccessResponse(UserRespDto)
   async createUser(@Body() body: UserCreateDto): Promise<UserRespDto | null> {
     return await this.userService.createUser(body)
   }
 
-  @Put(':id')
+  @Post('update/:id')
   @ApiOperation({ summary: '修改用户' })
   @ApiSuccessResponse(UserRespDto)
   async updateUser(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() body: UserUpdateDto,
   ): Promise<UserRespDto | null> {
     return await this.userService.updateUser(id, body)
   }
 
-  @Delete(':id')
+  @Post('delete/:id')
   @ApiOperation({ summary: '删除用户' })
   @ApiSuccessResponse()
   async removeUser(@Param('id') id: number) {
@@ -92,10 +98,10 @@ export class UserController {
     return await this.userService.batchRemoveUser(body.ids)
   }
 
-  @Post(':id/status')
+  @Post('updateStatus/:id')
   @ApiOperation({ summary: '修改用户状态' })
   @ApiSuccessResponse()
-  async updateUserStatus(@Param('id') id: number, @Body() body: Pick<UserUpdateDto, 'status'>) {
+  async updateUserStatus(@Param('id') id: number, @Body() body: UpdateStatusDto) {
     return await this.userService.updateUserStatus(id, body)
   }
 
@@ -106,7 +112,7 @@ export class UserController {
     return await this.userService.batchUpdateUserStatus(body)
   }
 
-  @Get('template')
+  @Post('template')
   @ApiOperation({ summary: '下载导入用户模板' })
   @ApiSuccessResponse()
   async downloadUserTemplate() {
@@ -125,5 +131,11 @@ export class UserController {
   @ApiSuccessResponse()
   async exportUser() {
     return await this.userService.exportUser()
+  }
+  @Get('check-unique')
+  @ApiOperation({ summary: '检测字段是否唯一' })
+  @ApiSuccessBooleanResponse()
+  async checkUnique(userCheckUniqueDto: UserCheckUniqueDto): Promise<boolean> {
+    return await this.userService.checkUserFieldUnique(userCheckUniqueDto)
   }
 }

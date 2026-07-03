@@ -11,22 +11,22 @@ import { ${pascalCaseName}PageDto } from '@/modules/${kebabCaseName}/dto/${kebab
 import { ${pascalCaseName}PageOptionDto } from '@/modules/${kebabCaseName}/dto/${kebabCaseName}.page.option.dto'
 import { ${pascalCaseName}RespDto } from '@/modules/${kebabCaseName}/dto/${kebabCaseName}.resp.dto'
 import { ${pascalCaseName}ListRespDto } from '@/modules/${kebabCaseName}/dto/${kebabCaseName}.list.resp.dto'
-import { ${pascalCaseName}CreateDto } from '@/modules/${kebabCaseName}/dto/${kebabCaseName}.create.resp.dto'
-import { ${pascalCaseName}UpdateDto } from '@/modules/${kebabCaseName}/dto/${kebabCaseName}.update.resp.dto'
+import { ${pascalCaseName}CreateDto } from '@/modules/${kebabCaseName}/dto/${kebabCaseName}.create.dto'
+import { ${pascalCaseName}UpdateDto } from '@/modules/${kebabCaseName}/dto/${kebabCaseName}.update.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
 import { BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { ${pascalCaseName}Repository } from '@/modules/${kebabCaseName}/${kebabCaseName}.repository'
 import { plainToInstance } from 'class-transformer'
-import { FindManyOptions, In } from 'typeorm'
+import { DataSource, FindManyOptions, In, Not } from 'typeorm'
 import { ${pascalCaseName} } from '@/modules/${kebabCaseName}/entities/${kebabCaseName}.entity'
+import { BusinessException } from '@/exceptions/business-exception'
+import { UpdateStatusDto } from '@/dto/update-status.dto'
 
 @Injectable()
 export class ${pascalCaseName}Service {
-  static readonly SEARCHABLE_FIELDS = ['${camelCaseName}Name', 'mobile', 'pinyin']
-  constructor(private readonly ${camelCaseName}Repository: ${pascalCaseName}Repository) {}
-  async page${pascalCaseName}(
-    ${camelCaseName}PageDto: ${pascalCaseName}PageDto,
-  ): Promise<PaginatedResult<${pascalCaseName}PageRespDto>> {
+  static readonly SEARCHABLE_FIELDS = ['${camelCaseName}Name']
+  constructor(private readonly ${camelCaseName}Repository: ${pascalCaseName}Repository, private readonly dataSource: DataSource) {}
+  async page${pascalCaseName}(${camelCaseName}PageDto: ${pascalCaseName}PageDto): Promise<PaginatedResult<${pascalCaseName}PageRespDto>> {
     const [entities, total] = await this.${camelCaseName}Repository.search${pascalCaseName}sByPage(${camelCaseName}PageDto)
     const list = plainToInstance(${pascalCaseName}PageRespDto, entities, {
       excludeExtraneousValues: true,
@@ -42,15 +42,15 @@ export class ${pascalCaseName}Service {
     ${camelCaseName}PageOptionDto: ${pascalCaseName}PageOptionDto,
   ): Promise<PaginatedResult<${pascalCaseName}PageRespDto>> {
     const { keyword, fields, page, pageSize } = ${camelCaseName}PageOptionDto
-    const queryBuilder = this.${camelCaseName}Repository.createQueryBuilder('${kebabCaseName}')
+    const queryBuilder = this.${camelCaseName}Repository.createQueryBuilder('${camelCaseName}')
     if (fields && fields.length) {
-      const selectFields = fields.map((field) => \`${kebabCaseName}.\${field}\`)
+      const selectFields = fields.split(',').map((field) => \`${camelCaseName}.\${field}\`)
       queryBuilder.select(selectFields)
     }
     if (keyword) {
-      const where = ${pascalCaseName}Service.SEARCHABLE_FIELDS.map(
-        (item) => \`${kebabCaseName}.\${item} LIKE :keyword\`,
-      ).join(' OR ')
+      const where = ${pascalCaseName}Service.SEARCHABLE_FIELDS.map((item) => \`${camelCaseName}.\${item} LIKE :keyword\`).join(
+        ' OR ',
+      )
       queryBuilder.andWhere(\`(\${where})\`, { keyword: \`%\${keyword}%\` })
     }
     const skip = (page - 1) * pageSize
@@ -69,53 +69,103 @@ export class ${pascalCaseName}Service {
   async find${pascalCaseName}ById(id: number): Promise<${pascalCaseName}RespDto | null> {
     // 直接用 repository 中的 api 进行查询
     const ${camelCaseName}Entity = await this.${camelCaseName}Repository.findOne({
-      where: {id},
+      where: { id },
     })
     if (!${camelCaseName}Entity) {
       throw new NotFoundException(\`未找到id为\${id}的${moduleNameCn}\`)
     }
-    return plainToInstance(${pascalCaseName}RespDto, ${camelCaseName}Entity, {excludeExtraneousValues: true})
+    return plainToInstance(${pascalCaseName}RespDto, ${camelCaseName}Entity, { excludeExtraneousValues: true })
   }
-  async find${pascalCaseName}ListByIds(ids: number[]): Promise<${pascalCaseName}ListRespDto | null> {
+  async find${pascalCaseName}ListByIds(ids: string): Promise<${pascalCaseName}ListRespDto | null> {
+    const idList = ids.split(',').map(id => Number.parseInt(id))
     const findOptions: FindManyOptions<${pascalCaseName}> = {
       where: {
-        id: In(ids),
+        id: In(idList),
       },
     } as any
     const entities = await this.${camelCaseName}Repository.find(findOptions)
     const list = plainToInstance(${pascalCaseName}RespDto, entities, { excludeExtraneousValues: true })
     const existIds = new Set(list.map((${camelCaseName}) => ${camelCaseName}.id))
-    const notFoundIds = ids.filter((id) => !existIds.has(id))
+    const notFoundIds = idList.filter((id) => !existIds.has(id))
     return {
       list,
       notFoundIds,
     }
   }
   async create${pascalCaseName}(${camelCaseName}CreateDto: ${pascalCaseName}CreateDto): Promise<${pascalCaseName}RespDto | null> {
-    return null
+    // todo 检查是否唯一
+    return await this.dataSource.transaction(async (manager) => {
+      const ${camelCaseName}Entity = await this.${camelCaseName}Repository.create${pascalCaseName}(${camelCaseName}CreateDto, manager)
+      // todo 添加${moduleNameCn}角色
+      return ${camelCaseName}Entity
+    })
   }
-  async update${pascalCaseName}(
-    id: number,
-    ${camelCaseName}UpdateDto: ${pascalCaseName}UpdateDto,
-  ): Promise<${pascalCaseName}RespDto | null> {
-    return null
+  async update${pascalCaseName}(id: number, ${camelCaseName}UpdateDto: ${pascalCaseName}UpdateDto): Promise<${pascalCaseName}RespDto | null> {
+    const ${camelCaseName}Entity = await this.${camelCaseName}Repository.findOne({
+      where: { id },
+    })
+    if (!${camelCaseName}Entity) {
+      throw new BusinessException(\`未找到id为\${id}的${moduleNameCn}\`)
+    }
+    return await this.dataSource.transaction(async (manager) => {
+      const updated${pascalCaseName}Entity = await this.${camelCaseName}Repository.update${pascalCaseName}(${camelCaseName}Entity, ${camelCaseName}UpdateDto, manager)
+      // todo 修改${moduleNameCn}角色
+      return updated${pascalCaseName}Entity
+    })
   }
   async remove${pascalCaseName}(id: number): Promise<null> {
-    return null
+    const ${camelCaseName}Entity = await this.${camelCaseName}Repository.findOne({
+      where: { id },
+    })
+    if (!${camelCaseName}Entity) {
+      throw new BusinessException(\`未找到id为\${id}的${moduleNameCn}\`)
+    }
+    return await this.dataSource.transaction(async (manager) => {
+      await this.${camelCaseName}Repository.remove${pascalCaseName}(${camelCaseName}Entity, manager)
+      return null
+    })
   }
-  async batchRemove${pascalCaseName}(ids: number[]): Promise<BatchRespDto | null> {
-    return null
+  async batchRemove${pascalCaseName}(ids: string): Promise<BatchRespDto | null> {
+    const idList = ids.split(',').map(id => Number.parseInt(id))
+    const ${camelCaseName}s = await this.${camelCaseName}Repository.find({ where: { id: In(idList) } })
+    let missingIds: number[] = []
+    if (${camelCaseName}s.length !== ids.length) {
+      missingIds = idList.filter(id => !${camelCaseName}s.some(${camelCaseName} => ${camelCaseName}.id === id))
+    }
+    return await this.dataSource.transaction(async (manager) => {
+      await this.${camelCaseName}Repository.batchRemove${pascalCaseName}(${camelCaseName}s, manager)
+      return {
+        notFoundIds: missingIds,
+      }
+    })
   }
-  async update${pascalCaseName}Status(
-    id: number,
-    ${camelCaseName}UpdateDto: Pick<${pascalCaseName}UpdateDto, 'status'>,
-  ): Promise<null> {
-    return null
+  async update${pascalCaseName}Status(id: number, ${camelCaseName}UpdateDto: UpdateStatusDto): Promise<null> {
+    const ${camelCaseName}Entity = await this.${camelCaseName}Repository.findOne({
+      where: { id },
+    })
+    if (!${camelCaseName}Entity) {
+      throw new BusinessException(\`未找到id为\${id}的${moduleNameCn}\`)
+    }
+    return await this.dataSource.transaction(async (manager) => {
+      await this.${camelCaseName}Repository.update${pascalCaseName}Status(${camelCaseName}Entity, ${camelCaseName}UpdateDto.status, manager)
+      return null
+    })
   }
   async batchUpdate${pascalCaseName}Status(
     batchUpdateStatusDto: BatchUpdateStatusDto,
   ): Promise<BatchRespDto | null> {
-    return null
+    const idList = batchUpdateStatusDto.ids.split(',').map(id => Number.parseInt(id))
+    const ${camelCaseName}s = await this.${camelCaseName}Repository.find({ where: { id: In(idList) } })
+    let missingIds: number[] = []
+    if (${camelCaseName}s.length !== batchUpdateStatusDto.ids.length) {
+      missingIds = idList.filter(id => !${camelCaseName}s.some(${camelCaseName} => ${camelCaseName}.id === id))
+    }
+    return await this.dataSource.transaction(async (manager) => {
+      await this.${camelCaseName}Repository.batchUpdate${pascalCaseName}Status(${camelCaseName}s, batchUpdateStatusDto.status, manager)
+      return {
+        notFoundIds: missingIds,
+      }
+    })
   }
 
   async downloadTemplate() {
@@ -128,6 +178,7 @@ export class ${pascalCaseName}Service {
     return null
   }
 }
+
 `
 }
 export default generateServiceTemplate

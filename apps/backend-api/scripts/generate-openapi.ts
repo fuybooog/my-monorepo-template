@@ -19,7 +19,7 @@ async function generate() {
 
   fs.writeFileSync(outputPath, JSON.stringify(document, null, 2))
 
-  console.log('✅ [Backend] openapi.json 资产生成成功！', outputPath)
+  console.log('✅ [Backend] openapi.json 生成成功！', outputPath)
   await app.close()
   process.exit(0)
 }

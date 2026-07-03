@@ -1,12 +1,16 @@
-import { ApiPropertyOptional, IntersectionType } from '@nestjs/swagger'
+import { ApiPropertyOptional, IntersectionType, OmitType } from '@nestjs/swagger'
 import { IsOptional, IsString } from 'class-validator'
-import { OmitType } from '@nestjs/swagger'
 import { UserBaseDto } from './user.base.dto'
 import { PaginationQueryDto } from '@/dto/pagination-query.dto'
 export class UserPageDto extends IntersectionType(
-  OmitType(UserBaseDto, ['id'] as const),
+  OmitType(UserBaseDto, ['id', 'userName'] as const),
   PaginationQueryDto,
 ) {
+  @ApiPropertyOptional({ description: '用户名', type: String })
+  @IsOptional()
+  @IsString()
+  userName?: string
+
   @ApiPropertyOptional({ description: '创建日期开始', example: '2000-10-10 00:00:00' })
   @IsString()
   @IsOptional()

@@ -9,7 +9,7 @@ import generateServiceTemplate from './generate-module-service'
 
 function createModule(moduleName: string, moduleNameCn: string = '', forceCover = false) {
   if (!moduleName) {
-    console.error('请提供模块名称！示例：pnpm run generate:module module-name table_name')
+    console.error('请提供模块名称！示例：pnpm run generate:module module-name')
     process.exit(1)
   }
   const kebabName = moduleName.toLowerCase()
@@ -19,7 +19,7 @@ function createModule(moduleName: string, moduleNameCn: string = '', forceCover 
   const templates = {
     [`${kebabName}.controller.ts`]: generateControllerTemplate(moduleName, moduleNameCn),
     [`${kebabName}.dto`]: generateDtoTemplate(moduleName),
-    [`${kebabName}.e2e-spec.ts`]: generateE2eSpecTemplate(moduleName),
+    [`${kebabName}-controller.e2e-spec.ts`]: generateE2eSpecTemplate(moduleName),
     [`${kebabName}.module.ts`]: generateModuleTemplate(moduleName),
     [`${kebabName}.repository.ts`]: generateRepositoryTemplate(moduleName),
     [`${kebabName}.service.ts`]: generateServiceTemplate(moduleName, moduleNameCn),
@@ -55,7 +55,9 @@ function createModule(moduleName: string, moduleNameCn: string = '', forceCover 
         }
       })
     } else {
-      const filePath = path.join(targetDir, key)
+      const filePath = key.includes('e2e')
+        ? path.join(targetDir, 'test', key)
+        : path.join(targetDir, key)
 
       const dirPath = path.dirname(filePath)
 

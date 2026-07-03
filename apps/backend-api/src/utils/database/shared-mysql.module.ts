@@ -19,7 +19,10 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
           autoLoadEntities: true,
           synchronize: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test',
-          logging: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test',
+          logging:
+            process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test'
+              ? ['query', 'error']
+              : false,
 
           charset: 'utf8mb4',
         }

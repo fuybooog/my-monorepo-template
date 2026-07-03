@@ -1,6 +1,5 @@
-import { ApiPropertyOptional, IntersectionType } from '@nestjs/swagger'
+import { ApiPropertyOptional, IntersectionType, OmitType } from '@nestjs/swagger'
 import { IsOptional, IsString } from 'class-validator'
-import { OmitType } from '@nestjs/swagger'
 import { ValueSetBaseDto } from './value-set.base.dto'
 import { PaginationQueryDto } from '@/dto/pagination-query.dto'
 export class ValueSetPageDto extends IntersectionType(

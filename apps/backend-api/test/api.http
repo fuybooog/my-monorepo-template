@@ -1,0 +1,93 @@
+
+### 登录请求
+# @name login
+POST http://localhost:3000/api/auth/passwordLogin
+Content-Type: application/json
+
+{
+    "userName": "123",
+    "password": "111111"
+}
+
+### 将登录响应头中的 Set-Cookie 保存到变量
+@authCookie = {{login.response.headers.Set-Cookie}}
+
+
+### 查询用户列表
+GET http://localhost:3000/api/user/page?userName=test
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+
+### 查询用户列表
+GET http://localhost:3000/api/user/option?fields=id,userName,mobile
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+### 根据id查询用户
+
+GET http://localhost:3000/api/user/find/366
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+### 根据ids查询用户
+
+GET http://localhost:3000/api/user/batch/query?ids=365,366
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+### 创建用户
+
+POST http://localhost:3000/api/user/create
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+{
+  "userName": "test070106"
+}
+### 修改用户
+
+POST http://localhost:3000/api/user/update/363
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+{
+  "userName": "test070104"
+}
+
+### 删除用户
+
+POST http://localhost:3000/api/user/delete/363
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+
+### 批量删除用户
+
+POST http://localhost:3000/api/user/batch/delete
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+{
+  "ids": "368,367"
+}
+
+### 修改用户状态
+
+POST http://localhost:3000/api/user/updateStatus/366
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+{
+  "status": "0"
+}
+### 批量修改用户状态
+
+POST http://localhost:3000/api/user/batch/status
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+{
+  "ids": "365,366",
+  "status": "1"
+}

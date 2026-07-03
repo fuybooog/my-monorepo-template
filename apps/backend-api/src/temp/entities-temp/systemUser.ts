@@ -106,10 +106,39 @@ export class SystemUser {
   @Column('datetime', {
     name: 'created_at',
     nullable: true,
-    comment: '创建日期',
+    comment: '创建时间',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
   })
   createdAt: Date | null
 
-  @Column('datetime', { name: 'updated_at', nullable: true })
+  @Column('datetime', {
+    name: 'updated_at',
+    nullable: true,
+    comment: '修改时间',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
   updatedAt: Date | null
+
+  @Column('datetime', {
+    name: 'deleted_at',
+    nullable: true,
+    comment: '删除时间',
+  })
+  deletedAt: Date | null
+
+  @Column('varchar', {
+    name: 'pinyin',
+    nullable: true,
+    comment: '全拼',
+    length: 100,
+  })
+  pinyin: string | null
+
+  @Column('varchar', {
+    name: 'py',
+    nullable: true,
+    comment: '拼音首字母',
+    length: 10,
+  })
+  py: string | null
 }

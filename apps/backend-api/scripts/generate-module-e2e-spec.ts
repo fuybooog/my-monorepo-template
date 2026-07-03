@@ -1,15 +1,17 @@
-import { toCamelCase, toKebabCase, toPascalCase } from './utils'
-function generateE2eSpecTemplate(moduleName) {
+import { toCamelCase, toKebabCase, toPascalCase, toSnakeCase } from './utils'
+
+function generateSpecTemplate(moduleName: string, moduleNameCn: string = '') {
   const kebabCaseName = toKebabCase(moduleName)
   const camelCaseName = toCamelCase(kebabCaseName)
   const pascalCaseName = toPascalCase(kebabCaseName)
+  const snakeCaseName = toSnakeCase(kebabCaseName)
   return `import { INestApplication } from '@nestjs/common'
 import request from 'supertest'
 import { DataSource } from 'typeorm'
 import { ${pascalCaseName} } from '@/modules/${kebabCaseName}/entities/${kebabCaseName}.entity'
-import { createTestApp } from '../../../test/test-util'
+import { createTestApp } from '../../../../test/test-util'
 
-describe('${pascalCaseName}Controller (E2E)', () => {
+describe('${pascalCaseName}Controller(E2E)', () => {
   let app: INestApplication
   let dataSource: DataSource
 
@@ -17,13 +19,13 @@ describe('${pascalCaseName}Controller (E2E)', () => {
     ;({ app, dataSource } = await createTestApp())
 
     // 假数据注入
-    // const ${camelCaseName}Repository = dataSource.getRepository(${pascalCaseName})
-    // await ${camelCaseName}Repository.clear()
-    // await ${camelCaseName}Repository.save([
-    //   { ${camelCaseName}Name: 'test_${camelCaseName}_1', password: 'hashed_password_1', status: '1' },
-    //   { ${camelCaseName}Name: 'test_${camelCaseName}_2', password: 'hashed_password_2', status: '2' },
-    //   { ${camelCaseName}Name: 'test_${camelCaseName}_3', password: 'hashed_password_3', status: '1' },
-    // ])
+    const ${camelCaseName}Repository = dataSource.getRepository(${pascalCaseName})
+    await ${camelCaseName}Repository.clear()
+    await ${camelCaseName}Repository.save([
+      { ${camelCaseName}Name: 'test_${snakeCaseName}_1', password: 'hashed_password_1', status: '1' },
+      { ${camelCaseName}Name: 'test_${snakeCaseName}_2', password: 'hashed_password_2', status: '2' },
+      { ${camelCaseName}Name: 'test_${snakeCaseName}_3', password: 'hashed_password_3', status: '1' },
+    ])
   })
 
   afterAll(async () => {
@@ -31,39 +33,116 @@ describe('${pascalCaseName}Controller (E2E)', () => {
     await app.close()
   })
 
-  it('【1】/api/${kebabCaseName} (GET) - 应成功返回完整的分页结构', async () => {
+  let ${camelCaseName}Id: number; // 共享变量，用于传递上下文
+
+
+  it('应新增${moduleNameCn}成功', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/${kebabCaseName}')
-      .query({ page: 1, pageSize: 10 })
-      .expect(200)
+      .post('/api/${kebabCaseName}/create')
+      .send({
+        ${camelCaseName}Name: 'add_test_${snakeCaseName}_name'
+      })
+      .expect(201);
 
-    const { head, data } = response.body
+    const { head, data } = response.body;
 
-    expect(head.errCode).toBe(0)
+    expect(head.errCode).toBe(0);
+    expect(data).toStrictEqual(expect.objectContaining({
+      ${camelCaseName}Name: 'add_test_${snakeCaseName}_name',
+    }));
 
-    expect(data).toHaveProperty('total')
-    expect(data).toHaveProperty('page')
-    expect(data).toHaveProperty('pageSize')
-    expect(data).toHaveProperty('list')
+    // 赋值给共享变量
+    ${camelCaseName}Id = data.id;
+    expect(${camelCaseName}Id).toBeTruthy(); // 确保获取到了 ID，否则后续测试无意义
+  });
 
-    expect(data.total).toBe(3)
-    expect(Array.isArray(data.list)).toBe(true)
-    expect(data.list.length).toBe(3)
-  })
-
-  it('【2】/api/${kebabCaseName} (GET) - 返回的列表数据中绝对不能包含密码字段', async () => {
+  it('应成功返回完整的分页结构', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/${kebabCaseName}')
-      .query({ page: 1, pageSize: 5 })
-      .expect(200)
+      .get('/api/${kebabCaseName}/page')
+      .expect(200);
 
-    const { data } = response.body
+    const { head, data } = response.body;
 
-    const firstUser = data.list[0]
-    expect(firstUser.${camelCaseName}Name).toBeDefined()
-    expect(firstUser.password).toBeUndefined()
-  })
+    expect(head.errCode).toBe(0);
+    expect(data).toStrictEqual(expect.objectContaining({
+      total: 4,
+      page: 1,
+      pageSize: 10,
+    }));
+    expect(Array.isArray(data.list)).toBe(true);
+    expect(data.list.length).toBe(4);
+    expect(data.list[0]).not.toHaveProperty('password');
+
+  });
+
+
+  it('应能根据 ID 查询到对应的${moduleNameCn}', async () => {
+    // 如果上一步失败没拿到 ID，直接跳过或报错
+    if (!${camelCaseName}Id) throw new Error('前置测试未获取到${moduleNameCn} ID');
+
+    const response = await request(app.getHttpServer())
+      .get(\`/api/${kebabCaseName}/find/\${${camelCaseName}Id}\`)
+      .expect(200);
+
+    const { head, data } = response.body;
+    expect(head.errCode).toBe(0);
+    expect(data).toHaveProperty('id');
+    expect(data).not.toHaveProperty('password');
+    expect(data.id).toBe(${camelCaseName}Id);
+  });
+
+  it('应能根据 ID 修改对应的${moduleNameCn}', async () => {
+    // 如果上一步失败没拿到 ID，直接跳过或报错
+    if (!${camelCaseName}Id) throw new Error('前置测试未获取到${moduleNameCn} ID');
+
+    const response = await request(app.getHttpServer())
+      .post(\`/api/${kebabCaseName}/update/\${${camelCaseName}Id}\`)
+      .send({
+        ${camelCaseName}Name: 'update_test_${snakeCaseName}_name'
+      })
+      .expect(201);
+
+    const { head, data } = response.body;
+    expect(head.errCode).toBe(0);
+    expect(data).toHaveProperty('id');
+    expect(data).not.toHaveProperty('password');
+    expect(data.id).toBe(${camelCaseName}Id);
+  });
+
+  it('应能根据 ID 修改对应的${moduleNameCn}的状态', async () => {
+    // 如果上一步失败没拿到 ID，直接跳过或报错
+    if (!${camelCaseName}Id) throw new Error('前置测试未获取到${moduleNameCn} ID');
+
+    const response = await request(app.getHttpServer())
+      .post(\`/api/${kebabCaseName}/updateStatus/\${${camelCaseName}Id}\`)
+      .send({
+        status: '1'
+      })
+      .expect(201);
+
+    const { head } = response.body;
+    expect(head.errCode).toBe(0);
+  });
+
+  it('应能成功删除该${moduleNameCn}', async () => {
+    if (!${camelCaseName}Id) throw new Error('前置测试未获取到${moduleNameCn} ID');
+
+    const response = await request(app.getHttpServer())
+      .post(\`/api/${kebabCaseName}/delete/\${${camelCaseName}Id}\`)
+      .expect(201);
+
+    const { head } = response.body;
+    expect(head.errCode).toBe(0);
+  });
+
+  it('删除后再次查询应返回 404', async () => {
+    if (!${camelCaseName}Id) throw new Error('前置测试未获取到${moduleNameCn} ID');
+
+    await request(app.getHttpServer())
+      .get(\`/api/${kebabCaseName}/find/\${${camelCaseName}Id}\`)
+      .expect(404);
+  });
 })
 `
 }
-export default generateE2eSpecTemplate
+export default generateSpecTemplate

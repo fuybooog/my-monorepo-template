@@ -4,7 +4,15 @@
  * 如有字段变更，请修改数据库表结构后，重新运行 pnpm db:sync 命令触发覆盖。
  */
 
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  Column,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+  DeleteDateColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 
 @Index('id_UNIQUE', ['id'], { unique: true })
 @Index('mobile_UNIQUE', ['mobile'], { unique: true })
@@ -109,13 +117,28 @@ export class UserGenerated {
   })
   status: string | null
 
-  @Column('datetime', {
-    name: 'created_at',
-    nullable: true,
-    comment: '创建日期',
-  })
+  @CreateDateColumn({ name: 'created_at', comment: '创建时间', nullable: true })
   createdAt: Date | null
 
-  @Column('datetime', { name: 'updated_at', nullable: true })
+  @UpdateDateColumn({ name: 'updated_at', comment: '修改时间', nullable: true })
   updatedAt: Date | null
+
+  @DeleteDateColumn({ name: 'deleted_at', comment: '删除时间', nullable: true })
+  deletedAt: Date | null
+
+  @Column('varchar', {
+    name: 'pinyin',
+    nullable: true,
+    comment: '全拼',
+    length: 100,
+  })
+  pinyin: string | null
+
+  @Column('varchar', {
+    name: 'py',
+    nullable: true,
+    comment: '拼音首字母',
+    length: 10,
+  })
+  py: string | null
 }

@@ -1,8 +1,10 @@
-import { DataSource, getMetadataArgsStorage, Repository } from 'typeorm'
+import { DataSource, EntityManager, getMetadataArgsStorage, Repository } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 import { User } from '@/modules/user/entities/user.entity'
 import { UserPageDto } from '@/modules/user/dto/user.page.dto'
 import { isTargetOrParent } from '@/utils/fns'
+import { UserCreateDto } from './dto/user.create.dto'
+import { UserUpdateDto } from './dto/user.update.dto'
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -16,7 +18,7 @@ export class UserRepository extends Repository<User> {
     const qb = this.createQueryBuilder('user')
 
     if (userName) {
-      qb.andWhere('user.userName LIKE :userName', { userName })
+      qb.andWhere('user.userName LIKE :userName', { userName: `%${userName}%` })
     }
 
     // todo 排序应该从前端传入
@@ -45,5 +47,36 @@ export class UserRepository extends Repository<User> {
     queryBuilder.leftJoinAndSelect('user.roles', 'role')
 
     return await queryBuilder.where('user.id = :id', { id }).getOne()
+  }
+
+  async createUser(userCreateDto: UserCreateDto, manager: EntityManager) {
+    const userInstance = manager.create(User, userCreateDto)
+    const savedUser = await manager.save(User, userInstance)
+    return savedUser
+  }
+
+  async updateUser(user: User, userUpdateDto: UserUpdateDto, manager: EntityManager) {
+    const updatedUser = Object.assign(user, userUpdateDto)
+    return await manager.save(User, updatedUser)
+  }
+  async removeUser(user: User, manager: EntityManager) {
+    user.deletedAt = new Date()
+    return await manager.save(User, user)
+  }
+  async batchRemoveUser(users: User[], manager: EntityManager) {
+    users.forEach((user) => {
+      user.deletedAt = new Date()
+    })
+    return await manager.save(users)
+  }
+  async updateUserStatus(user: User, status: string, manager: EntityManager) {
+    user.status = status
+    return await manager.save(User, user)
+  }
+  async batchUpdateUserStatus(users: User[], status: string, manager: EntityManager) {
+    users.forEach((user) => {
+      user.status = status
+    })
+    return await manager.save(users)
   }
 }

@@ -79,6 +79,18 @@ export class SystemValueSet {
   })
   updatedUserId: number | null
 
-  @Column('varchar', { name: 'updated_user_name', nullable: true, length: 45 })
+  @Column('varchar', {
+    name: 'updated_user_name',
+    nullable: true,
+    comment: '修改人姓名',
+    length: 45,
+  })
   updatedUserName: string | null
+
+  @Column('datetime', {
+    name: 'deleted_at',
+    nullable: true,
+    comment: '删除时间',
+  })
+  deletedAt: Date | null
 }

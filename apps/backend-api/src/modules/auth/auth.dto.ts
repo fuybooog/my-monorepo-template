@@ -1,16 +1,7 @@
-import { IsEnum, IsNotEmpty, IsString, Matches } from 'class-validator'
+import { IsNotEmpty, IsString, Matches } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
-export enum LoginType {
-  PASSWORD = 'password',
-  PHONE = 'phone',
-}
-
 export class PasswordLoginDto {
-  @ApiProperty({ enum: LoginType, description: '登录类型' })
-  @IsEnum(LoginType)
-  type!: LoginType.PASSWORD
-
   @ApiProperty({ description: '用户名' })
   @IsNotEmpty()
   @IsString()
@@ -23,10 +14,6 @@ export class PasswordLoginDto {
 }
 
 export class PhoneLoginDto {
-  @ApiProperty({ enum: LoginType })
-  @IsEnum(LoginType)
-  type!: LoginType.PHONE
-
   @ApiProperty({ description: '手机号' })
   @IsNotEmpty()
   @Matches(/^1[3-9]\d{9}$/)

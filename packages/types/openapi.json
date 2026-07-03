@@ -161,17 +161,218 @@
         "tags": ["Common"]
       }
     },
-    "/user": {
+    "/user/page": {
       "get": {
-        "operationId": "SystemUserController_pageUser",
+        "operationId": "UserController_pageUser",
         "parameters": [
           {
-            "name": "userName",
-            "required": true,
+            "name": "nickName",
+            "required": false,
             "in": "query",
-            "description": "用户姓名",
+            "description": "昵称",
             "schema": {
-              "example": "张三",
+              "type": "string"
+            }
+          },
+          {
+            "name": "gender",
+            "required": false,
+            "in": "query",
+            "description": "性别代码",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "genderName",
+            "required": false,
+            "in": "query",
+            "description": "性别名称",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "birth",
+            "required": false,
+            "in": "query",
+            "description": "生日",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mobile",
+            "required": false,
+            "in": "query",
+            "description": "手机号",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "address",
+            "required": false,
+            "in": "query",
+            "description": "地址",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "addressDetail",
+            "required": false,
+            "in": "query",
+            "description": "地址详情",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "maritalStatus",
+            "required": false,
+            "in": "query",
+            "description": "婚姻状况代码",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "maritalStatusName",
+            "required": false,
+            "in": "query",
+            "description": "婚姻状况名称",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "required": false,
+            "in": "query",
+            "description": "邮箱",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "状态：0-禁用，1-启用",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAt",
+            "required": false,
+            "in": "query",
+            "description": "创建时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "required": false,
+            "in": "query",
+            "description": "修改时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deletedAt",
+            "required": false,
+            "in": "query",
+            "description": "删除时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pinyin",
+            "required": false,
+            "in": "query",
+            "description": "全拼",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "py",
+            "required": false,
+            "in": "query",
+            "description": "拼音首字母",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "页码",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "userName",
+            "required": false,
+            "in": "query",
+            "description": "用户名",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAtStart",
+            "required": false,
+            "in": "query",
+            "description": "创建日期开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "创建日期结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtStart",
+            "required": false,
+            "in": "query",
+            "description": "开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
               "type": "string"
             }
           }
@@ -213,7 +414,7 @@
                                 "list": {
                                   "type": "array",
                                   "items": {
-                                    "$ref": "#/components/schemas/SystemUserPageResp"
+                                    "$ref": "#/components/schemas/UserPageRespDto"
                                   }
                                 }
                               }
@@ -229,59 +430,62 @@
           }
         },
         "summary": "分页查询用户列表",
-        "tags": ["SystemUser"]
-      },
+        "tags": ["User"]
+      }
+    },
+    "/user/schema-generator-holder-page-user": {
       "post": {
-        "operationId": "SystemUserController_createUser",
+        "deprecated": true,
+        "operationId": "UserController__pageUser",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SystemUserCreateDto"
+                "$ref": "#/components/schemas/UserPageDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "成功响应",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/SystemUserResp"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
+            "description": ""
           }
         },
-        "summary": "创建用户",
-        "tags": ["SystemUser"]
+        "summary": "请勿调用，用于生成前端DTO",
+        "tags": ["User"]
       }
     },
     "/user/option": {
       "get": {
-        "operationId": "SystemUserController_pageOptionUser",
+        "operationId": "UserController_pageOptionUser",
         "parameters": [
           {
-            "name": "keyword",
-            "required": true,
+            "name": "page",
+            "required": false,
             "in": "query",
-            "description": "关键字，可输入姓名，手机号，身份证等",
+            "description": "页码",
             "schema": {
-              "example": "张三",
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "keyword",
+            "required": false,
+            "in": "query",
+            "description": "关键字",
+            "schema": {
+              "example": "",
               "type": "string"
             }
           },
@@ -289,12 +493,10 @@
             "name": "fields",
             "required": false,
             "in": "query",
-            "description": "返回的字段，默认是id,username",
+            "description": "返回的列表字段",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
+              "example": "",
+              "type": "string"
             }
           }
         ],
@@ -335,7 +537,7 @@
                                 "list": {
                                   "type": "array",
                                   "items": {
-                                    "$ref": "#/components/schemas/SystemUserPageResp"
+                                    "$ref": "#/components/schemas/UserPageRespDto"
                                   }
                                 }
                               }
@@ -351,12 +553,36 @@
           }
         },
         "summary": "分页查询用户列表(可选字段)",
-        "tags": ["SystemUser"]
+        "tags": ["User"]
       }
     },
-    "/user/{id}": {
+    "/user/schema-generator-holder-page-option-user": {
+      "post": {
+        "deprecated": true,
+        "operationId": "UserController__pageOptionUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPageOptionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "请勿调用，用于生成前端DTO",
+        "tags": ["User"]
+      }
+    },
+    "/user/find/{id}": {
       "get": {
-        "operationId": "SystemUserController_findUserById",
+        "operationId": "UserController_findUserById",
         "parameters": [
           {
             "name": "id",
@@ -380,7 +606,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/SystemUserResp"
+                          "$ref": "#/components/schemas/UserRespDto"
                         }
                       }
                     }
@@ -391,10 +617,95 @@
           }
         },
         "summary": "按id查询用户",
-        "tags": ["SystemUser"]
-      },
-      "put": {
-        "operationId": "SystemUserController_updateUser",
+        "tags": ["User"]
+      }
+    },
+    "/user/batch/query": {
+      "get": {
+        "operationId": "UserController_findUserListByIds",
+        "parameters": [
+          {
+            "name": "ids",
+            "required": true,
+            "in": "query",
+            "description": "用“,”拼接的id",
+            "schema": {
+              "example": "",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserListRespDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "按ids查询用户",
+        "tags": ["User"]
+      }
+    },
+    "/user/create": {
+      "post": {
+        "operationId": "UserController_createUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserRespDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "创建用户",
+        "tags": ["User"]
+      }
+    },
+    "/user/update/{id}": {
+      "post": {
+        "operationId": "UserController_updateUser",
         "parameters": [
           {
             "name": "id",
@@ -410,7 +721,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SystemUserUpdateDto"
+                "$ref": "#/components/schemas/UserUpdateDto"
               }
             }
           }
@@ -428,7 +739,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/SystemUserResp"
+                          "$ref": "#/components/schemas/UserRespDto"
                         }
                       }
                     }
@@ -439,10 +750,12 @@
           }
         },
         "summary": "修改用户",
-        "tags": ["SystemUser"]
-      },
-      "delete": {
-        "operationId": "SystemUserController_removeUser",
+        "tags": ["User"]
+      }
+    },
+    "/user/delete/{id}": {
+      "post": {
+        "operationId": "UserController_removeUser",
         "parameters": [
           {
             "name": "id",
@@ -479,53 +792,12 @@
           }
         },
         "summary": "删除用户",
-        "tags": ["SystemUser"]
-      }
-    },
-    "/user/batch/query": {
-      "post": {
-        "operationId": "SystemUserController_findUserListByIds",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BatchDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功响应",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/SystemUserResp"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "summary": "按ids查询用户",
-        "tags": ["SystemUser"]
+        "tags": ["User"]
       }
     },
     "/user/batch/delete": {
       "post": {
-        "operationId": "SystemUserController_batchRemoveUser",
+        "operationId": "UserController_batchRemoveUser",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -550,7 +822,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/BatchResp"
+                          "$ref": "#/components/schemas/BatchRespDto"
                         }
                       }
                     }
@@ -561,12 +833,12 @@
           }
         },
         "summary": "批量删除用户",
-        "tags": ["SystemUser"]
+        "tags": ["User"]
       }
     },
-    "/user/{id}/status": {
+    "/user/updateStatus/{id}": {
       "post": {
-        "operationId": "SystemUserController_updateUserStatus",
+        "operationId": "UserController_updateUserStatus",
         "parameters": [
           {
             "name": "id",
@@ -577,6 +849,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStatusDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "成功响应",
@@ -603,12 +885,12 @@
           }
         },
         "summary": "修改用户状态",
-        "tags": ["SystemUser"]
+        "tags": ["User"]
       }
     },
     "/user/batch/status": {
       "post": {
-        "operationId": "SystemUserController_batchUpdateUserStatus",
+        "operationId": "UserController_batchUpdateUserStatus",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -633,7 +915,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/BatchResp"
+                          "$ref": "#/components/schemas/BatchRespDto"
                         }
                       }
                     }
@@ -644,12 +926,12 @@
           }
         },
         "summary": "批量修改用户状态",
-        "tags": ["SystemUser"]
+        "tags": ["User"]
       }
     },
     "/user/template": {
-      "get": {
-        "operationId": "SystemUserController_downloadUserTemplate",
+      "post": {
+        "operationId": "UserController_downloadUserTemplate",
         "parameters": [],
         "responses": {
           "200": {
@@ -676,13 +958,13 @@
             }
           }
         },
-        "summary": "下载导入模板",
-        "tags": ["SystemUser"]
+        "summary": "下载导入用户模板",
+        "tags": ["User"]
       }
     },
     "/user/import": {
       "post": {
-        "operationId": "SystemUserController_importUser",
+        "operationId": "UserController_importUser",
         "parameters": [],
         "responses": {
           "200": {
@@ -709,13 +991,13 @@
             }
           }
         },
-        "summary": "导入数据",
-        "tags": ["SystemUser"]
+        "summary": "导入用户数据",
+        "tags": ["User"]
       }
     },
     "/user/export": {
       "post": {
-        "operationId": "SystemUserController_exportUser",
+        "operationId": "UserController_exportUser",
         "parameters": [],
         "responses": {
           "200": {
@@ -742,8 +1024,41 @@
             }
           }
         },
-        "summary": "导出数据",
-        "tags": ["SystemUser"]
+        "summary": "导出用户数据",
+        "tags": ["User"]
+      }
+    },
+    "/user/check-unique": {
+      "get": {
+        "operationId": "UserController_checkUnique",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功响应（返回布尔值）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "boolean",
+                          "description": "校验结果：true 代表通过/唯一，false 代表失败/重复",
+                          "example": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "检测字段是否唯一",
+        "tags": ["User"]
       }
     }
   },
@@ -809,11 +1124,6 @@
       "PasswordLoginDto": {
         "type": "object",
         "properties": {
-          "type": {
-            "type": "string",
-            "enum": ["password", "phone"],
-            "description": "登录类型"
-          },
           "userName": {
             "type": "string",
             "description": "用户名"
@@ -823,15 +1133,11 @@
             "description": "密码"
           }
         },
-        "required": ["type", "userName", "password"]
+        "required": ["userName", "password"]
       },
       "PhoneLoginDto": {
         "type": "object",
         "properties": {
-          "type": {
-            "type": "string",
-            "enum": ["password", "phone"]
-          },
           "phone": {
             "type": "string",
             "description": "手机号"
@@ -841,7 +1147,7 @@
             "description": "验证码"
           }
         },
-        "required": ["type", "phone", "code"]
+        "required": ["phone", "code"]
       },
       "CurrentLoginResponseDto": {
         "type": "object",
@@ -883,84 +1189,518 @@
         "type": "object",
         "properties": {}
       },
-      "SystemUserPageResp": {
+      "UserPageRespDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "number",
-            "description": "用户ID",
-            "example": 123
+            "description": "用户id"
           },
           "userName": {
             "type": "string",
-            "description": "用户名",
-            "example": "testName"
+            "description": "用户名"
           },
-          "mobile": {
+          "nickName": {
             "type": "string",
-            "description": "手机号",
-            "example": "13511112222"
+            "description": "昵称"
+          },
+          "gender": {
+            "type": "string",
+            "description": "性别代码"
+          },
+          "genderName": {
+            "type": "string",
+            "description": "性别名称"
           },
           "birth": {
             "type": "string",
-            "description": "生日",
-            "example": "1991-01-01"
+            "description": "生日"
+          },
+          "mobile": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "address": {
+            "type": "string",
+            "description": "地址"
+          },
+          "addressDetail": {
+            "type": "string",
+            "description": "地址详情"
+          },
+          "maritalStatus": {
+            "type": "string",
+            "description": "婚姻状况代码"
+          },
+          "maritalStatusName": {
+            "type": "string",
+            "description": "婚姻状况名称"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          },
+          "pinyin": {
+            "type": "string",
+            "description": "全拼"
+          },
+          "py": {
+            "type": "string",
+            "description": "拼音首字母"
           }
         },
-        "required": ["id", "userName", "mobile", "birth"]
+        "required": ["id", "userName"]
       },
-      "SystemUserResp": {
+      "UserPageDto": {
+        "type": "object",
+        "properties": {
+          "nickName": {
+            "type": "string",
+            "description": "昵称"
+          },
+          "gender": {
+            "type": "string",
+            "description": "性别代码"
+          },
+          "genderName": {
+            "type": "string",
+            "description": "性别名称"
+          },
+          "birth": {
+            "type": "string",
+            "description": "生日"
+          },
+          "mobile": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "address": {
+            "type": "string",
+            "description": "地址"
+          },
+          "addressDetail": {
+            "type": "string",
+            "description": "地址详情"
+          },
+          "maritalStatus": {
+            "type": "string",
+            "description": "婚姻状况代码"
+          },
+          "maritalStatusName": {
+            "type": "string",
+            "description": "婚姻状况名称"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          },
+          "pinyin": {
+            "type": "string",
+            "description": "全拼"
+          },
+          "py": {
+            "type": "string",
+            "description": "拼音首字母"
+          },
+          "page": {
+            "type": "number",
+            "description": "页码"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "每页条数"
+          },
+          "userName": {
+            "type": "string",
+            "description": "用户名"
+          },
+          "createdAtStart": {
+            "type": "string",
+            "description": "创建日期开始",
+            "example": "2000-10-10 00:00:00"
+          },
+          "createdAtEnd": {
+            "type": "string",
+            "description": "创建日期结束",
+            "example": "2000-10-10 23:59:59"
+          },
+          "updatedAtStart": {
+            "type": "string",
+            "description": "开始",
+            "example": "2000-10-10 00:00:00"
+          },
+          "updatedAtEnd": {
+            "type": "string",
+            "description": "结束",
+            "example": "2000-10-10 23:59:59"
+          }
+        }
+      },
+      "UserPageOptionDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "description": "页码"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "每页条数"
+          },
+          "keyword": {
+            "type": "string",
+            "description": "关键字",
+            "example": ""
+          },
+          "fields": {
+            "type": "string",
+            "description": "返回的列表字段",
+            "example": ""
+          }
+        }
+      },
+      "UserRespDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "number",
-            "description": "用户ID",
-            "example": 123
+            "description": "用户id"
           },
           "userName": {
             "type": "string",
-            "description": "用户名",
-            "example": "testName"
+            "description": "用户名"
           },
-          "mobile": {
+          "nickName": {
             "type": "string",
-            "description": "手机号",
-            "example": "13511112222"
+            "description": "昵称"
+          },
+          "gender": {
+            "type": "string",
+            "description": "性别代码"
+          },
+          "genderName": {
+            "type": "string",
+            "description": "性别名称"
           },
           "birth": {
             "type": "string",
-            "description": "生日",
-            "example": "1991-01-01"
+            "description": "生日"
+          },
+          "mobile": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "address": {
+            "type": "string",
+            "description": "地址"
+          },
+          "addressDetail": {
+            "type": "string",
+            "description": "地址详情"
+          },
+          "maritalStatus": {
+            "type": "string",
+            "description": "婚姻状况代码"
+          },
+          "maritalStatusName": {
+            "type": "string",
+            "description": "婚姻状况名称"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          },
+          "pinyin": {
+            "type": "string",
+            "description": "全拼"
+          },
+          "py": {
+            "type": "string",
+            "description": "拼音首字母"
           }
         },
-        "required": ["id", "userName", "mobile", "birth"]
+        "required": ["id", "userName"]
+      },
+      "UserListRespDto": {
+        "type": "object",
+        "properties": {
+          "notFoundIds": {
+            "description": "未找到的id数组",
+            "example": "",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "list": {
+            "description": "用户列表",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["list"]
+      },
+      "UserCreateDto": {
+        "type": "object",
+        "properties": {
+          "nickName": {
+            "type": "string",
+            "description": "昵称"
+          },
+          "gender": {
+            "type": "string",
+            "description": "性别代码"
+          },
+          "genderName": {
+            "type": "string",
+            "description": "性别名称"
+          },
+          "birth": {
+            "type": "string",
+            "description": "生日"
+          },
+          "mobile": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "address": {
+            "type": "string",
+            "description": "地址"
+          },
+          "addressDetail": {
+            "type": "string",
+            "description": "地址详情"
+          },
+          "maritalStatus": {
+            "type": "string",
+            "description": "婚姻状况代码"
+          },
+          "maritalStatusName": {
+            "type": "string",
+            "description": "婚姻状况名称"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          },
+          "pinyin": {
+            "type": "string",
+            "description": "全拼"
+          },
+          "py": {
+            "type": "string",
+            "description": "拼音首字母"
+          },
+          "userName": {
+            "type": "string",
+            "description": "用户名"
+          },
+          "roles": {
+            "description": "用户角色",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["userName"]
+      },
+      "UserUpdateDto": {
+        "type": "object",
+        "properties": {
+          "nickName": {
+            "type": "string",
+            "description": "昵称"
+          },
+          "gender": {
+            "type": "string",
+            "description": "性别代码"
+          },
+          "genderName": {
+            "type": "string",
+            "description": "性别名称"
+          },
+          "birth": {
+            "type": "string",
+            "description": "生日"
+          },
+          "mobile": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "address": {
+            "type": "string",
+            "description": "地址"
+          },
+          "addressDetail": {
+            "type": "string",
+            "description": "地址详情"
+          },
+          "maritalStatus": {
+            "type": "string",
+            "description": "婚姻状况代码"
+          },
+          "maritalStatusName": {
+            "type": "string",
+            "description": "婚姻状况名称"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          },
+          "pinyin": {
+            "type": "string",
+            "description": "全拼"
+          },
+          "py": {
+            "type": "string",
+            "description": "拼音首字母"
+          },
+          "userName": {
+            "type": "string",
+            "description": "用户名"
+          },
+          "roles": {
+            "description": "用户角色",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "BatchRespDto": {
+        "type": "object",
+        "properties": {
+          "notFoundIds": {
+            "description": "未找到的id数组",
+            "example": "",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
       },
       "BatchDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "ids": {
+            "type": "string",
+            "description": "用“,”拼接的id",
+            "example": ""
+          }
+        },
+        "required": ["ids"]
       },
-      "SystemUserCreateDto": {
-        "type": "object",
-        "properties": {}
-      },
-      "SystemUserUpdateDto": {
+      "UpdateStatusDto": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "description": "状态，1：启用，0：禁用",
-            "example": "1"
+            "description": "状态值",
+            "enum": ["1", "0"]
           }
         },
         "required": ["status"]
       },
-      "BatchResp": {
-        "type": "object",
-        "properties": {}
-      },
       "BatchUpdateStatusDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "ids": {
+            "type": "string",
+            "description": "用“,”拼接的id",
+            "example": ""
+          },
+          "status": {
+            "type": "string",
+            "description": "状态",
+            "enum": ["1", "0"]
+          }
+        },
+        "required": ["ids", "status"]
       }
     }
   }

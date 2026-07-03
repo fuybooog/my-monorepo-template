@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
-import { AuthModule, CommonModule, SystemUserModule } from '@/modules'
+import { AuthModule, CommonModule, UserModule } from '@/modules'
 
-const SHARED_MODULES = [AuthModule, CommonModule, SystemUserModule] as const
+const SHARED_MODULES = [AuthModule, CommonModule, UserModule] as const
 
 @Module({
   imports: [...SHARED_MODULES],

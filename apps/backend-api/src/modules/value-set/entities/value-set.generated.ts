@@ -4,7 +4,15 @@
  * 如有字段变更，请修改数据库表结构后，重新运行 pnpm db:sync 命令触发覆盖。
  */
 
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  Column,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+  DeleteDateColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 
 @Index('id_UNIQUE', ['id'], { unique: true })
 @Index('set_code', ['setCode', 'code'], { unique: true })
@@ -49,18 +57,10 @@ export class ValueSetGenerated {
   })
   status: string | null
 
-  @Column('datetime', {
-    name: 'created_at',
-    nullable: true,
-    comment: '创建时间',
-  })
+  @CreateDateColumn({ name: 'created_at', comment: '创建时间', nullable: true })
   createdAt: Date | null
 
-  @Column('datetime', {
-    name: 'updated_at',
-    nullable: true,
-    comment: '修改时间',
-  })
+  @UpdateDateColumn({ name: 'updated_at', comment: '修改时间', nullable: true })
   updatedAt: Date | null
 
   @Column('int', {
@@ -85,6 +85,14 @@ export class ValueSetGenerated {
   })
   updatedUserId: number | null
 
-  @Column('varchar', { name: 'updated_user_name', nullable: true, length: 45 })
+  @Column('varchar', {
+    name: 'updated_user_name',
+    nullable: true,
+    comment: '修改人姓名',
+    length: 45,
+  })
   updatedUserName: string | null
+
+  @DeleteDateColumn({ name: 'deleted_at', comment: '删除时间', nullable: true })
+  deletedAt: Date | null
 }

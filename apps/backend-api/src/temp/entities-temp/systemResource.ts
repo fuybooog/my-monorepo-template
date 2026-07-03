@@ -56,9 +56,22 @@ export class SystemResource {
     name: 'created_at',
     nullable: true,
     comment: '创建时间',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
   })
   createdAt: Date | null
 
-  @Column('datetime', { name: 'updated_at', nullable: true })
+  @Column('datetime', {
+    name: 'updated_at',
+    nullable: true,
+    comment: '修改时间',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
   updatedAt: Date | null
+
+  @Column('datetime', {
+    name: 'deleted_at',
+    nullable: true,
+    comment: '删除时间',
+  })
+  deletedAt: Date | null
 }

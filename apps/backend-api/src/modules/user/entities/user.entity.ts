@@ -1,6 +1,7 @@
 import { Entity, ManyToMany, JoinTable, Column } from 'typeorm'
 import { UserGenerated } from '@/modules/user/entities/user.generated'
 import { Role } from '@/modules/role/entities/role.entity'
+import { Exclude } from 'class-transformer'
 
 @Entity('system_user')
 export class User extends UserGenerated {
@@ -13,5 +14,6 @@ export class User extends UserGenerated {
   roles!: Role[]
 
   @Column('varchar', { name: 'password', nullable: true, length: 255, select: false })
+  @Exclude()
   declare password: string | null
 }

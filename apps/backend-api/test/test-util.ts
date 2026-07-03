@@ -19,9 +19,13 @@ export async function createTestApp() {
 
   const app = moduleFixture.createNestApplication()
   app.setGlobalPrefix('api')
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true, // 必须开启克隆转换
+      whitelist: true,
+    }),
+  )
   app.useGlobalInterceptors(new TransformInterceptor())
-
   await app.init()
 
   // 2. 统一做数据库熔断强校验

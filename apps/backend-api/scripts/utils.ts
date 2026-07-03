@@ -29,6 +29,19 @@ export function toKebabCase(str: string): string {
   return result
 }
 
+export function toSnakeCase(str: string): string {
+  if (!str) return ''
+
+  // 1. 在大写字母前插入下划线
+  let result = str.replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+
+  // 2. 将所有非字母数字的字符替换为单个下划线
+  result = result.replace(/[^a-zA-Z0-9]+/g, '_')
+
+  // 3. 转小写并去首尾下划线
+  return result.toLowerCase().replace(/^_+|_+$/g, '')
+}
+
 /**
  * 将全小写中划线格式的字符串转为小写驼峰（camelCase）
  * 输入必须符合 kebab-case（全小写，单词间用 '-' 分隔），否则结果可能不符合预期
@@ -133,7 +146,7 @@ export function getDateFieldsStr(prop: EntityProperty): string {
 export function getDateFieldsStrByDates(properties: EntityProperty[]) {
   let fieldsStr = ''
   properties.forEach((prop) => {
-    if (prop.type.includes('Date')) {
+    if (prop.type.includes('Date') && prop.name !== 'deletedAt') {
       fieldsStr += getDateFieldsStr(prop)
     }
   })
@@ -143,34 +156,25 @@ export function getDateFieldsStrByDates(properties: EntityProperty[]) {
 export function generateDtoFields(
   properties: EntityProperty[],
   type1: 'req' | 'resp' = 'req',
-  type2: 'read' | 'write' = 'read',
 ): string {
   let fieldsStr = ''
 
   properties.forEach((prop) => {
-    // 写入请求参数不需要下列字段
-    if (
-      type1 === 'req' &&
-      type2 === 'write' &&
-      ['id', 'createdAt', 'updatedAt', 'updated_at'].includes(prop.name)
-    ) {
-      return
-    }
-
-    if (prop.type.includes('Date') && type1 === 'req' && type2 === 'read') {
-      return
-    }
-
     const apiDesc = `description: '${prop.comment || ''}'`
 
-    fieldsStr += `  @${prop.type.includes('null') ? 'ApiPropertyOptional' : 'ApiProperty'}({ ${apiDesc} })\n`
+    fieldsStr += `  @${prop.type.includes('null') ? 'ApiPropertyOptional' : 'ApiProperty'}({ ${apiDesc}, type: {typeValue} })\n`
+    let typeValue = 'String'
     if (prop.type.includes('number')) {
       fieldsStr += `  @IsInt()\n`
+      typeValue = 'Number'
     } else if (prop.type.includes('string')) {
       fieldsStr += `  @IsString()\n`
+      typeValue = 'String'
     } else if (prop.type.includes('[]')) {
       fieldsStr += `  @IsArray()\n`
+      typeValue = 'Array'
     }
+    fieldsStr = renderStr(fieldsStr, { typeValue })
     if (prop.type.includes('null')) {
       fieldsStr += `  @IsOptional()\n`
     }
@@ -183,4 +187,8 @@ export function generateDtoFields(
   })
 
   return fieldsStr
+}
+
+function renderStr(template: string, context: Record<string, string>) {
+  return template.replace(/\{(\w+)\}/g, (match, key) => context[key] || '')
 }

@@ -15,12 +15,16 @@ export namespace Backend {
   export type CurrentLoginResponseDto = components['schemas']['CurrentLoginResponseDto']
   export type UpdateCommonDto = components['schemas']['UpdateCommonDto']
   export type PaginatedResult = components['schemas']['PaginatedResult']
-  export type SystemUserPageResp = components['schemas']['SystemUserPageResp']
-  export type SystemUserResp = components['schemas']['SystemUserResp']
+  export type UserPageRespDto = components['schemas']['UserPageRespDto']
+  export type UserPageDto = components['schemas']['UserPageDto']
+  export type UserPageOptionDto = components['schemas']['UserPageOptionDto']
+  export type UserRespDto = components['schemas']['UserRespDto']
+  export type UserListRespDto = components['schemas']['UserListRespDto']
+  export type UserCreateDto = components['schemas']['UserCreateDto']
+  export type UserUpdateDto = components['schemas']['UserUpdateDto']
+  export type BatchRespDto = components['schemas']['BatchRespDto']
   export type BatchDto = components['schemas']['BatchDto']
-  export type SystemUserCreateDto = components['schemas']['SystemUserCreateDto']
-  export type SystemUserUpdateDto = components['schemas']['SystemUserUpdateDto']
-  export type BatchResp = components['schemas']['BatchResp']
+  export type UpdateStatusDto = components['schemas']['UpdateStatusDto']
   export type BatchUpdateStatusDto = components['schemas']['BatchUpdateStatusDto']
 
   /* ====== 动态 AST 自动桥接的 Response 类型 ====== */
@@ -84,138 +88,167 @@ export namespace Backend {
       ? R
       : unknown
 
-  export type PageUserRes = operations['SystemUserController_pageUser']['responses'] extends {
+  export type PageUserRes = operations['UserController_pageUser']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
     ? R
-    : operations['SystemUserController_pageUser']['responses'] extends {
+    : operations['UserController_pageUser']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R
       : unknown
 
-  export type CreateUserRes = operations['SystemUserController_createUser']['responses'] extends {
+  export type _pageUserRes = operations['UserController__pageUser']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
     ? R
-    : operations['SystemUserController_createUser']['responses'] extends {
+    : operations['UserController__pageUser']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R
       : unknown
 
-  export type PageOptionUserRes =
-    operations['SystemUserController_pageOptionUser']['responses'] extends {
+  export type PageOptionUserRes = operations['UserController_pageOptionUser']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['UserController_pageOptionUser']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type _pageOptionUserRes =
+    operations['UserController__pageOptionUser']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['SystemUserController_pageOptionUser']['responses'] extends {
+      : operations['UserController__pageOptionUser']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type FindUserByIdRes =
-    operations['SystemUserController_findUserById']['responses'] extends {
-      '200': { content: { 'application/json': infer R } }
-    }
-      ? R
-      : operations['SystemUserController_findUserById']['responses'] extends {
-            '201': { content: { 'application/json': infer R } }
-          }
-        ? R
-        : unknown
-
-  export type UpdateUserRes = operations['SystemUserController_updateUser']['responses'] extends {
+  export type FindUserByIdRes = operations['UserController_findUserById']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
     ? R
-    : operations['SystemUserController_updateUser']['responses'] extends {
-          '201': { content: { 'application/json': infer R } }
-        }
-      ? R
-      : unknown
-
-  export type RemoveUserRes = operations['SystemUserController_removeUser']['responses'] extends {
-    '200': { content: { 'application/json': infer R } }
-  }
-    ? R
-    : operations['SystemUserController_removeUser']['responses'] extends {
+    : operations['UserController_findUserById']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R
       : unknown
 
   export type FindUserListByIdsRes =
-    operations['SystemUserController_findUserListByIds']['responses'] extends {
+    operations['UserController_findUserListByIds']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['SystemUserController_findUserListByIds']['responses'] extends {
+      : operations['UserController_findUserListByIds']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
+  export type CreateUserRes = operations['UserController_createUser']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['UserController_createUser']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type UpdateUserRes = operations['UserController_updateUser']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['UserController_updateUser']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type RemoveUserRes = operations['UserController_removeUser']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['UserController_removeUser']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
   export type BatchRemoveUserRes =
-    operations['SystemUserController_batchRemoveUser']['responses'] extends {
+    operations['UserController_batchRemoveUser']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['SystemUserController_batchRemoveUser']['responses'] extends {
+      : operations['UserController_batchRemoveUser']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
   export type UpdateUserStatusRes =
-    operations['SystemUserController_updateUserStatus']['responses'] extends {
+    operations['UserController_updateUserStatus']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['SystemUserController_updateUserStatus']['responses'] extends {
+      : operations['UserController_updateUserStatus']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
   export type BatchUpdateUserStatusRes =
-    operations['SystemUserController_batchUpdateUserStatus']['responses'] extends {
+    operations['UserController_batchUpdateUserStatus']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['SystemUserController_batchUpdateUserStatus']['responses'] extends {
+      : operations['UserController_batchUpdateUserStatus']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
   export type DownloadUserTemplateRes =
-    operations['SystemUserController_downloadUserTemplate']['responses'] extends {
+    operations['UserController_downloadUserTemplate']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['SystemUserController_downloadUserTemplate']['responses'] extends {
+      : operations['UserController_downloadUserTemplate']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type ImportUserRes = operations['SystemUserController_importUser']['responses'] extends {
+  export type ImportUserRes = operations['UserController_importUser']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
     ? R
-    : operations['SystemUserController_importUser']['responses'] extends {
+    : operations['UserController_importUser']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R
       : unknown
 
-  export type ExportUserRes = operations['SystemUserController_exportUser']['responses'] extends {
+  export type ExportUserRes = operations['UserController_exportUser']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
     ? R
-    : operations['SystemUserController_exportUser']['responses'] extends {
+    : operations['UserController_exportUser']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type CheckUniqueRes = operations['UserController_checkUnique']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['UserController_checkUnique']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R

@@ -108,6 +108,37 @@ async function run() {
       )
     }
 
+    content = content.replace(
+      /@Column\("datetime",\s*\{\s*name:\s*"deleted_at",[\s\S]*?\}\)\s*deletedAt/g,
+      `@DeleteDateColumn({ name: "deleted_at", comment: "删除时间", nullable: true })
+  deletedAt`,
+    )
+
+    content = content.replace(
+      /@Column\("datetime",\s*\{\s*name:\s*"created_at",[\s\S]*?\}\)\s*createdAt/g,
+      `@CreateDateColumn({ name: "created_at", comment: "创建时间", nullable: true })
+  createdAt`,
+    )
+    content = content.replace(
+      /@Column\("datetime",\s*\{\s*name:\s*"updated_at",[\s\S]*?\}\)\s*updatedAt/g,
+      `@UpdateDateColumn({ name: "updated_at", comment: "修改时间", nullable: true })
+  updatedAt`,
+    )
+
+    // 3. 动态修复头部从 "typeorm" 导入的装饰器，防止遗漏
+    const typeormImportMatch = content.match(/import\s*\{([\s\S]*?)\}\s*from\s*"typeorm"/)
+    if (typeormImportMatch) {
+      const imports = typeormImportMatch[1].split(',').map((i) => i.trim())
+
+      // 检查并补全缺少的特殊装饰器
+      if (!imports.includes('DeleteDateColumn')) imports.push('DeleteDateColumn')
+      if (!imports.includes('CreateDateColumn')) imports.push('CreateDateColumn')
+      if (!imports.includes('UpdateDateColumn')) imports.push('UpdateDateColumn')
+
+      const newImportStr = `import { ${imports.filter(Boolean).join(', ')} } from "typeorm";`
+      content = content.replace(typeormImportMatch[0], newImportStr)
+    }
+
     if (!moduleName) {
       console.warn(
         `⚠️ 找不到表 [${tableName}] 的模块映射，跳过自动分发，你可以去临时目录手动处理。`,

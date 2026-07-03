@@ -4,7 +4,15 @@
  * 如有字段变更，请修改数据库表结构后，重新运行 pnpm db:sync 命令触发覆盖。
  */
 
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  Column,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+  DeleteDateColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 
 @Index('id_UNIQUE', ['id'], { unique: true })
 @Index('unique_prop_UNIQUE', ['uniqueProp'], { unique: true })
@@ -58,13 +66,12 @@ export class ResourceGenerated {
   @Column('int', { name: 'sort_number', nullable: true, comment: '排序号' })
   sortNumber: number | null
 
-  @Column('datetime', {
-    name: 'created_at',
-    nullable: true,
-    comment: '创建时间',
-  })
+  @CreateDateColumn({ name: 'created_at', comment: '创建时间', nullable: true })
   createdAt: Date | null
 
-  @Column('datetime', { name: 'updated_at', nullable: true })
+  @UpdateDateColumn({ name: 'updated_at', comment: '修改时间', nullable: true })
   updatedAt: Date | null
+
+  @DeleteDateColumn({ name: 'deleted_at', comment: '删除时间', nullable: true })
+  deletedAt: Date | null
 }

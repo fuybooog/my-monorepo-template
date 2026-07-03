@@ -102,7 +102,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/user': {
+  '/user/page': {
     parameters: {
       query?: never
       header?: never
@@ -110,10 +110,29 @@ export interface paths {
       cookie?: never
     }
     /** 分页查询用户列表 */
-    get: operations['SystemUserController_pageUser']
+    get: operations['UserController_pageUser']
     put?: never
-    /** 创建用户 */
-    post: operations['SystemUserController_createUser']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/user/schema-generator-holder-page-user': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * 请勿调用，用于生成前端DTO
+     * @deprecated
+     */
+    post: operations['UserController__pageUser']
     delete?: never
     options?: never
     head?: never
@@ -128,7 +147,7 @@ export interface paths {
       cookie?: never
     }
     /** 分页查询用户列表(可选字段) */
-    get: operations['SystemUserController_pageOptionUser']
+    get: operations['UserController_pageOptionUser']
     put?: never
     post?: never
     delete?: never
@@ -137,7 +156,27 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/user/{id}': {
+  '/user/schema-generator-holder-page-option-user': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * 请勿调用，用于生成前端DTO
+     * @deprecated
+     */
+    post: operations['UserController__pageOptionUser']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/user/find/{id}': {
     parameters: {
       query?: never
       header?: never
@@ -145,12 +184,10 @@ export interface paths {
       cookie?: never
     }
     /** 按id查询用户 */
-    get: operations['SystemUserController_findUserById']
-    /** 修改用户 */
-    put: operations['SystemUserController_updateUser']
+    get: operations['UserController_findUserById']
+    put?: never
     post?: never
-    /** 删除用户 */
-    delete: operations['SystemUserController_removeUser']
+    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -163,10 +200,61 @@ export interface paths {
       path?: never
       cookie?: never
     }
+    /** 按ids查询用户 */
+    get: operations['UserController_findUserListByIds']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/user/create': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     get?: never
     put?: never
-    /** 按ids查询用户 */
-    post: operations['SystemUserController_findUserListByIds']
+    /** 创建用户 */
+    post: operations['UserController_createUser']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/user/update/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 修改用户 */
+    post: operations['UserController_updateUser']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/user/delete/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 删除用户 */
+    post: operations['UserController_removeUser']
     delete?: never
     options?: never
     head?: never
@@ -183,14 +271,14 @@ export interface paths {
     get?: never
     put?: never
     /** 批量删除用户 */
-    post: operations['SystemUserController_batchRemoveUser']
+    post: operations['UserController_batchRemoveUser']
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  '/user/{id}/status': {
+  '/user/updateStatus/{id}': {
     parameters: {
       query?: never
       header?: never
@@ -200,7 +288,7 @@ export interface paths {
     get?: never
     put?: never
     /** 修改用户状态 */
-    post: operations['SystemUserController_updateUserStatus']
+    post: operations['UserController_updateUserStatus']
     delete?: never
     options?: never
     head?: never
@@ -217,7 +305,7 @@ export interface paths {
     get?: never
     put?: never
     /** 批量修改用户状态 */
-    post: operations['SystemUserController_batchUpdateUserStatus']
+    post: operations['UserController_batchUpdateUserStatus']
     delete?: never
     options?: never
     head?: never
@@ -231,10 +319,10 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** 下载导入模板 */
-    get: operations['SystemUserController_downloadUserTemplate']
+    get?: never
     put?: never
-    post?: never
+    /** 下载导入用户模板 */
+    post: operations['UserController_downloadUserTemplate']
     delete?: never
     options?: never
     head?: never
@@ -250,8 +338,8 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 导入数据 */
-    post: operations['SystemUserController_importUser']
+    /** 导入用户数据 */
+    post: operations['UserController_importUser']
     delete?: never
     options?: never
     head?: never
@@ -267,8 +355,25 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 导出数据 */
-    post: operations['SystemUserController_exportUser']
+    /** 导出用户数据 */
+    post: operations['UserController_exportUser']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/user/check-unique': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 检测字段是否唯一 */
+    get: operations['UserController_checkUnique']
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -312,19 +417,12 @@ export interface components {
       roles: string[]
     }
     PasswordLoginDto: {
-      /**
-       * @description 登录类型
-       * @enum {string}
-       */
-      type: 'password' | 'phone'
       /** @description 用户名 */
       userName: string
       /** @description 密码 */
       password: string
     }
     PhoneLoginDto: {
-      /** @enum {string} */
-      type: 'password' | 'phone'
       /** @description 手机号 */
       phone: string
       /** @description 验证码 */
@@ -354,61 +452,276 @@ export interface components {
     }
     UpdateCommonDto: Record<string, never>
     PaginatedResult: Record<string, never>
-    SystemUserPageResp: {
-      /**
-       * @description 用户ID
-       * @example 123
-       */
+    UserPageRespDto: {
+      /** @description 用户id */
       id: number
-      /**
-       * @description 用户名
-       * @example testName
-       */
+      /** @description 用户名 */
       userName: string
-      /**
-       * @description 手机号
-       * @example 13511112222
-       */
-      mobile: string
-      /**
-       * @description 生日
-       * @example 1991-01-01
-       */
-      birth: string
+      /** @description 昵称 */
+      nickName?: string
+      /** @description 性别代码 */
+      gender?: string
+      /** @description 性别名称 */
+      genderName?: string
+      /** @description 生日 */
+      birth?: string
+      /** @description 手机号 */
+      mobile?: string
+      /** @description 地址 */
+      address?: string
+      /** @description 地址详情 */
+      addressDetail?: string
+      /** @description 婚姻状况代码 */
+      maritalStatus?: string
+      /** @description 婚姻状况名称 */
+      maritalStatusName?: string
+      /** @description 邮箱 */
+      email?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+      /** @description 全拼 */
+      pinyin?: string
+      /** @description 拼音首字母 */
+      py?: string
     }
-    SystemUserResp: {
+    UserPageDto: {
+      /** @description 昵称 */
+      nickName?: string
+      /** @description 性别代码 */
+      gender?: string
+      /** @description 性别名称 */
+      genderName?: string
+      /** @description 生日 */
+      birth?: string
+      /** @description 手机号 */
+      mobile?: string
+      /** @description 地址 */
+      address?: string
+      /** @description 地址详情 */
+      addressDetail?: string
+      /** @description 婚姻状况代码 */
+      maritalStatus?: string
+      /** @description 婚姻状况名称 */
+      maritalStatusName?: string
+      /** @description 邮箱 */
+      email?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+      /** @description 全拼 */
+      pinyin?: string
+      /** @description 拼音首字母 */
+      py?: string
+      /** @description 页码 */
+      page?: number
+      /** @description 每页条数 */
+      pageSize?: number
+      /** @description 用户名 */
+      userName?: string
       /**
-       * @description 用户ID
-       * @example 123
+       * @description 创建日期开始
+       * @example 2000-10-10 00:00:00
        */
+      createdAtStart?: string
+      /**
+       * @description 创建日期结束
+       * @example 2000-10-10 23:59:59
+       */
+      createdAtEnd?: string
+      /**
+       * @description 开始
+       * @example 2000-10-10 00:00:00
+       */
+      updatedAtStart?: string
+      /**
+       * @description 结束
+       * @example 2000-10-10 23:59:59
+       */
+      updatedAtEnd?: string
+    }
+    UserPageOptionDto: {
+      /** @description 页码 */
+      page?: number
+      /** @description 每页条数 */
+      pageSize?: number
+      /**
+       * @description 关键字
+       * @example
+       */
+      keyword?: string
+      /**
+       * @description 返回的列表字段
+       * @example
+       */
+      fields?: string
+    }
+    UserRespDto: {
+      /** @description 用户id */
       id: number
-      /**
-       * @description 用户名
-       * @example testName
-       */
+      /** @description 用户名 */
       userName: string
-      /**
-       * @description 手机号
-       * @example 13511112222
-       */
-      mobile: string
-      /**
-       * @description 生日
-       * @example 1991-01-01
-       */
-      birth: string
+      /** @description 昵称 */
+      nickName?: string
+      /** @description 性别代码 */
+      gender?: string
+      /** @description 性别名称 */
+      genderName?: string
+      /** @description 生日 */
+      birth?: string
+      /** @description 手机号 */
+      mobile?: string
+      /** @description 地址 */
+      address?: string
+      /** @description 地址详情 */
+      addressDetail?: string
+      /** @description 婚姻状况代码 */
+      maritalStatus?: string
+      /** @description 婚姻状况名称 */
+      maritalStatusName?: string
+      /** @description 邮箱 */
+      email?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+      /** @description 全拼 */
+      pinyin?: string
+      /** @description 拼音首字母 */
+      py?: string
     }
-    BatchDto: Record<string, never>
-    SystemUserCreateDto: Record<string, never>
-    SystemUserUpdateDto: {
+    UserListRespDto: {
       /**
-       * @description 状态，1：启用，0：禁用
-       * @example 1
+       * @description 未找到的id数组
+       * @example
        */
-      status: string
+      notFoundIds?: string[]
+      /** @description 用户列表 */
+      list: string[]
     }
-    BatchResp: Record<string, never>
-    BatchUpdateStatusDto: Record<string, never>
+    UserCreateDto: {
+      /** @description 昵称 */
+      nickName?: string
+      /** @description 性别代码 */
+      gender?: string
+      /** @description 性别名称 */
+      genderName?: string
+      /** @description 生日 */
+      birth?: string
+      /** @description 手机号 */
+      mobile?: string
+      /** @description 地址 */
+      address?: string
+      /** @description 地址详情 */
+      addressDetail?: string
+      /** @description 婚姻状况代码 */
+      maritalStatus?: string
+      /** @description 婚姻状况名称 */
+      maritalStatusName?: string
+      /** @description 邮箱 */
+      email?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+      /** @description 全拼 */
+      pinyin?: string
+      /** @description 拼音首字母 */
+      py?: string
+      /** @description 用户名 */
+      userName: string
+      /** @description 用户角色 */
+      roles?: string[]
+    }
+    UserUpdateDto: {
+      /** @description 昵称 */
+      nickName?: string
+      /** @description 性别代码 */
+      gender?: string
+      /** @description 性别名称 */
+      genderName?: string
+      /** @description 生日 */
+      birth?: string
+      /** @description 手机号 */
+      mobile?: string
+      /** @description 地址 */
+      address?: string
+      /** @description 地址详情 */
+      addressDetail?: string
+      /** @description 婚姻状况代码 */
+      maritalStatus?: string
+      /** @description 婚姻状况名称 */
+      maritalStatusName?: string
+      /** @description 邮箱 */
+      email?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+      /** @description 全拼 */
+      pinyin?: string
+      /** @description 拼音首字母 */
+      py?: string
+      /** @description 用户名 */
+      userName?: string
+      /** @description 用户角色 */
+      roles?: string[]
+    }
+    BatchRespDto: {
+      /**
+       * @description 未找到的id数组
+       * @example
+       */
+      notFoundIds?: string[]
+    }
+    BatchDto: {
+      /**
+       * @description 用“,”拼接的id
+       * @example
+       */
+      ids: string
+    }
+    UpdateStatusDto: {
+      /**
+       * @description 状态值
+       * @enum {string}
+       */
+      status: '1' | '0'
+    }
+    BatchUpdateStatusDto: {
+      /**
+       * @description 用“,”拼接的id
+       * @example
+       */
+      ids: string
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      status: '1' | '0'
+    }
   }
   responses: never
   parameters: never
@@ -548,11 +861,55 @@ export interface operations {
       }
     }
   }
-  SystemUserController_pageUser: {
+  UserController_pageUser: {
     parameters: {
-      query: {
-        /** @description 用户姓名 */
-        userName: string
+      query?: {
+        /** @description 昵称 */
+        nickName?: string
+        /** @description 性别代码 */
+        gender?: string
+        /** @description 性别名称 */
+        genderName?: string
+        /** @description 生日 */
+        birth?: string
+        /** @description 手机号 */
+        mobile?: string
+        /** @description 地址 */
+        address?: string
+        /** @description 地址详情 */
+        addressDetail?: string
+        /** @description 婚姻状况代码 */
+        maritalStatus?: string
+        /** @description 婚姻状况名称 */
+        maritalStatusName?: string
+        /** @description 邮箱 */
+        email?: string
+        /** @description 状态：0-禁用，1-启用 */
+        status?: string
+        /** @description 创建时间 */
+        createdAt?: string
+        /** @description 修改时间 */
+        updatedAt?: string
+        /** @description 删除时间 */
+        deletedAt?: string
+        /** @description 全拼 */
+        pinyin?: string
+        /** @description 拼音首字母 */
+        py?: string
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 用户名 */
+        userName?: string
+        /** @description 创建日期开始 */
+        createdAtStart?: string
+        /** @description 创建日期结束 */
+        createdAtEnd?: string
+        /** @description 开始 */
+        updatedAtStart?: string
+        /** @description 结束 */
+        updatedAtEnd?: string
       }
       header?: never
       path?: never
@@ -583,14 +940,14 @@ export interface operations {
                * @example 10
                */
               pageSize?: number
-              list?: components['schemas']['SystemUserPageResp'][]
+              list?: components['schemas']['UserPageRespDto'][]
             }
           }
         }
       }
     }
   }
-  SystemUserController_createUser: {
+  UserController__pageUser: {
     parameters: {
       query?: never
       header?: never
@@ -599,30 +956,29 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['SystemUserCreateDto']
+        'application/json': components['schemas']['UserPageDto']
       }
     }
     responses: {
-      /** @description 成功响应 */
       200: {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['SystemUserResp']
-          }
-        }
+        content?: never
       }
     }
   }
-  SystemUserController_pageOptionUser: {
+  UserController_pageOptionUser: {
     parameters: {
-      query: {
-        /** @description 关键字，可输入姓名，手机号，身份证等 */
-        keyword: string
-        /** @description 返回的字段，默认是id,username */
-        fields?: string[]
+      query?: {
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 关键字 */
+        keyword?: string
+        /** @description 返回的列表字段 */
+        fields?: string
       }
       header?: never
       path?: never
@@ -653,14 +1009,35 @@ export interface operations {
                * @example 10
                */
               pageSize?: number
-              list?: components['schemas']['SystemUserPageResp'][]
+              list?: components['schemas']['UserPageRespDto'][]
             }
           }
         }
       }
     }
   }
-  SystemUserController_findUserById: {
+  UserController__pageOptionUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserPageOptionDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  UserController_findUserById: {
     parameters: {
       query?: never
       header?: never
@@ -678,24 +1055,47 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['SystemUserResp']
+            data?: components['schemas']['UserRespDto']
           }
         }
       }
     }
   }
-  SystemUserController_updateUser: {
+  UserController_findUserListByIds: {
+    parameters: {
+      query: {
+        /** @description 用“,”拼接的id */
+        ids: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data?: components['schemas']['UserListRespDto']
+          }
+        }
+      }
+    }
+  }
+  UserController_createUser: {
     parameters: {
       query?: never
       header?: never
-      path: {
-        id: number
-      }
+      path?: never
       cookie?: never
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['SystemUserUpdateDto']
+        'application/json': components['schemas']['UserCreateDto']
       }
     }
     responses: {
@@ -706,13 +1106,41 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['SystemUserResp']
+            data?: components['schemas']['UserRespDto']
           }
         }
       }
     }
   }
-  SystemUserController_removeUser: {
+  UserController_updateUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserUpdateDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data?: components['schemas']['UserRespDto']
+          }
+        }
+      }
+    }
+  }
+  UserController_removeUser: {
     parameters: {
       query?: never
       header?: never
@@ -737,7 +1165,7 @@ export interface operations {
       }
     }
   }
-  SystemUserController_findUserListByIds: {
+  UserController_batchRemoveUser: {
     parameters: {
       query?: never
       header?: never
@@ -757,39 +1185,13 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['SystemUserResp']
+            data?: components['schemas']['BatchRespDto']
           }
         }
       }
     }
   }
-  SystemUserController_batchRemoveUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['BatchDto']
-      }
-    }
-    responses: {
-      /** @description 成功响应 */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['BatchResp']
-          }
-        }
-      }
-    }
-  }
-  SystemUserController_updateUserStatus: {
+  UserController_updateUserStatus: {
     parameters: {
       query?: never
       header?: never
@@ -798,7 +1200,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateStatusDto']
+      }
+    }
     responses: {
       /** @description 成功响应 */
       200: {
@@ -814,7 +1220,7 @@ export interface operations {
       }
     }
   }
-  SystemUserController_batchUpdateUserStatus: {
+  UserController_batchUpdateUserStatus: {
     parameters: {
       query?: never
       header?: never
@@ -834,13 +1240,13 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['BatchResp']
+            data?: components['schemas']['BatchRespDto']
           }
         }
       }
     }
   }
-  SystemUserController_downloadUserTemplate: {
+  UserController_downloadUserTemplate: {
     parameters: {
       query?: never
       header?: never
@@ -863,7 +1269,7 @@ export interface operations {
       }
     }
   }
-  SystemUserController_importUser: {
+  UserController_importUser: {
     parameters: {
       query?: never
       header?: never
@@ -886,7 +1292,7 @@ export interface operations {
       }
     }
   }
-  SystemUserController_exportUser: {
+  UserController_exportUser: {
     parameters: {
       query?: never
       header?: never
@@ -904,6 +1310,32 @@ export interface operations {
           'application/json': components['schemas']['ApiResponseDto'] & {
             /** @default null */
             data: null | null
+          }
+        }
+      }
+    }
+  }
+  UserController_checkUnique: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应（返回布尔值） */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /**
+             * @description 校验结果：true 代表通过/唯一，false 代表失败/重复
+             * @example true
+             */
+            data?: boolean
           }
         }
       }
