@@ -1,4 +1,3 @@
-export const isTargetOrParent = (target: any, leaf: any) => {
-  // return target === leaf ||  target.isPrototypeOf(leaf)
-  return target === leaf || Object.prototype.isPrototypeOf.call(target, leaf)
+export const isTargetOrParent = (target: any, child: any) => {
+  return target === child || Object.prototype.isPrototypeOf.call(target, child)
 }
