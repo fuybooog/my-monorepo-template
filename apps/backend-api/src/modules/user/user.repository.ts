@@ -13,7 +13,7 @@ export class UserRepository extends Repository<User> {
   }
 
   async searchUsersByPage(query: UserPageDto) {
-    const { page = 1, pageSize = 10, userName } = query
+    const { page = 1, pageSize = 10, userName, sort } = query
 
     const qb = this.createQueryBuilder('user')
 
@@ -21,10 +21,30 @@ export class UserRepository extends Repository<User> {
       qb.andWhere('user.userName LIKE :userName', { userName: `%${userName}%` })
     }
 
-    // todo 排序应该从前端传入
-    qb.orderBy('user.createdAt', 'DESC')
-      .skip((page - 1) * pageSize)
-      .take(pageSize)
+    if (sort && Object.keys(sort).length > 0) {
+      const allowedFields = ['userName', 'createdAt', 'updatedAt']
+
+      let isFirst = true
+      for (const [key, direction] of Object.entries(sort)) {
+        if (allowedFields.includes(key)) {
+          // 拼接成类似 'user.userName' 的全称
+          const orderField = `user.${key}`
+
+          if (isFirst) {
+            qb.orderBy(orderField, direction)
+            isFirst = false
+          } else {
+            qb.addOrderBy(orderField, direction)
+          }
+        }
+      }
+      qb.addOrderBy('user.id', 'ASC')
+    } else {
+      // 默认排序：如果没有传入任何排序，走默认的降序
+      qb.orderBy('user.createdAt', 'DESC').addOrderBy('user.id', 'ASC')
+    }
+
+    qb.skip((page - 1) * pageSize).take(pageSize)
 
     return await qb.getManyAndCount()
   }

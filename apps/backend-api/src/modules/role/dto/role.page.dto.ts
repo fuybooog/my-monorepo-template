@@ -1,6 +1,5 @@
-import { ApiPropertyOptional, IntersectionType } from '@nestjs/swagger'
+import { ApiPropertyOptional, IntersectionType, OmitType } from '@nestjs/swagger'
 import { IsOptional, IsString } from 'class-validator'
-import { OmitType } from '@nestjs/swagger'
 import { RoleBaseDto } from './role.base.dto'
 import { PaginationQueryDto } from '@/dto/pagination-query.dto'
 export class RolePageDto extends IntersectionType(
@@ -17,12 +16,12 @@ export class RolePageDto extends IntersectionType(
   @IsOptional()
   createdAtEnd?: string
 
-  @ApiPropertyOptional({ description: '开始', example: '2000-10-10 00:00:00' })
+  @ApiPropertyOptional({ description: '修改时间开始', example: '2000-10-10 00:00:00' })
   @IsString()
   @IsOptional()
   updatedAtStart?: string
 
-  @ApiPropertyOptional({ description: '结束', example: '2000-10-10 23:59:59' })
+  @ApiPropertyOptional({ description: '修改时间结束', example: '2000-10-10 23:59:59' })
   @IsString()
   @IsOptional()
   updatedAtEnd?: string

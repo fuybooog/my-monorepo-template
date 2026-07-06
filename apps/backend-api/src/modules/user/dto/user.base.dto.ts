@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { IsInt, IsOptional, IsString } from 'class-validator'
 export class UserBaseDto {
-  @ApiProperty({ description: '用户id', type: Number })
+  @ApiProperty({ description: '用户ID', type: Number })
   @IsInt()
   id: number
 

@@ -6,9 +6,13 @@ import { ValidationPipe } from '@nestjs/common'
 import cookieParser from 'cookie-parser'
 import { ConfigService } from '@nestjs/config'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import qs from 'qs'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+
+  const expressApp = app.getHttpAdapter().getInstance()
+  expressApp.set('query parser', (str: string) => qs.parse(str))
 
   app.setGlobalPrefix('api')
   const configService = app.get(ConfigService)

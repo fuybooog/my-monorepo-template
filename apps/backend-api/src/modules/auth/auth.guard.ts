@@ -1,10 +1,16 @@
-import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common'
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
 import { Request } from 'express'
 import { IS_PUBLIC_KEY } from '@/decorators/public.decorator'
 import { ConfigService } from '@nestjs/config'
-import { JwtPayload } from '@/types/jwt-payload'
+import type { JwtPayload } from '@/types'
 import { RedisService } from '@/utils/redis/redisService'
 
 @Injectable()
@@ -36,19 +42,19 @@ export class AuthGuard implements CanActivate {
       })
 
       const redisKey = `auth:token:${payload.sub}`
-      let redisToken: string | null = null 
+      let redisToken: string | null = null
       let redisFlag = true
       try {
         redisToken = await Promise.race([
           this.redisService.get(redisKey),
-          new Promise<null>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
+          new Promise<null>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000)),
         ])
       } catch (_err) {
         redisFlag = false
         const logger = new Logger('AuthGuard')
         logger.warn(`Redis 服务不可用，安全守卫已自动降级为【纯 JWT 校验模式】`)
       }
-      
+
       if (redisFlag && (!redisToken || redisToken !== token)) {
         throw new UnauthorizedException('登录状态无效！')
       }

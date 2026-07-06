@@ -21,6 +21,7 @@ export const ApiSuccessResponse = <TModel extends Type<any>>(model?: TModel) => 
               properties: {
                 data: { type: 'null', default: null, nullable: true },
               },
+              required: ['data'],
             },
           ],
         },
@@ -42,6 +43,7 @@ export const ApiSuccessResponse = <TModel extends Type<any>>(model?: TModel) => 
                 $ref: getSchemaPath(model),
               },
             },
+            required: ['data'],
           },
         ],
       },
@@ -63,6 +65,7 @@ export const ApiSuccessPageResponse = <TModel extends Type<any>>(model: TModel) 
                 allOf: [
                   { $ref: getSchemaPath(PaginatedResult) },
                   {
+                    required: ['total', 'page', 'pageSize', 'list'],
                     properties: {
                       total: { type: 'number', description: '总条数', example: 100 },
                       page: { type: 'number', description: '当前页码', example: 1 },
@@ -76,6 +79,7 @@ export const ApiSuccessPageResponse = <TModel extends Type<any>>(model: TModel) 
                 ],
               },
             },
+            required: ['data'],
           },
         ],
       },
@@ -102,6 +106,7 @@ export const ApiSuccessBooleanResponse = () => {
                 example: true,
               },
             },
+            required: ['data'],
           },
         ],
       },

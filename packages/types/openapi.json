@@ -30,7 +30,8 @@
                         "data": {
                           "$ref": "#/components/schemas/LoginResponseDto"
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -83,7 +84,8 @@
                         "data": {
                           "$ref": "#/components/schemas/CurrentLoginResponseDto"
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -115,7 +117,8 @@
                           "default": null,
                           "nullable": true
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -375,6 +378,22 @@
               "example": "2000-10-10 23:59:59",
               "type": "string"
             }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "排序对象",
+            "schema": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "example": {
+                "userName": "ASC",
+                "createdAt": "DESC"
+              },
+              "type": "object"
+            }
           }
         ],
         "responses": {
@@ -395,6 +414,7 @@
                               "$ref": "#/components/schemas/PaginatedResult"
                             },
                             {
+                              "required": ["total", "page", "pageSize", "list"],
                               "properties": {
                                 "total": {
                                   "type": "number",
@@ -421,7 +441,8 @@
                             }
                           ]
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -518,6 +539,7 @@
                               "$ref": "#/components/schemas/PaginatedResult"
                             },
                             {
+                              "required": ["total", "page", "pageSize", "list"],
                               "properties": {
                                 "total": {
                                   "type": "number",
@@ -544,7 +566,8 @@
                             }
                           ]
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -608,7 +631,8 @@
                         "data": {
                           "$ref": "#/components/schemas/UserRespDto"
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -650,7 +674,8 @@
                         "data": {
                           "$ref": "#/components/schemas/UserListRespDto"
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -691,7 +716,8 @@
                         "data": {
                           "$ref": "#/components/schemas/UserRespDto"
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -741,7 +767,8 @@
                         "data": {
                           "$ref": "#/components/schemas/UserRespDto"
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -783,7 +810,8 @@
                           "default": null,
                           "nullable": true
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -824,7 +852,8 @@
                         "data": {
                           "$ref": "#/components/schemas/BatchRespDto"
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -876,7 +905,8 @@
                           "default": null,
                           "nullable": true
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -917,7 +947,8 @@
                         "data": {
                           "$ref": "#/components/schemas/BatchRespDto"
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -950,7 +981,8 @@
                           "default": null,
                           "nullable": true
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -983,7 +1015,8 @@
                           "default": null,
                           "nullable": true
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -1016,7 +1049,8 @@
                           "default": null,
                           "nullable": true
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -1049,7 +1083,8 @@
                           "description": "校验结果：true 代表通过/唯一，false 代表失败/重复",
                           "example": true
                         }
-                      }
+                      },
+                      "required": ["data"]
                     }
                   ]
                 }
@@ -1365,6 +1400,17 @@
             "type": "string",
             "description": "结束",
             "example": "2000-10-10 23:59:59"
+          },
+          "sort": {
+            "type": "object",
+            "description": "排序对象",
+            "example": {
+              "userName": "ASC",
+              "createdAt": "DESC"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         }
       },

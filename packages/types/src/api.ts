@@ -549,6 +549,16 @@ export interface components {
        * @example 2000-10-10 23:59:59
        */
       updatedAtEnd?: string
+      /**
+       * @description 排序对象
+       * @example {
+       *       "userName": "ASC",
+       *       "createdAt": "DESC"
+       *     }
+       */
+      sort?: {
+        [key: string]: string
+      }
     }
     UserPageOptionDto: {
       /** @description 页码 */
@@ -751,7 +761,7 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['LoginResponseDto']
+            data: components['schemas']['LoginResponseDto']
           }
         }
       }
@@ -794,7 +804,7 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['CurrentLoginResponseDto']
+            data: components['schemas']['CurrentLoginResponseDto']
           }
         }
       }
@@ -910,6 +920,10 @@ export interface operations {
         updatedAtStart?: string
         /** @description 结束 */
         updatedAtEnd?: string
+        /** @description 排序对象 */
+        sort?: {
+          [key: string]: string
+        }
       }
       header?: never
       path?: never
@@ -924,23 +938,23 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['PaginatedResult'] & {
+            data: components['schemas']['PaginatedResult'] & {
               /**
                * @description 总条数
                * @example 100
                */
-              total?: number
+              total: number
               /**
                * @description 当前页码
                * @example 1
                */
-              page?: number
+              page: number
               /**
                * @description 每页条数
                * @example 10
                */
-              pageSize?: number
-              list?: components['schemas']['UserPageRespDto'][]
+              pageSize: number
+              list: components['schemas']['UserPageRespDto'][]
             }
           }
         }
@@ -993,23 +1007,23 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['PaginatedResult'] & {
+            data: components['schemas']['PaginatedResult'] & {
               /**
                * @description 总条数
                * @example 100
                */
-              total?: number
+              total: number
               /**
                * @description 当前页码
                * @example 1
                */
-              page?: number
+              page: number
               /**
                * @description 每页条数
                * @example 10
                */
-              pageSize?: number
-              list?: components['schemas']['UserPageRespDto'][]
+              pageSize: number
+              list: components['schemas']['UserPageRespDto'][]
             }
           }
         }
@@ -1055,7 +1069,7 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['UserRespDto']
+            data: components['schemas']['UserRespDto']
           }
         }
       }
@@ -1080,7 +1094,7 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['UserListRespDto']
+            data: components['schemas']['UserListRespDto']
           }
         }
       }
@@ -1106,7 +1120,7 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['UserRespDto']
+            data: components['schemas']['UserRespDto']
           }
         }
       }
@@ -1134,7 +1148,7 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['UserRespDto']
+            data: components['schemas']['UserRespDto']
           }
         }
       }
@@ -1185,7 +1199,7 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['BatchRespDto']
+            data: components['schemas']['BatchRespDto']
           }
         }
       }
@@ -1240,7 +1254,7 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            data?: components['schemas']['BatchRespDto']
+            data: components['schemas']['BatchRespDto']
           }
         }
       }
@@ -1335,7 +1349,7 @@ export interface operations {
              * @description 校验结果：true 代表通过/唯一，false 代表失败/重复
              * @example true
              */
-            data?: boolean
+            data: boolean
           }
         }
       }

@@ -1,7 +1,9 @@
 import { ApiPropertyOptional, IntersectionType, OmitType } from '@nestjs/swagger'
-import { IsOptional, IsString } from 'class-validator'
+import { IsObject, IsOptional, IsString } from 'class-validator'
 import { UserBaseDto } from './user.base.dto'
 import { PaginationQueryDto } from '@/dto/pagination-query.dto'
+import type { SortType } from '@/types'
+import { Transform } from 'class-transformer'
 export class UserPageDto extends IntersectionType(
   OmitType(UserBaseDto, ['id', 'userName'] as const),
   PaginationQueryDto,
@@ -30,4 +32,27 @@ export class UserPageDto extends IntersectionType(
   @IsString()
   @IsOptional()
   updatedAtEnd?: string
+
+  @ApiPropertyOptional({
+    description: '排序对象',
+    example: { userName: 'ASC', createdAt: 'DESC' },
+    type: 'object',
+    additionalProperties: { type: 'string' },
+  })
+  @IsOptional()
+  @IsObject()
+  @Transform(({ value }) => {
+    if (!value || typeof value !== 'object') return value
+
+    // 转换为标准大写，并过滤掉非 ASC/DESC 的非法输入，防止 SQL 注入
+    const cleanSort: SortType = {}
+    for (const key in value) {
+      const direction = String(value[key]).toUpperCase()
+      if (direction === 'ASC' || direction === 'DESC') {
+        cleanSort[key] = direction
+      }
+    }
+    return cleanSort
+  })
+  sort?: SortType
 }
