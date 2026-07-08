@@ -2,6 +2,20 @@
 
 import axios, { type AxiosInstance, type AxiosRequestConfig, type CancelTokenSource } from 'axios'
 
+const safeCleanParams = (obj: any) => {
+  if (!obj || typeof obj !== 'object' || obj instanceof FormData) return obj
+
+  const newObj: Record<string, any> = {}
+  Object.keys(obj).forEach((key) => {
+    const value = obj[key]
+    // 🌟 精准拦截：只剔除 null, undefined 和空字符串。数字 0 和布尔 false 必须安全保留！
+    if (value !== null && value !== undefined && String(value).trim() !== '') {
+      newObj[key] = value
+    }
+  })
+  return newObj
+}
+
 // --- 1. 类型定义扩展 ---
 
 export interface RequestMetaData {
@@ -33,6 +47,8 @@ declare module 'axios' {
     autoCancelPrevious?: boolean
     onBusinessError?: (errMsg: string, errCode: number) => void
     onError?: (error: { head: { errCode: number; errMsg: string } }) => void
+    // 是否清除掉查询条件中值为''，null，undefined的字段，get请求下默认清除
+    autoCleanParams?: boolean
   }
 }
 
@@ -249,7 +265,20 @@ export class HttpClient {
   private setupInterceptors() {
     this.instance.interceptors.request.use(
       (config) => {
+        const method = config.method?.toLowerCase()
         config.metaData = { startTime: Date.now() }
+        // 策略 A: GET 请求（通常是列表查询）默认开启清洗，除非显式传入 autoCleanParams: false
+        // 策略 B: POST/PUT 等修改请求默认不清洗（防误杀清空操作），除非显式传入 autoCleanParams: true
+        const shouldClean =
+          config.autoCleanParams !== undefined ? config.autoCleanParams : method === 'get'
+
+        if (shouldClean) {
+          if (method === 'get' && config.params) {
+            config.params = safeCleanParams(config.params)
+          } else if (config.data) {
+            config.data = safeCleanParams(config.data)
+          }
+        }
         const token = localStorage.getItem('token')
         if (token && config.headers) {
           config.headers['Authorization'] = `Bearer ${token}`
@@ -300,42 +329,42 @@ export class HttpClient {
    * 6. 统一错误格式化
    */
   private normalizeError(error: any) {
-  let errCode = -1
-  let errMsg = '未知网络错误'
+    let errCode = -1
+    let errMsg
 
-  if (axios.isCancel(error)) {
-    errMsg = '请求已被取消'
-  } else if (error.response) {
-    const serverBody = error.response.data
+    if (axios.isCancel(error)) {
+      errMsg = '请求已被取消'
+    } else if (error.response) {
+      const serverBody = error.response.data
 
-    if (serverBody && serverBody.head) {
-      errCode = serverBody.head.errCode ?? error.response.status
-      errMsg = serverBody.head.errMsg || '业务操作失败'
+      if (serverBody && serverBody.head) {
+        errCode = serverBody.head.errCode ?? error.response.status
+        errMsg = serverBody.head.errMsg || '业务操作失败'
+      } else {
+        errCode = error.response.status
+        errMsg = serverBody?.message || error.message || `服务器开小差了 [${errCode}]`
+      }
+
+      if (errCode === 401 || errCode === -2) {
+        localStorage.removeItem('token')
+      }
+    } else if (error.request) {
+      errMsg = '无法连接到服务器，请检查网络设置'
     } else {
-      errCode = error.response.status
-      errMsg = serverBody?.message || error.message || `服务器开小差了 [${errCode}]`
+      errMsg = error.message || '初始化请求失败'
     }
 
-    if (errCode === 401 || errCode === -2) {
-      localStorage.removeItem('token')
+    const fakeStandardResponse = {
+      head: {
+        errCode: errCode,
+        errMsg: errMsg,
+      },
+      data: null,
+      raw: error,
     }
-  } else if (error.request) {
-    errMsg = '无法连接到服务器，请检查网络设置'
-  } else {
-    errMsg = error.message || '初始化请求失败'
-  }
 
-  const fakeStandardResponse = {
-    head: {
-      errCode: errCode,
-      errMsg: errMsg,
-    },
-    data: null,
-    raw: error,
+    return fakeStandardResponse
   }
-
-  return fakeStandardResponse
-}
 
   /**
    * 工具方法：精确生成缓存/合并 Key

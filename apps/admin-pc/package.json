@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\""
   },
   "dependencies": {
+    "@ant-design/icons": "^6.3.2",
     "@repo/api": "workspace:*",
     "@repo/types": "workspace:*",
     "antd": "^6.4.4",

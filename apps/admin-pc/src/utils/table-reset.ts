@@ -1,25 +1,20 @@
 import { SorterResult } from 'antd/es/table/interface'
 
-export function transPaginateParams<T extends Record<string, unknown>>(
-  params: T,
-): Omit<T, 'current'> & { page: number } {
-  const { current = 1, ...others } = params
-  return {
-    ...others,
-    page: current,
-  } as unknown as Omit<T, 'current'> & { page: number }
-}
 export function formatSortParams(sorter: SorterResult | SorterResult[]): {
   sort?: Record<string, 'DESC' | 'ASC'>
 } {
   if (!sorter) {
     return {}
   }
+  const sorterList = Array.isArray(sorter) ? sorter : [sorter]
+  const activeSorters = sorterList.filter((item) => item?.field && item?.order)
+  if (activeSorters.length === 0) {
+    return {}
+  }
   return {
-    sort: (Array.isArray(sorter) ? sorter : [sorter])
+    sort: activeSorters
       .map((item) => {
         const fieldKey = Array.isArray(item.field) ? String(item.field[0]) : String(item.field)
-
         return {
           [fieldKey]: (item.order === 'descend' ? 'DESC' : 'ASC') as 'DESC' | 'ASC',
         }
