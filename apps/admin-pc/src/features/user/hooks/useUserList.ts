@@ -35,8 +35,7 @@ export function useUserList() {
     }
   }
 
-  const onBatchDelete = async (keys: React.Key[], rows: Backend.UserPageRespDto[]) => {
-    console.log(keys, rows)
+  const onBatchDelete = async (keys: React.Key[]) => {
     const res = await userApi.batchDelete(keys.join())
     if (res.head.errCode === 0) {
       if (res.data.notFoundIds?.length) {

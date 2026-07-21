@@ -4,7 +4,7 @@ const commonApi = {
   get: () => {
     return http.get('/common/get')
   },
-  update: (data: { json: any[] }) => {
+  update: (data: { json: Record<string, unknown>[] }) => {
     return http.post('/common/update', data)
   },
 }

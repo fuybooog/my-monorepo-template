@@ -8,13 +8,161 @@ import React, {
   useRef,
 } from 'react'
 import { Table, TableProps } from 'antd'
-import { SmartTableInstance, SmartTableProps } from './smart-types'
-import { SmartTableToolbar } from './SmartTableToolbar'
-import { formatSortParams } from '@/utils'
-import { getColumnKey, serializeFormValues } from './smart-utils'
 import { SorterResult } from 'antd/es/table/interface'
 import { isEqual } from 'lodash'
+import { SmartTableInstance, SmartTableProps } from './smart-types'
+import { SmartTableToolbar } from './SmartTableToolbar'
 import { SmartTableButtons } from './SmartTableButtons'
+import { formatSortParams } from '@/utils'
+import { getColumnKey, serializeFormValues } from './smart-utils'
+
+// ==========================================
+// 1. Custom Hooks 拆分
+// ==========================================
+
+/** 列设置本地存储与过滤 Hook */
+const useTableColumns = <RecordType extends object>({
+  columns = [],
+  storageKey,
+  actionColumn,
+  onLinkClick,
+}: {
+  columns?: SmartTableProps<RecordType>['columns']
+  storageKey?: string
+  actionColumn?: SmartTableProps<RecordType>['actionColumn']
+  onLinkClick?: SmartTableProps<RecordType>['onLinkClick']
+}) => {
+  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>(() => {
+    const allKeys = (columns || []).map((col) => getColumnKey(col)).filter(Boolean) as React.Key[]
+    if (storageKey) {
+      const localValue = localStorage.getItem(`table_cols_${storageKey}`)
+      if (localValue) {
+        try {
+          return JSON.parse(localValue) as React.Key[]
+        } catch (e) {
+          console.error('获取 local 列配置报错', e)
+        }
+      }
+    }
+    return allKeys
+  })
+
+  const handleCheckedKeysChange = (nextKeys: React.Key[]) => {
+    setCheckedKeys(nextKeys)
+    if (storageKey) {
+      localStorage.setItem(`table_cols_${storageKey}`, JSON.stringify(nextKeys))
+    }
+  }
+
+  // 1. 根据勾选过滤列
+  const filteredColumns = useMemo(() => {
+    return (columns || []).filter((col) => {
+      const key = getColumnKey(col)
+      if (!key) return true
+      return checkedKeys.includes(key)
+    })
+  }, [columns, checkedKeys])
+
+  // 2. 处理自动包裹 link 的列
+  const processedColumns = useMemo(() => {
+    return filteredColumns.map((col) => {
+      const linkConfig = col.link
+      if (!linkConfig || col.render) return col
+
+      const onClick = typeof linkConfig === 'object' ? linkConfig.onClick : undefined
+      const target = typeof linkConfig === 'object' ? linkConfig.target : '_self'
+
+      return {
+        ...col,
+        render: (text: string, record: RecordType) => (
+          <a
+            onClick={(e) => {
+              e.stopPropagation()
+              if (onClick) onClick(record)
+              else onLinkClick?.(record, col.key as string)
+            }}
+            target={target}
+            style={{ color: '#1890ff', cursor: 'pointer' }}
+          >
+            {text}
+          </a>
+        ),
+      }
+    })
+  }, [filteredColumns, onLinkClick])
+
+  // 3. 拼接操作列
+  const finalColumns = useMemo(() => {
+    if (!actionColumn) return processedColumns
+
+    const withoutAction = processedColumns.filter((col) => getColumnKey(col) !== 'action')
+    const actionCol = {
+      title: actionColumn.title || '操作',
+      key: 'action',
+      fixed: actionColumn.fixed || 'right',
+      width: actionColumn.width || 180,
+      render: (_: unknown, record: RecordType) => (
+        <SmartTableButtons record={record} actionColumn={actionColumn} />
+      ),
+    }
+    return [...withoutAction, actionCol]
+  }, [processedColumns, actionColumn])
+
+  return {
+    checkedKeys,
+    handleCheckedKeysChange,
+    finalColumns,
+  }
+}
+
+/** 跨页多选状态管理 Hook */
+const useRowSelectionManager = <RecordType extends object>(
+  rowKey: string | ((record: RecordType) => React.Key),
+) => {
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const [selectedRows, setSelectedRows] = useState<RecordType[]>([])
+
+  const clearSelection = useCallback(() => {
+    setSelectedRowKeys([])
+    setSelectedRows([])
+  }, [])
+
+  const getRowKey = useCallback(
+    (record: RecordType): React.Key => {
+      if (typeof rowKey === 'function') {
+        return rowKey(record)
+      }
+      return (record as Record<string, unknown>)[rowKey] as React.Key
+    },
+    [rowKey],
+  )
+
+  const handleRowSelectionChange = useCallback(
+    (keys: React.Key[], rows: RecordType[]) => {
+      setSelectedRowKeys(keys)
+      setSelectedRows((prevRows) => {
+        const currentIds = rows.map((r) => getRowKey(r))
+        const historyRows = prevRows.filter((r) => {
+          const id = getRowKey(r)
+          return keys.includes(id) && !currentIds.includes(id)
+        })
+        return [...historyRows, ...rows]
+      })
+    },
+    [getRowKey],
+  )
+
+  return {
+    selectedRowKeys,
+    selectedRows,
+    clearSelection,
+    handleRowSelectionChange,
+  }
+}
+
+// ==========================================
+// 2. 主组件逻辑
+// ==========================================
 
 const SmartTableInner = <RecordType extends object>(
   props: SmartTableProps<RecordType>,
@@ -35,124 +183,35 @@ const SmartTableInner = <RecordType extends object>(
     ...restAntdProps
   } = props
 
+  // 防错校验
+  if (!pure && !request) {
+    throw new Error('当 pure 为 false 时，request 必传！')
+  }
+
   const [loading, setLoading] = useState(false)
   const [dataSource, setDataSource] = useState<RecordType[]>([])
   const [total, setTotal] = useState(0)
   const [pagination, setPagination] = useState({ page: 1, pageSize: 10 })
   const [sorter, setSorter] = useState<SorterResult | SorterResult[]>({})
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-  const [selectedRows, setSelectedRows] = useState<RecordType[]>([])
-
-  // const [prevSearchParams, setPrevSearchParams] = useState(searchParams)
+  // 用于比较 searchParams 是否发生深变更
   const prevSearchParamsRef = useRef(searchParams)
 
-  // const paramsChanged = useMemo(() => {
-  //   // return JSON.stringify(prevSearchParamsRef.current) !== JSON.stringify(searchParams)
-  //   return !isEqual(prevSearchParamsRef.current, searchParams)
-  // }, [searchParams])
+  // 计算表格主键
+  const finalRowKey = (restAntdProps.rowKey as string | ((record: RecordType) => React.Key)) || 'id'
 
-  const searchParamsRef = useRef(searchParams)
-  const paginationRef = useRef(pagination)
-  const sorterRef = useRef(sorter)
-
-  // 当查询条件变动时，强制从第一页开始查询
-  useEffect(() => {
-    if (!isEqual(prevSearchParamsRef.current, searchParams)) {
-      prevSearchParamsRef.current = searchParams
-      setPagination((prev) => (prev.page === 1 ? prev : { ...prev, page: 1 }))
-    }
-  }, [searchParams])
-
-  useEffect(() => {
-    searchParamsRef.current = searchParams
-  }, [searchParams])
-  useEffect(() => {
-    paginationRef.current = pagination
-  }, [pagination])
-  useEffect(() => {
-    sorterRef.current = sorter
-  }, [sorter])
-
-  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>(() => {
-    const allKeys = columns.map((col) => getColumnKey(col)).filter(Boolean) as React.Key[]
-    if (storageKey) {
-      const localValue = localStorage.getItem(`table_cols_${storageKey}`)
-      if (localValue) {
-        try {
-          return JSON.parse(localValue) as React.Key[]
-        } catch (e) {
-          console.error('获取local数据报错', e)
-        }
-      }
-    }
-    return allKeys
+  // 使用拆分后的 Hooks
+  const { checkedKeys, handleCheckedKeysChange, finalColumns } = useTableColumns({
+    columns,
+    storageKey,
+    actionColumn,
+    onLinkClick,
   })
-  // 1. 过滤列（保留用户勾选的列）
-  const filteredColumns = useMemo(() => {
-    return columns.filter((col) => {
-      const key = getColumnKey(col)
-      if (!key) return true
-      return checkedKeys.includes(key)
-    })
-  }, [columns, checkedKeys])
 
-  // 在 finalColumns 之前或内部处理
-  const processedColumns = useMemo(() => {
-    return filteredColumns.map((col) => {
-      const linkConfig = col.link
-      if (!linkConfig) return col
+  const { selectedRowKeys, selectedRows, clearSelection, handleRowSelectionChange } =
+    useRowSelectionManager(finalRowKey)
 
-      // 如果列已有 render，则不自动包裹链接（避免覆盖）
-      if (col.render) return col
-
-      const onClick = typeof linkConfig === 'object' ? linkConfig.onClick : undefined
-      const target = typeof linkConfig === 'object' ? linkConfig.target : '_self'
-
-      return {
-        ...col,
-        render: (text: string, record: RecordType) => (
-          <a
-            onClick={(e) => {
-              e.stopPropagation() // 阻止行选中事件
-              if (onClick) onClick(record)
-              else onLinkClick?.(record, col.key as string)
-            }}
-            target={target}
-            style={{ color: '#1890ff', cursor: 'pointer' }}
-          >
-            {text}
-          </a>
-        ),
-      }
-    })
-  }, [filteredColumns, onLinkClick])
-
-  // 2. 追加操作列（如果有）
-  const finalColumns = useMemo(() => {
-    if (!actionColumn) return processedColumns
-
-    // 移除外部可能已经添加的操作列（避免重复）
-    const withoutAction = processedColumns.filter((col) => getColumnKey(col) !== 'action')
-    const actionCol = {
-      title: actionColumn.title || '操作',
-      key: 'action',
-      fixed: actionColumn.fixed || 'right',
-      width: actionColumn.width || 180,
-      render: (_: unknown, record: RecordType) => (
-        <SmartTableButtons record={record} actionColumn={actionColumn} />
-      ),
-    }
-    return [...withoutAction, actionCol]
-  }, [processedColumns, actionColumn])
-
-  const handleCheckedKeysChange = (nextKeys: React.Key[]) => {
-    setCheckedKeys(nextKeys)
-    if (storageKey) {
-      localStorage.setItem(`table_cols_${storageKey}`, JSON.stringify(nextKeys))
-    }
-  }
-
+  // 数据请求的核心逻辑
   const loadData = useCallback(
     async (targetPagination = pagination, targetSorter = sorter, overrideParams = searchParams) => {
       if (pure || !request) return
@@ -175,36 +234,55 @@ const SmartTableInner = <RecordType extends object>(
         setLoading(false)
       }
     },
-    [pure, request, defaultSort, schema],
+    [pure, request, defaultSort, schema, pagination, sorter, searchParams],
   )
 
+  // 监听 searchParams 深对比，变动时重置页码
   useEffect(() => {
-    if (!autoSearch) {
-      return
+    if (!isEqual(prevSearchParamsRef.current, searchParams)) {
+      prevSearchParamsRef.current = searchParams
+      setPagination((prev) => (prev.page === 1 ? prev : { ...prev, page: 1 }))
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadData(pagination, sorter, searchParams)
+  }, [searchParams])
+
+  // 控制自动请求：当分页、排序或搜索条件发生改变时触发
+  useEffect(() => {
+    if (!autoSearch) return
+
+    let isSubscribed = true
+
+    const runSearch = async () => {
+      if (isSubscribed) {
+        await loadData(pagination, sorter, searchParams)
+      }
+    }
+
+    void runSearch()
+
+    return () => {
+      isSubscribed = false
+    }
   }, [pagination, sorter, searchParams, autoSearch, loadData])
 
-  const clearSelection = () => {
-    setSelectedRowKeys([])
-    setSelectedRows([])
-  }
-
-  useImperativeHandle(ref, () => ({
-    refresh: (resetPage = false) => {
-      if (resetPage) {
-        setPagination((prev) => ({ ...prev, page: 1 }))
-      } else {
-        loadData(pagination, sorter, searchParams)
-      }
-    },
-    clearSelection,
-  }))
+  // 暴露给外部的 ref 方法
+  useImperativeHandle(
+    ref,
+    () => ({
+      refresh: (resetPage = false) => {
+        if (resetPage) {
+          setPagination((prev) => ({ ...prev, page: 1 }))
+        } else {
+          loadData(pagination, sorter, searchParams)
+        }
+      },
+      clearSelection,
+    }),
+    [loadData, pagination, sorter, searchParams, clearSelection],
+  )
 
   const handleTableChange: TableProps<RecordType>['onChange'] = (
     newPagination,
-    filters,
+    _filters,
     newSorter,
   ) => {
     setPagination({
@@ -214,9 +292,10 @@ const SmartTableInner = <RecordType extends object>(
     setSorter(newSorter)
   }
 
-  if (!pure && !request) throw new Error('当 pure 为 false 时，request 必传！')
-
-  const finalRowKey = (restAntdProps.rowKey as string | ((record: RecordType) => React.Key)) || 'id'
+  // Pure 模式简易渲染
+  if (pure) {
+    return <Table columns={finalColumns} {...restAntdProps} />
+  }
 
   return (
     <div>
@@ -234,55 +313,32 @@ const SmartTableInner = <RecordType extends object>(
           onBatchDelete={toolbar?.onBatchDelete}
         />
       )}
-      {pure ? (
-        <Table columns={columns} {...restAntdProps} />
-      ) : (
-        <Table
-          rowKey={finalRowKey}
-          loading={loading}
-          dataSource={dataSource}
-          columns={finalColumns}
-          onChange={handleTableChange}
-          pagination={{
-            current: pagination.page,
-            pageSize: pagination.pageSize,
-            total: total,
-            showSizeChanger: true,
-            showTotal: (totalCount) => `共 ${totalCount} 条数据`,
-          }}
-          rowSelection={
-            toolbar !== false
-              ? {
-                  selectedRowKeys,
-                  preserveSelectedRowKeys: true,
-                  onChange: (keys, rows) => {
-                    setSelectedRowKeys(keys)
-                    setSelectedRows((prevRows) => {
-                      const getRowKey = (record: RecordType): React.Key => {
-                        if (typeof finalRowKey === 'function') {
-                          return finalRowKey(record)
-                        }
 
-                        const obj = record as Record<string, unknown>
-                        return obj[finalRowKey] as React.Key
-                      }
-
-                      const currentIds = rows.map((r) => getRowKey(r))
-
-                      const historyRows = prevRows.filter((r) => {
-                        const id = getRowKey(r)
-                        return keys.includes(id) && !currentIds.includes(id)
-                      })
-                      return [...historyRows, ...rows]
-                    })
-                  },
-                  ...restAntdProps.rowSelection,
-                }
-              : restAntdProps.rowSelection
-          }
-          {...restAntdProps}
-        />
-      )}
+      <Table
+        rowKey={finalRowKey}
+        loading={loading}
+        dataSource={dataSource}
+        columns={finalColumns}
+        onChange={handleTableChange}
+        pagination={{
+          current: pagination.page,
+          pageSize: pagination.pageSize,
+          total,
+          showSizeChanger: true,
+          showTotal: (totalCount) => `共 ${totalCount} 条数据`,
+        }}
+        rowSelection={
+          toolbar !== false
+            ? {
+                selectedRowKeys,
+                preserveSelectedRowKeys: true,
+                onChange: handleRowSelectionChange,
+                ...restAntdProps.rowSelection,
+              }
+            : restAntdProps.rowSelection
+        }
+        {...restAntdProps}
+      />
     </div>
   )
 }

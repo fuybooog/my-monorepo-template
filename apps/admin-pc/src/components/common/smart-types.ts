@@ -10,9 +10,9 @@ import {
 } from 'antd'
 import { ColumnType } from 'antd/es/table'
 
-// form属性
+// form属
 
-export type SchemaItem<T extends React.ComponentType<any> = any> = {
+export type SmartFormItem<T extends React.ComponentType<any> = any> = {
   title: string
   itemProps?: Omit<FormItemProps, 'label' | 'name'>
 
@@ -24,7 +24,7 @@ export type SchemaItem<T extends React.ComponentType<any> = any> = {
   | { widget?: never; props?: never; render: (form: FormInstance) => React.ReactNode }
 )
 
-export type SmartSchema = Record<string, SchemaItem<any>>
+export type SmartSchema = Record<string, SmartFormItem<any>>
 
 export type SmartFormMode = 'query' | 'create' | 'edit' | 'view'
 export type SmartFormEditMode = Exclude<SmartFormMode, 'query'>
@@ -41,7 +41,7 @@ export interface SmartFormExtraProps {
   // 是否与地址栏url同步 默认true
   syncUrlParams?: boolean
   // 与地址栏url同步的解析函数
-  urlParamsTransform?: (params: Record<string, string>) => Record<string, any>
+  urlParamsTransform?: (params: Record<string, unknown>) => Record<string, unknown>
   // 是否自动触发查询，查询场景：输入框清空，选择器触发变动（select,date等）
   autoSubmit?: boolean
 }
@@ -66,7 +66,7 @@ interface BaseSmartTableProps<RecordType> {
         actions?: (SmartToolbarBuiltInAction | SmartToolbarCustomAction<RecordType>)[]
         hideSettings?: boolean
         onCreate?: () => void
-        onBatchDelete?: (keys: React.Key[], rows: RecordType[]) => void
+        onBatchDelete?: (keys: React.Key[], rows?: RecordType[]) => void
       }
     | false // 如果传 false 则彻底关闭工具栏
   // 是否使用默认排序规则
@@ -143,7 +143,7 @@ export interface SmartTableToolbarProps<T> {
   storageKey?: string
   // 额外暴露出一些快捷操作
   onCreate?: () => void
-  onBatchDelete?: (keys: React.Key[], rows: T[]) => void
+  onBatchDelete?: (keys: React.Key[], rows?: T[]) => void
 }
 
 // columns属性

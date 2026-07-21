@@ -34,7 +34,7 @@ export function UserListPage() {
     () =>
       getUserColumns({
         onNameClick(record) {
-          console.log('record', record)
+          console.warn('record', record)
         },
       }),
     [],

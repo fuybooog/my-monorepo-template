@@ -10,7 +10,7 @@ const http = new HttpClient({
   onError(error) {
     // 鉴权错误，跳转登录
     // 系统错误，对应处理
-    console.log('onError', error)
+    console.error('onError', error)
   },
 })
 

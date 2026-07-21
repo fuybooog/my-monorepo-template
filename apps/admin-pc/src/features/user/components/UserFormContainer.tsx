@@ -48,7 +48,6 @@ export const UserFormContainer: React.FC<UserFormContainerProps> = ({ id, mode, 
 
   const handleFinish = async (values: Backend.UserRespDto) => {
     const cleanParams = serializeFormValues(values, dynamicSchema)
-    console.log('handleFinish', cleanParams)
 
     try {
       if (mode === 'create') {
