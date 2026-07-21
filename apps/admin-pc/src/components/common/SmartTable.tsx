@@ -48,6 +48,7 @@ const useTableColumns = <RecordType extends object>({
   })
 
   const handleCheckedKeysChange = (nextKeys: React.Key[]) => {
+    if (!storageKey) return
     setCheckedKeys(nextKeys)
     if (storageKey) {
       localStorage.setItem(`table_cols_${storageKey}`, JSON.stringify(nextKeys))
@@ -56,6 +57,7 @@ const useTableColumns = <RecordType extends object>({
 
   // 1. 根据勾选过滤列
   const filteredColumns = useMemo(() => {
+    if (!storageKey) return columns || []
     return (columns || []).filter((col) => {
       const key = getColumnKey(col)
       if (!key) return true
@@ -308,7 +310,7 @@ const SmartTableInner = <RecordType extends object>(
           checkedKeys={checkedKeys}
           onCheckedKeysChange={handleCheckedKeysChange}
           actions={toolbar?.actions}
-          hideSettings={toolbar?.hideSettings}
+          hideSettings={!storageKey || toolbar?.hideSettings}
           onCreate={toolbar?.onCreate}
           onBatchDelete={toolbar?.onBatchDelete}
         />
