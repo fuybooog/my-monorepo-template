@@ -3,6 +3,7 @@ import React from 'react'
 import { Tag } from 'antd'
 import dayjs from 'dayjs'
 import type { AnyObject } from 'antd/es/_util/type'
+import { DEFAULT_STATUS_MAP, StatusConfig } from '@/constants'
 
 const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 
@@ -42,16 +43,6 @@ export function commonTimeRender(
   const value = formatOrValue
   if (!value) return '-'
   return dayjs(value).format(DEFAULT_FORMAT)
-}
-
-export interface StatusConfig {
-  text: string
-  color: string
-}
-
-const DEFAULT_STATUS_MAP: Record<string | number, StatusConfig> = {
-  '1': { text: '启用', color: 'success' },
-  '0': { text: '禁用', color: 'error' },
 }
 
 const DEFAULT_KEY = '0'

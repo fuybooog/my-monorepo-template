@@ -21,5 +21,5 @@ export class BatchRespDto {
   @Expose()
   @ApiPropertyOptional({ description: '未找到的id数组', example: '' })
   @IsOptional()
-  notFoundIds?: number[]
+  notFoundIds?: number[] | string[]
 }

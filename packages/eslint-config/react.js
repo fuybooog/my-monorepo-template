@@ -19,6 +19,23 @@ export default [
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react-hooks/set-state-in-effect': 'warn',
+      'no-unused-vars': 'off',
+      // 使用 TypeScript 版本，并配置忽略模式
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+      'no-console': [
+        'warn',
+        {
+          allow: ['error', 'warn'], // 允许这两个方法，其他（log, info, debug 等）会警告
+        },
+      ],
     },
   },
 ]

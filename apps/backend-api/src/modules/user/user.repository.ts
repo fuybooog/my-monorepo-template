@@ -13,34 +13,40 @@ export class UserRepository extends Repository<User> {
   }
 
   async searchUsersByPage(query: UserPageDto) {
-    const { page = 1, pageSize = 10, userName, sort } = query
+    const { page = 1, pageSize = 10, userName, sort, status, birthStart, birthEnd } = query
 
     const qb = this.createQueryBuilder('user')
 
     if (userName) {
       qb.andWhere('user.userName LIKE :userName', { userName: `%${userName}%` })
     }
+    if (status) {
+      qb.andWhere('user.status = :status', { status: status })
+    }
+    if (birthStart) {
+      qb.andWhere('user.birth >= :birthStart', { birthStart: birthStart })
+    }
+    if (birthEnd) {
+      qb.andWhere('user.birth <= :birthEnd', { birthEnd: birthEnd })
+    }
 
     if (sort && Object.keys(sort).length > 0) {
       const allowedFields = ['userName', 'createdAt', 'updatedAt']
-
       let isFirst = true
+
       for (const [key, direction] of Object.entries(sort)) {
         if (allowedFields.includes(key)) {
-          // 拼接成类似 'user.userName' 的全称
           const orderField = `user.${key}`
-
           if (isFirst) {
-            qb.orderBy(orderField, direction)
+            qb.orderBy(orderField, direction as 'ASC' | 'DESC')
             isFirst = false
           } else {
-            qb.addOrderBy(orderField, direction)
+            qb.addOrderBy(orderField, direction as 'ASC' | 'DESC')
           }
         }
       }
       qb.addOrderBy('user.id', 'ASC')
     } else {
-      // 默认排序：如果没有传入任何排序，走默认的降序
       qb.orderBy('user.createdAt', 'DESC').addOrderBy('user.id', 'ASC')
     }
 

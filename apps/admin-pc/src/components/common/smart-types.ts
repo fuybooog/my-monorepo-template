@@ -1,6 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
-import { FormItemProps, FormInstance, TableProps, FormProps } from 'antd'
+import {
+  FormItemProps,
+  FormInstance,
+  TableProps,
+  FormProps,
+  DropdownProps,
+  ButtonProps,
+} from 'antd'
+import { ColumnType } from 'antd/es/table'
 
 // form属性
 
@@ -19,6 +27,7 @@ export type SchemaItem<T extends React.ComponentType<any> = any> = {
 export type SmartSchema = Record<string, SchemaItem<any>>
 
 export type SmartFormMode = 'query' | 'create' | 'edit' | 'view'
+export type SmartFormEditMode = Exclude<SmartFormMode, 'query'>
 
 export interface SmartFormExtraProps {
   // 表单结构
@@ -33,11 +42,22 @@ export interface SmartFormExtraProps {
   syncUrlParams?: boolean
   // 与地址栏url同步的解析函数
   urlParamsTransform?: (params: Record<string, string>) => Record<string, any>
+  // 是否自动触发查询，查询场景：输入框清空，选择器触发变动（select,date等）
+  autoSubmit?: boolean
 }
 
 export type SmartFormProps = Omit<FormProps, 'children'> & SmartFormExtraProps
 
 // table属性
+
+export interface LinkConfig<RecordType> {
+  onClick?: (record: RecordType) => void // 自定义点击，若不提供则触发全局 onLinkClick
+  target?: '_blank' | '_self'
+}
+
+export interface SmartColumnType<RecordType> extends ColumnType<RecordType> {
+  link?: boolean | LinkConfig<RecordType>
+}
 
 interface BaseSmartTableProps<RecordType> {
   storageKey?: string // 开启本地列持久化存储的唯一 key
@@ -51,7 +71,12 @@ interface BaseSmartTableProps<RecordType> {
     | false // 如果传 false 则彻底关闭工具栏
   // 是否使用默认排序规则
   defaultSort?: boolean
+  // 首次渲染时是否自动查询
   autoSearch?: boolean
+  // 表单schema
+  schema?: SmartSchema
+  actionColumn?: ActionColumnConfig<RecordType> | false
+  onLinkClick?: (row: RecordType, columnKey: React.Key) => void
 }
 
 interface ImpureTableProps<RecordType> extends BaseSmartTableProps<RecordType> {
@@ -73,10 +98,16 @@ export type SmartTableExtraProps<RecordType> =
   | ImpureTableProps<RecordType>
   | PureTableProps<RecordType>
 
-export type SmartTableProps<RecordType> = TableProps<RecordType> & SmartTableExtraProps<RecordType>
+interface ColumnsTypeProps<RecordType> extends Omit<TableProps<RecordType>, 'columns'> {
+  columns?: SmartColumnType<RecordType>[]
+}
+
+export type SmartTableProps<RecordType> = ColumnsTypeProps<RecordType> &
+  SmartTableExtraProps<RecordType>
 
 export interface SmartTableInstance {
   refresh: (resetPage?: boolean) => void
+  clearSelection: () => void
 }
 
 // Toolbar 属性
@@ -120,4 +151,35 @@ export interface ColumnSettingsProps {
   columns: any[]
   checkedKeys: any[]
   onCheckedKeysChange: (vals: React.Key[]) => void
+}
+
+// 预设按钮类型（支持字符串简写）
+export type PresetAction = 'edit' | 'delete'
+
+export interface CustomAction<RecordType> extends Omit<
+  ButtonProps,
+  'onClick' | 'disabled' | 'hidden'
+> {
+  key: string
+  label: string
+  icon?: React.ReactNode // 保留，与 ButtonProps.icon 类型一致
+  disabled?: boolean | ((record: RecordType) => boolean) // 支持函数
+  hidden?: boolean | ((record: RecordType) => boolean)
+  onClick?: (record: RecordType) => void // 自定义 onClick，带 record
+  popTitle?: string
+  popDescription?: string
+}
+
+export type ActionItem<RecordType> = PresetAction | CustomAction<RecordType>
+
+// 操作列配置：继承 ColumnType
+export interface ActionColumnConfig<RecordType> extends ColumnType<RecordType> {
+  buttons: ActionItem<RecordType>[]
+  maxVisible?: number
+  moreText?: string
+  moreIcon?: React.ReactNode
+  moreDropdownProps?: DropdownProps
+  onEdit?: (record: RecordType) => void
+  onDelete?: (record: RecordType) => void
+  onAction?: (key: string, record: RecordType) => void
 }

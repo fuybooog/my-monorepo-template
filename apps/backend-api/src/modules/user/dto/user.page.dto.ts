@@ -13,6 +13,16 @@ export class UserPageDto extends IntersectionType(
   @IsString()
   userName?: string
 
+  @ApiPropertyOptional({ description: '生日日期开始', example: '2000-10-10' })
+  @IsString()
+  @IsOptional()
+  birthStart?: string
+
+  @ApiPropertyOptional({ description: '生日日期结束', example: '2000-10-10' })
+  @IsString()
+  @IsOptional()
+  birthEnd?: string
+
   @ApiPropertyOptional({ description: '创建日期开始', example: '2000-10-10 00:00:00' })
   @IsString()
   @IsOptional()

@@ -71,7 +71,7 @@ describe('UserService (E2E/Integration)', () => {
       expect(result?.id).toBeGreaterThan(0)
 
       // 数据库核对入库字段
-      const saved = await userService.findUserById(result!.id)
+      const saved = await userService.findUserById(result!.id!)
       expect(saved).toMatchObject(fullUserDto)
     })
 

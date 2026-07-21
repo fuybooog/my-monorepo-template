@@ -1,2 +1,3 @@
-export * from './table-reset'
+export * from './table-fns'
+export * from './form-fns'
 export * from './common-render'

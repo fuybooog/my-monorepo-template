@@ -380,6 +380,826 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/value-set/page': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 分页查询值集列表 */
+    get: operations['ValueSetController_pageValueSet']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/schema-generator-holder-page-value-set': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * 请勿调用，用于生成前端DTO
+     * @deprecated
+     */
+    post: operations['ValueSetController__pageValueSet']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/option': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 分页查询值集列表(可选字段) */
+    get: operations['ValueSetController_pageOptionValueSet']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/schema-generator-holder-page-option-value-set': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * 请勿调用，用于生成前端DTO
+     * @deprecated
+     */
+    post: operations['ValueSetController__pageOptionValueSet']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/by-set-codes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 按集code查询值集 */
+    get: operations['ValueSetController_findValueSetBySetCodes']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/schema-generator-holder-by-set-codes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * 请勿调用，用于生成前端DTO
+     * @deprecated
+     */
+    post: operations['ValueSetController__findValueSetBySetCodes']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/find/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 按id查询值集 */
+    get: operations['ValueSetController_findValueSetById']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/batch/query': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 按ids查询值集 */
+    get: operations['ValueSetController_findValueSetListByIds']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/create': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 创建值集 */
+    post: operations['ValueSetController_createValueSet']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/update/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 修改值集 */
+    post: operations['ValueSetController_updateValueSet']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/delete/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 删除值集 */
+    post: operations['ValueSetController_removeValueSet']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/batch/delete': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 批量删除值集 */
+    post: operations['ValueSetController_batchRemoveValueSet']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/updateStatus/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 修改值集状态 */
+    post: operations['ValueSetController_updateValueSetStatus']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/batch/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 批量修改值集状态 */
+    post: operations['ValueSetController_batchUpdateValueSetStatus']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/template': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 下载导入值集模板 */
+    post: operations['ValueSetController_downloadValueSetTemplate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/import': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 导入值集数据 */
+    post: operations['ValueSetController_importValueSet']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/export': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 导出值集数据 */
+    post: operations['ValueSetController_exportValueSet']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/page': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 分页查询用户列表 */
+    get: operations['ResourceController_pageResource']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/schema-generator-holder-page-resource': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * 请勿调用，用于生成前端DTO
+     * @deprecated
+     */
+    post: operations['ResourceController__pageResource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/option': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 分页查询用户列表(可选字段) */
+    get: operations['ResourceController_pageOptionResource']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/schema-generator-holder-page-option-resource': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * 请勿调用，用于生成前端DTO
+     * @deprecated
+     */
+    post: operations['ResourceController__pageOptionResource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/find/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 按id查询用户 */
+    get: operations['ResourceController_findResourceById']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/batch/query': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 按ids查询用户 */
+    get: operations['ResourceController_findResourceListByIds']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/create': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 创建用户 */
+    post: operations['ResourceController_createResource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/update/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 修改用户 */
+    post: operations['ResourceController_updateResource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/delete/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 删除用户 */
+    post: operations['ResourceController_removeResource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/batch/delete': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 批量删除用户 */
+    post: operations['ResourceController_batchRemoveResource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/updateStatus/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 修改用户状态 */
+    post: operations['ResourceController_updateResourceStatus']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/batch/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 批量修改用户状态 */
+    post: operations['ResourceController_batchUpdateResourceStatus']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/template': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 下载导入用户模板 */
+    post: operations['ResourceController_downloadResourceTemplate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/import': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 导入用户数据 */
+    post: operations['ResourceController_importResource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/export': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 导出用户数据 */
+    post: operations['ResourceController_exportResource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/page': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 分页查询用户列表 */
+    get: operations['RoleController_pageRole']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/schema-generator-holder-page-role': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * 请勿调用，用于生成前端DTO
+     * @deprecated
+     */
+    post: operations['RoleController__pageRole']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/option': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 分页查询用户列表(可选字段) */
+    get: operations['RoleController_pageOptionRole']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/schema-generator-holder-page-option-role': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * 请勿调用，用于生成前端DTO
+     * @deprecated
+     */
+    post: operations['RoleController__pageOptionRole']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/find/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 按id查询用户 */
+    get: operations['RoleController_findRoleById']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/batch/query': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 按ids查询用户 */
+    get: operations['RoleController_findRoleListByIds']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/create': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 创建用户 */
+    post: operations['RoleController_createRole']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/update/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 修改用户 */
+    post: operations['RoleController_updateRole']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/delete/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 删除用户 */
+    post: operations['RoleController_removeRole']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/batch/delete': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 批量删除用户 */
+    post: operations['RoleController_batchRemoveRole']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/updateStatus/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 修改用户状态 */
+    post: operations['RoleController_updateRoleStatus']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/batch/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 批量修改用户状态 */
+    post: operations['RoleController_batchUpdateRoleStatus']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/template': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 下载导入用户模板 */
+    post: operations['RoleController_downloadRoleTemplate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/import': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 导入用户数据 */
+    post: operations['RoleController_importRole']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/role/export': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 导出用户数据 */
+    post: operations['RoleController_exportRole']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -529,6 +1349,16 @@ export interface components {
       pageSize?: number
       /** @description 用户名 */
       userName?: string
+      /**
+       * @description 生日日期开始
+       * @example 2000-10-10
+       */
+      birthStart?: string
+      /**
+       * @description 生日日期结束
+       * @example 2000-10-10
+       */
+      birthEnd?: string
       /**
        * @description 创建日期开始
        * @example 2000-10-10 00:00:00
@@ -732,6 +1562,501 @@ export interface components {
        */
       status: '1' | '0'
     }
+    ValueSetPageRespDto: {
+      /** @description 字典id */
+      id: number
+      /** @description 集编码 */
+      setCode: string
+      /** @description 集名称 */
+      setName: string
+      /** @description 字典编码 */
+      code: string
+      /** @description 字典名称 */
+      name: string
+      /** @description 父编码 */
+      parentSetCode?: string
+      /** @description 父名称 */
+      parentSetName?: string
+      /** @description 状态  0-禁用 1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 创建人id */
+      createdUserId?: number
+      /** @description 创建人名称 */
+      createdUserName?: string
+      /** @description 修改人id */
+      updatedUserId?: number
+      /** @description 修改人姓名 */
+      updatedUserName?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    ValueSetPageDto: {
+      /** @description 父编码 */
+      parentSetCode?: string
+      /** @description 父名称 */
+      parentSetName?: string
+      /** @description 状态  0-禁用 1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 创建人id */
+      createdUserId?: number
+      /** @description 创建人名称 */
+      createdUserName?: string
+      /** @description 修改人id */
+      updatedUserId?: number
+      /** @description 修改人姓名 */
+      updatedUserName?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+      /** @description 页码 */
+      page?: number
+      /** @description 每页条数 */
+      pageSize?: number
+      /**
+       * @description 集CODE
+       * @example SYS_GENDER
+       */
+      setCode?: string
+      /**
+       * @description 集NAME
+       * @example 性别
+       */
+      setName?: string
+      /**
+       * @description 值CODE
+       * @example 1
+       */
+      code?: string
+      /**
+       * @description 值NAME
+       * @example 男
+       */
+      name?: string
+      /**
+       * @description 创建时间开始
+       * @example 2000-10-10 00:00:00
+       */
+      createdAtStart?: string
+      /**
+       * @description 创建时间结束
+       * @example 2000-10-10 23:59:59
+       */
+      createdAtEnd?: string
+      /**
+       * @description 修改时间开始
+       * @example 2000-10-10 00:00:00
+       */
+      updatedAtStart?: string
+      /**
+       * @description 修改时间结束
+       * @example 2000-10-10 23:59:59
+       */
+      updatedAtEnd?: string
+    }
+    ValueSetPageOptionDto: {
+      /** @description 页码 */
+      page?: number
+      /** @description 每页条数 */
+      pageSize?: number
+      /**
+       * @description 关键字
+       * @example
+       */
+      keyword?: string
+      /**
+       * @description 返回的列表字段
+       * @example
+       */
+      fields?: string
+    }
+    ValueSetRespDto: {
+      /** @description 字典id */
+      id: number
+      /** @description 集编码 */
+      setCode: string
+      /** @description 集名称 */
+      setName: string
+      /** @description 字典编码 */
+      code: string
+      /** @description 字典名称 */
+      name: string
+      /** @description 父编码 */
+      parentSetCode?: string
+      /** @description 父名称 */
+      parentSetName?: string
+      /** @description 状态  0-禁用 1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 创建人id */
+      createdUserId?: number
+      /** @description 创建人名称 */
+      createdUserName?: string
+      /** @description 修改人id */
+      updatedUserId?: number
+      /** @description 修改人姓名 */
+      updatedUserName?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    ValueSetListRespDto: {
+      /**
+       * @description 未找到的id数组
+       * @example
+       */
+      notFoundIds?: string[]
+      /** @description 列表 */
+      list: components['schemas']['ValueSetRespDto'][]
+    }
+    ValueSetListDto: {
+      /** @description ,分隔的集CODE */
+      setCodes: string
+    }
+    ValueSetCreateDto: {
+      /** @description 集编码 */
+      setCode: string
+      /** @description 集名称 */
+      setName: string
+      /** @description 字典编码 */
+      code: string
+      /** @description 字典名称 */
+      name: string
+      /** @description 父编码 */
+      parentSetCode?: string
+      /** @description 父名称 */
+      parentSetName?: string
+      /** @description 状态  0-禁用 1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 创建人id */
+      createdUserId?: number
+      /** @description 创建人名称 */
+      createdUserName?: string
+      /** @description 修改人id */
+      updatedUserId?: number
+      /** @description 修改人姓名 */
+      updatedUserName?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    ValueSetUpdateDto: {
+      /** @description 集编码 */
+      setCode: string
+      /** @description 集名称 */
+      setName: string
+      /** @description 字典编码 */
+      code: string
+      /** @description 字典名称 */
+      name: string
+      /** @description 父编码 */
+      parentSetCode?: string
+      /** @description 父名称 */
+      parentSetName?: string
+      /** @description 状态  0-禁用 1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 创建人id */
+      createdUserId?: number
+      /** @description 创建人名称 */
+      createdUserName?: string
+      /** @description 修改人id */
+      updatedUserId?: number
+      /** @description 修改人姓名 */
+      updatedUserName?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    ResourcePageRespDto: {
+      /** @description 资源id */
+      id: number
+      /** @description 资源名称 */
+      label?: string
+      /** @description 唯一编码 */
+      uniqueProp?: string
+      /** @description 唯一父编码 */
+      parentUniqueProp?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 资源类型：1-页面 2-按钮 3-列 */
+      type?: string
+      /** @description 排序号 */
+      sortNumber?: number
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    ResourcePageDto: {
+      /** @description 资源名称 */
+      label?: string
+      /** @description 唯一编码 */
+      uniqueProp?: string
+      /** @description 唯一父编码 */
+      parentUniqueProp?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 资源类型：1-页面 2-按钮 3-列 */
+      type?: string
+      /** @description 排序号 */
+      sortNumber?: number
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+      /** @description 页码 */
+      page?: number
+      /** @description 每页条数 */
+      pageSize?: number
+      /**
+       * @description 创建时间开始
+       * @example 2000-10-10 00:00:00
+       */
+      createdAtStart?: string
+      /**
+       * @description 创建时间结束
+       * @example 2000-10-10 23:59:59
+       */
+      createdAtEnd?: string
+      /**
+       * @description 修改时间开始
+       * @example 2000-10-10 00:00:00
+       */
+      updatedAtStart?: string
+      /**
+       * @description 修改时间结束
+       * @example 2000-10-10 23:59:59
+       */
+      updatedAtEnd?: string
+    }
+    ResourcePageOptionDto: {
+      /** @description 页码 */
+      page?: number
+      /** @description 每页条数 */
+      pageSize?: number
+      /**
+       * @description 关键字
+       * @example
+       */
+      keyword?: string
+      /**
+       * @description 返回的列表字段
+       * @example
+       */
+      fields?: string
+    }
+    ResourceRespDto: {
+      /** @description 资源id */
+      id: number
+      /** @description 资源名称 */
+      label?: string
+      /** @description 唯一编码 */
+      uniqueProp?: string
+      /** @description 唯一父编码 */
+      parentUniqueProp?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 资源类型：1-页面 2-按钮 3-列 */
+      type?: string
+      /** @description 排序号 */
+      sortNumber?: number
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    ResourceListRespDto: {
+      /**
+       * @description 未找到的id数组
+       * @example
+       */
+      notFoundIds?: string[]
+      /** @description 列表 */
+      list: string[]
+    }
+    ResourceCreateDto: {
+      /** @description 资源名称 */
+      label?: string
+      /** @description 唯一编码 */
+      uniqueProp?: string
+      /** @description 唯一父编码 */
+      parentUniqueProp?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 资源类型：1-页面 2-按钮 3-列 */
+      type?: string
+      /** @description 排序号 */
+      sortNumber?: number
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    ResourceUpdateDto: {
+      /** @description 资源名称 */
+      label?: string
+      /** @description 唯一编码 */
+      uniqueProp?: string
+      /** @description 唯一父编码 */
+      parentUniqueProp?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 资源类型：1-页面 2-按钮 3-列 */
+      type?: string
+      /** @description 排序号 */
+      sortNumber?: number
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    RolePageRespDto: {
+      /** @description 角色id */
+      id: number
+      /** @description 角色名称 */
+      roleName: string
+      /** @description 角色编码 */
+      roleCode: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    RolePageDto: {
+      /** @description 角色名称 */
+      roleName: string
+      /** @description 角色编码 */
+      roleCode: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+      /** @description 页码 */
+      page?: number
+      /** @description 每页条数 */
+      pageSize?: number
+      /**
+       * @description 创建时间开始
+       * @example 2000-10-10 00:00:00
+       */
+      createdAtStart?: string
+      /**
+       * @description 创建时间结束
+       * @example 2000-10-10 23:59:59
+       */
+      createdAtEnd?: string
+      /**
+       * @description 修改时间开始
+       * @example 2000-10-10 00:00:00
+       */
+      updatedAtStart?: string
+      /**
+       * @description 修改时间结束
+       * @example 2000-10-10 23:59:59
+       */
+      updatedAtEnd?: string
+    }
+    RolePageOptionDto: {
+      /** @description 页码 */
+      page?: number
+      /** @description 每页条数 */
+      pageSize?: number
+      /**
+       * @description 关键字
+       * @example
+       */
+      keyword?: string
+      /**
+       * @description 返回的列表字段
+       * @example
+       */
+      fields?: string
+    }
+    RoleRespDto: {
+      /** @description 角色id */
+      id: number
+      /** @description 角色名称 */
+      roleName: string
+      /** @description 角色编码 */
+      roleCode: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    RoleListRespDto: {
+      /**
+       * @description 未找到的id数组
+       * @example
+       */
+      notFoundIds?: string[]
+      /** @description 列表 */
+      list: string[]
+    }
+    RoleCreateDto: {
+      /** @description 角色名称 */
+      roleName: string
+      /** @description 角色编码 */
+      roleCode: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    RoleUpdateDto: {
+      /** @description 角色名称 */
+      roleName: string
+      /** @description 角色编码 */
+      roleCode: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
   }
   responses: never
   parameters: never
@@ -912,6 +2237,10 @@ export interface operations {
         pageSize?: number
         /** @description 用户名 */
         userName?: string
+        /** @description 生日日期开始 */
+        birthStart?: string
+        /** @description 生日日期结束 */
+        birthEnd?: string
         /** @description 创建日期开始 */
         createdAtStart?: string
         /** @description 创建日期结束 */
@@ -1350,6 +2679,1370 @@ export interface operations {
              * @example true
              */
             data: boolean
+          }
+        }
+      }
+    }
+  }
+  ValueSetController_pageValueSet: {
+    parameters: {
+      query?: {
+        /** @description 父编码 */
+        parentSetCode?: string
+        /** @description 父名称 */
+        parentSetName?: string
+        /** @description 状态  0-禁用 1-启用 */
+        status?: string
+        /** @description 创建时间 */
+        createdAt?: string
+        /** @description 修改时间 */
+        updatedAt?: string
+        /** @description 创建人id */
+        createdUserId?: number
+        /** @description 创建人名称 */
+        createdUserName?: string
+        /** @description 修改人id */
+        updatedUserId?: number
+        /** @description 修改人姓名 */
+        updatedUserName?: string
+        /** @description 删除时间 */
+        deletedAt?: string
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 集CODE */
+        setCode?: string
+        /** @description 集NAME */
+        setName?: string
+        /** @description 值CODE */
+        code?: string
+        /** @description 值NAME */
+        name?: string
+        /** @description 创建时间开始 */
+        createdAtStart?: string
+        /** @description 创建时间结束 */
+        createdAtEnd?: string
+        /** @description 修改时间开始 */
+        updatedAtStart?: string
+        /** @description 修改时间结束 */
+        updatedAtEnd?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 分页成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['PaginatedResult'] & {
+              /**
+               * @description 总条数
+               * @example 100
+               */
+              total: number
+              /**
+               * @description 当前页码
+               * @example 1
+               */
+              page: number
+              /**
+               * @description 每页条数
+               * @example 10
+               */
+              pageSize: number
+              list: components['schemas']['ValueSetPageRespDto'][]
+            }
+          }
+        }
+      }
+    }
+  }
+  ValueSetController__pageValueSet: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValueSetPageDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ValueSetController_pageOptionValueSet: {
+    parameters: {
+      query?: {
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 关键字 */
+        keyword?: string
+        /** @description 返回的列表字段 */
+        fields?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 分页成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['PaginatedResult'] & {
+              /**
+               * @description 总条数
+               * @example 100
+               */
+              total: number
+              /**
+               * @description 当前页码
+               * @example 1
+               */
+              page: number
+              /**
+               * @description 每页条数
+               * @example 10
+               */
+              pageSize: number
+              list: components['schemas']['ValueSetPageRespDto'][]
+            }
+          }
+        }
+      }
+    }
+  }
+  ValueSetController__pageOptionValueSet: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValueSetPageOptionDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ValueSetController_findValueSetBySetCodes: {
+    parameters: {
+      query: {
+        /** @description ,分隔的集CODE */
+        setCodes: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['ValueSetListRespDto']
+          }
+        }
+      }
+    }
+  }
+  ValueSetController__findValueSetBySetCodes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValueSetListDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ValueSetController_findValueSetById: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['ValueSetRespDto']
+          }
+        }
+      }
+    }
+  }
+  ValueSetController_findValueSetListByIds: {
+    parameters: {
+      query: {
+        /** @description 用“,”拼接的id */
+        ids: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['ValueSetListRespDto']
+          }
+        }
+      }
+    }
+  }
+  ValueSetController_createValueSet: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValueSetCreateDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['ValueSetRespDto']
+          }
+        }
+      }
+    }
+  }
+  ValueSetController_updateValueSet: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValueSetUpdateDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['ValueSetRespDto']
+          }
+        }
+      }
+    }
+  }
+  ValueSetController_removeValueSet: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  ValueSetController_batchRemoveValueSet: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BatchDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['BatchRespDto']
+          }
+        }
+      }
+    }
+  }
+  ValueSetController_updateValueSetStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateStatusDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  ValueSetController_batchUpdateValueSetStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BatchUpdateStatusDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['BatchRespDto']
+          }
+        }
+      }
+    }
+  }
+  ValueSetController_downloadValueSetTemplate: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  ValueSetController_importValueSet: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  ValueSetController_exportValueSet: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  ResourceController_pageResource: {
+    parameters: {
+      query?: {
+        /** @description 资源名称 */
+        label?: string
+        /** @description 唯一编码 */
+        uniqueProp?: string
+        /** @description 唯一父编码 */
+        parentUniqueProp?: string
+        /** @description 状态：0-禁用，1-启用 */
+        status?: string
+        /** @description 资源类型：1-页面 2-按钮 3-列 */
+        type?: string
+        /** @description 排序号 */
+        sortNumber?: number
+        /** @description 创建时间 */
+        createdAt?: string
+        /** @description 修改时间 */
+        updatedAt?: string
+        /** @description 删除时间 */
+        deletedAt?: string
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 创建时间开始 */
+        createdAtStart?: string
+        /** @description 创建时间结束 */
+        createdAtEnd?: string
+        /** @description 修改时间开始 */
+        updatedAtStart?: string
+        /** @description 修改时间结束 */
+        updatedAtEnd?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 分页成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['PaginatedResult'] & {
+              /**
+               * @description 总条数
+               * @example 100
+               */
+              total: number
+              /**
+               * @description 当前页码
+               * @example 1
+               */
+              page: number
+              /**
+               * @description 每页条数
+               * @example 10
+               */
+              pageSize: number
+              list: components['schemas']['ResourcePageRespDto'][]
+            }
+          }
+        }
+      }
+    }
+  }
+  ResourceController__pageResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResourcePageDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ResourceController_pageOptionResource: {
+    parameters: {
+      query?: {
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 关键字 */
+        keyword?: string
+        /** @description 返回的列表字段 */
+        fields?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 分页成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['PaginatedResult'] & {
+              /**
+               * @description 总条数
+               * @example 100
+               */
+              total: number
+              /**
+               * @description 当前页码
+               * @example 1
+               */
+              page: number
+              /**
+               * @description 每页条数
+               * @example 10
+               */
+              pageSize: number
+              list: components['schemas']['ResourcePageRespDto'][]
+            }
+          }
+        }
+      }
+    }
+  }
+  ResourceController__pageOptionResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResourcePageOptionDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ResourceController_findResourceById: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['ResourceRespDto']
+          }
+        }
+      }
+    }
+  }
+  ResourceController_findResourceListByIds: {
+    parameters: {
+      query: {
+        /** @description 用“,”拼接的id */
+        ids: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['ResourceListRespDto']
+          }
+        }
+      }
+    }
+  }
+  ResourceController_createResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResourceCreateDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['ResourceRespDto']
+          }
+        }
+      }
+    }
+  }
+  ResourceController_updateResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResourceUpdateDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['ResourceRespDto']
+          }
+        }
+      }
+    }
+  }
+  ResourceController_removeResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  ResourceController_batchRemoveResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BatchDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['BatchRespDto']
+          }
+        }
+      }
+    }
+  }
+  ResourceController_updateResourceStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateStatusDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  ResourceController_batchUpdateResourceStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BatchUpdateStatusDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['BatchRespDto']
+          }
+        }
+      }
+    }
+  }
+  ResourceController_downloadResourceTemplate: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  ResourceController_importResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  ResourceController_exportResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  RoleController_pageRole: {
+    parameters: {
+      query: {
+        /** @description 角色名称 */
+        roleName: string
+        /** @description 角色编码 */
+        roleCode: string
+        /** @description 状态：0-禁用，1-启用 */
+        status?: string
+        /** @description 创建时间 */
+        createdAt?: string
+        /** @description 修改时间 */
+        updatedAt?: string
+        /** @description 删除时间 */
+        deletedAt?: string
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 创建时间开始 */
+        createdAtStart?: string
+        /** @description 创建时间结束 */
+        createdAtEnd?: string
+        /** @description 修改时间开始 */
+        updatedAtStart?: string
+        /** @description 修改时间结束 */
+        updatedAtEnd?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 分页成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['PaginatedResult'] & {
+              /**
+               * @description 总条数
+               * @example 100
+               */
+              total: number
+              /**
+               * @description 当前页码
+               * @example 1
+               */
+              page: number
+              /**
+               * @description 每页条数
+               * @example 10
+               */
+              pageSize: number
+              list: components['schemas']['RolePageRespDto'][]
+            }
+          }
+        }
+      }
+    }
+  }
+  RoleController__pageRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RolePageDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  RoleController_pageOptionRole: {
+    parameters: {
+      query?: {
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 关键字 */
+        keyword?: string
+        /** @description 返回的列表字段 */
+        fields?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 分页成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['PaginatedResult'] & {
+              /**
+               * @description 总条数
+               * @example 100
+               */
+              total: number
+              /**
+               * @description 当前页码
+               * @example 1
+               */
+              page: number
+              /**
+               * @description 每页条数
+               * @example 10
+               */
+              pageSize: number
+              list: components['schemas']['RolePageRespDto'][]
+            }
+          }
+        }
+      }
+    }
+  }
+  RoleController__pageOptionRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RolePageOptionDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  RoleController_findRoleById: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['RoleRespDto']
+          }
+        }
+      }
+    }
+  }
+  RoleController_findRoleListByIds: {
+    parameters: {
+      query: {
+        /** @description 用“,”拼接的id */
+        ids: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['RoleListRespDto']
+          }
+        }
+      }
+    }
+  }
+  RoleController_createRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RoleCreateDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['RoleRespDto']
+          }
+        }
+      }
+    }
+  }
+  RoleController_updateRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RoleUpdateDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['RoleRespDto']
+          }
+        }
+      }
+    }
+  }
+  RoleController_removeRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  RoleController_batchRemoveRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BatchDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['BatchRespDto']
+          }
+        }
+      }
+    }
+  }
+  RoleController_updateRoleStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateStatusDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  RoleController_batchUpdateRoleStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BatchUpdateStatusDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['BatchRespDto']
+          }
+        }
+      }
+    }
+  }
+  RoleController_downloadRoleTemplate: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  RoleController_importRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  RoleController_exportRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
           }
         }
       }

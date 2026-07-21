@@ -33,7 +33,7 @@ export class ${pascalCaseName}Controller {
   constructor(private readonly ${camelCaseName}Service: ${pascalCaseName}Service) {}
 
   @Get('page')
-  @ApiOperation({ summary: '分页查询用户列表' })
+  @ApiOperation({ summary: '分页查询${moduleNameCn}列表' })
   @ApiSuccessPageResponse(${pascalCaseName}PageRespDto)
   async page${pascalCaseName}(@Query() query: ${pascalCaseName}PageDto): Promise<PaginatedResult<${pascalCaseName}PageRespDto>> {
     return await this.${camelCaseName}Service.page${pascalCaseName}(query)
@@ -47,7 +47,7 @@ export class ${pascalCaseName}Controller {
   }
 
   @Get('option')
-  @ApiOperation({ summary: '分页查询用户列表(可选字段)' })
+  @ApiOperation({ summary: '分页查询${moduleNameCn}列表(可选字段)' })
   @ApiSuccessPageResponse(${pascalCaseName}PageRespDto)
   async pageOption${pascalCaseName}(
     @Query() query: ${pascalCaseName}PageOptionDto,
@@ -64,7 +64,7 @@ export class ${pascalCaseName}Controller {
 
 
   @Get('find/:id')
-  @ApiOperation({ summary: '按id查询用户' })
+  @ApiOperation({ summary: '按id查询${moduleNameCn}' })
   @ApiSuccessResponse(${pascalCaseName}RespDto)
   async find${pascalCaseName}ById(@Param('id', ParseIntPipe) id: number): Promise<${pascalCaseName}RespDto | null> {
     const ${camelCaseName} = await this.${camelCaseName}Service.find${pascalCaseName}ById(id)
@@ -72,21 +72,21 @@ export class ${pascalCaseName}Controller {
   }
   
   @Get('batch/query')
-  @ApiOperation({ summary: '按ids查询用户' })
+  @ApiOperation({ summary: '按ids查询${moduleNameCn}' })
   @ApiSuccessResponse(${pascalCaseName}ListRespDto)
   async find${pascalCaseName}ListByIds(@Query() query: BatchDto): Promise<${pascalCaseName}ListRespDto | null> {
     return await this.${camelCaseName}Service.find${pascalCaseName}ListByIds(query.ids)
   }
 
   @Post('create')
-  @ApiOperation({ summary: '创建用户' })
+  @ApiOperation({ summary: '创建${moduleNameCn}' })
   @ApiSuccessResponse(${pascalCaseName}RespDto)
   async create${pascalCaseName}(@Body() body: ${pascalCaseName}CreateDto): Promise<${pascalCaseName}RespDto | null> {
     return await this.${camelCaseName}Service.create${pascalCaseName}(body)
   }
 
   @Post('update/:id')
-  @ApiOperation({ summary: '修改用户' })
+  @ApiOperation({ summary: '修改${moduleNameCn}' })
   @ApiSuccessResponse(${pascalCaseName}RespDto)
   async update${pascalCaseName}(
     @Param('id', ParseIntPipe) id: number,
@@ -96,49 +96,49 @@ export class ${pascalCaseName}Controller {
   }
 
   @Post('delete/:id')
-  @ApiOperation({ summary: '删除用户' })
+  @ApiOperation({ summary: '删除${moduleNameCn}' })
   @ApiSuccessResponse()
   async remove${pascalCaseName}(@Param('id') id: number) {
     return await this.${camelCaseName}Service.remove${pascalCaseName}(id)
   }
 
   @Post('batch/delete')
-  @ApiOperation({ summary: '批量删除用户' })
+  @ApiOperation({ summary: '批量删除${moduleNameCn}' })
   @ApiSuccessResponse(BatchRespDto)
   async batchRemove${pascalCaseName}(@Body() body: BatchDto): Promise<BatchRespDto | null> {
     return await this.${camelCaseName}Service.batchRemove${pascalCaseName}(body.ids)
   }
 
   @Post('updateStatus/:id')
-  @ApiOperation({ summary: '修改用户状态' })
+  @ApiOperation({ summary: '修改${moduleNameCn}状态' })
   @ApiSuccessResponse()
   async update${pascalCaseName}Status(@Param('id') id: number, @Body() body: UpdateStatusDto) {
     return await this.${camelCaseName}Service.update${pascalCaseName}Status(id, body)
   }
 
   @Post('batch/status')
-  @ApiOperation({ summary: '批量修改用户状态' })
+  @ApiOperation({ summary: '批量修改${moduleNameCn}状态' })
   @ApiSuccessResponse(BatchRespDto)
   async batchUpdate${pascalCaseName}Status(@Body() body: BatchUpdateStatusDto): Promise<BatchRespDto | null> {
     return await this.${camelCaseName}Service.batchUpdate${pascalCaseName}Status(body)
   }
 
   @Post('template')
-  @ApiOperation({ summary: '下载导入用户模板' })
+  @ApiOperation({ summary: '下载导入${moduleNameCn}模板' })
   @ApiSuccessResponse()
   async download${pascalCaseName}Template() {
     return await this.${camelCaseName}Service.downloadTemplate()
   }
 
   @Post('import')
-  @ApiOperation({ summary: '导入用户数据' })
+  @ApiOperation({ summary: '导入${moduleNameCn}数据' })
   @ApiSuccessResponse()
   async import${pascalCaseName}() {
     return await this.${camelCaseName}Service.import${pascalCaseName}()
   }
 
   @Post('export')
-  @ApiOperation({ summary: '导出用户数据' })
+  @ApiOperation({ summary: '导出${moduleNameCn}数据' })
   @ApiSuccessResponse()
   async export${pascalCaseName}() {
     return await this.${camelCaseName}Service.export${pascalCaseName}()

@@ -91,3 +91,17 @@ Cookie: {{authCookie}}
   "ids": "365,366",
   "status": "1"
 }
+
+### 查询值集
+
+GET http://localhost:3000/api/value-set/page
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+
+### 按setCodes查询值集
+
+GET http://localhost:3000/api/value-set/by-set-codes?setCodes=SYS_GENDER,SYS_MARITAL_STATUS
+Content-Type: application/json
+Cookie: {{authCookie}}
+

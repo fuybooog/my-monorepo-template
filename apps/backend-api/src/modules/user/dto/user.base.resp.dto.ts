@@ -5,12 +5,12 @@ export class UserBaseRespDto {
   @ApiProperty({ description: '用户id', type: Number })
   @IsInt()
   @Expose()
-  id: number
+  id?: number
 
   @ApiProperty({ description: '用户名', type: String })
   @IsString()
   @Expose()
-  userName: string
+  userName?: string
 
   @ApiPropertyOptional({ description: '昵称', type: String })
   @IsString()

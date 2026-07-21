@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 
 import { ValueSetPageRespDto } from '@/modules/value-set/dto/value-set.page.resp.dto'
-import { ValueSetPageDto } from '@/modules/value-set/dto/value-set.page.dto'
+import { ValueSetListDto, ValueSetPageDto } from '@/modules/value-set/dto/value-set.page.dto'
 import { ValueSetPageOptionDto } from '@/modules/value-set/dto/value-set.page.option.dto'
 import { ValueSetRespDto } from '@/modules/value-set/dto/value-set.resp.dto'
 import { ValueSetListRespDto } from '@/modules/value-set/dto/value-set.list.resp.dto'
@@ -193,5 +193,23 @@ export class ValueSetService {
   }
   async exportValueSet() {
     return null
+  }
+  async findValueSetBySetCodes(
+    valueSetListDto: ValueSetListDto,
+  ): Promise<ValueSetListRespDto | null> {
+    const setCodeList = valueSetListDto.setCodes.split(',')
+    const findOptions: FindManyOptions<ValueSet> = {
+      where: {
+        setCode: In(setCodeList),
+      },
+    } as any
+    const entities = await this.valueSetRepository.find(findOptions)
+    const list = plainToInstance(ValueSetRespDto, entities, { excludeExtraneousValues: true })
+    const existSetCodes = new Set(list.map((valueSet) => valueSet.setCode))
+    const notFoundIds = setCodeList.filter((setCode) => !existSetCodes.has(setCode))
+    return {
+      list,
+      notFoundIds,
+    }
   }
 }

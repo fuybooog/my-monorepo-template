@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { Button, Form, Space } from 'antd'
 import { SmartFormExtraProps, SmartFormMode, SmartFormProps, SmartSchema } from './smart-types'
+import dayjs from 'dayjs'
 
 const SmartFormContent: React.FC<{
   schema: SmartSchema
@@ -65,11 +66,11 @@ const SmartFormContent: React.FC<{
                   if (item.viewRender) {
                     return item.viewRender(val, formInstance.getFieldsValue())
                   }
-                  if (item.widget?.name === 'Select' && item.props?.options) {
+                  if (item.widget?.displayName === 'Select' && item.props?.options) {
                     const matched = item.props.options.find(
-                      (opt: Record<string, unknown>) => opt.value === val,
+                      (opt: Record<string, unknown>) => opt.id === val,
                     )
-                    return <span>{matched ? matched.label : (val ?? '-')}</span>
+                    return <span>{matched ? matched.name : (val ?? '-')}</span>
                   }
                   return <span>{val !== undefined && val !== null ? String(val) : '-'}</span>
                 }}
@@ -79,10 +80,22 @@ const SmartFormContent: React.FC<{
             ) : (
               (() => {
                 const WidgetComponent = item.widget
-                const defaultProps = {
-                  placeholder: typeof item.title === 'string' ? `请输入${item.title}` : undefined,
+                let defaultProps: Record<string, unknown> = {
                   allowClear: true,
-                  autoComplete: 'off',
+                }
+                if (item.widget?.displayName === 'Input') {
+                  defaultProps = {
+                    ...defaultProps,
+                    placeholder: typeof item.title === 'string' ? `请输入${item.title}` : undefined,
+                    autoComplete: 'off',
+                  }
+                } else if (item.widget?.displayName === 'Select') {
+                  defaultProps = {
+                    ...defaultProps,
+                    ...(typeof item.title === 'string' ? { placeholder: item.title } : {}),
+                    fieldNames: { value: 'id', label: 'name' },
+                    style: { width: 80 },
+                  }
                 }
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 return <WidgetComponent {...defaultProps} {...(item.props as any)} />
@@ -107,6 +120,8 @@ export const SmartForm: React.FC<SmartFormProps> = ({
   syncUrlParams = false,
   urlParamsTransform,
   initialValues,
+  autoSubmit = true,
+  onValuesChange,
   ...restFormProps
 }) => {
   const [internalForm] = Form.useForm()
@@ -136,8 +151,47 @@ export const SmartForm: React.FC<SmartFormProps> = ({
     }
   }, [syncUrlParams, schema, activeForm, mode, urlParamsTransform])
 
+  const handleValuesChange = (
+    changedValues: Record<string, unknown>,
+    allValues: Record<string, unknown>,
+  ) => {
+    onValuesChange?.(changedValues, allValues)
+
+    if (mode !== 'query' || !autoSubmit) return
+
+    const changedKey = Object.keys(changedValues)[0]
+    if (!changedKey) return
+
+    const itemSchema = schema[changedKey]
+    if (!itemSchema) return
+
+    const widgetName = itemSchema.widget?.displayName || itemSchema.widget?.name || ''
+
+    const isSelectOrPicker =
+      /select|picker|radio|checkbox|cascader/i.test(widgetName) ||
+      'options' in (itemSchema.props || {}) ||
+      dayjs.isDayjs(changedValues[changedKey])
+
+    if (isSelectOrPicker) {
+      activeForm.submit()
+    }
+
+    const isInputWidget = /input/i.test(widgetName)
+    const isCleared = changedValues[changedKey] === undefined || changedValues[changedKey] === ''
+
+    if (isInputWidget && isCleared) {
+      activeForm.submit()
+    }
+  }
+
   return (
-    <Form form={activeForm} layout={defaultLayout} initialValues={initialValues} {...restFormProps}>
+    <Form
+      form={activeForm}
+      layout={defaultLayout}
+      initialValues={initialValues}
+      onValuesChange={handleValuesChange}
+      {...restFormProps}
+    >
       <SmartFormContent schema={schema} mode={mode} actionRender={actionRender}>
         {children}
       </SmartFormContent>
