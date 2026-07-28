@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react'
-import { Button, Form, FormInstance, Space } from 'antd'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useMemo, useEffect } from 'react'
+import { Button, Col, Form, FormInstance, Input, Row, RowProps, Space } from 'antd'
 import dayjs from 'dayjs'
 import {
   SmartFormExtraProps,
@@ -8,9 +9,10 @@ import {
   SmartFormProps,
   SmartSchema,
 } from './smart-types'
+import { ValueSetViewer } from '../value-set-select/ValueSetViewer'
 
 // ==========================================
-// 1. Custom Hooks 拆分
+// 1. Custom Hooks
 // ==========================================
 
 /** 响应 URL 参数同步逻辑 */
@@ -27,11 +29,11 @@ const useUrlParamsSync = ({
   form: FormInstance
   urlParamsTransform?: SmartFormProps['urlParamsTransform']
 }) => {
-  React.useEffect(() => {
+  useEffect(() => {
     if (!syncUrlParams || mode !== 'query') return
 
     const searchParams = new URLSearchParams(window.location.search)
-    const urlFields: Record<string, unknown> = {}
+    const urlFields: Record<string, string> = {}
 
     Object.keys(schema).forEach((key) => {
       const val = searchParams.get(key)
@@ -48,7 +50,7 @@ const useUrlParamsSync = ({
   }, [syncUrlParams, schema, form, mode, urlParamsTransform])
 }
 
-/** 自动提交判断逻辑 */
+/** 自动提交处理逻辑 */
 const useAutoSubmitHandler = ({
   mode,
   autoSubmit,
@@ -73,92 +75,208 @@ const useAutoSubmitHandler = ({
     const itemSchema = schema[changedKey]
     if (!itemSchema) return
 
-    const val = changedValues[changedKey]
     const widgetName = itemSchema.widget?.displayName || itemSchema.widget?.name || ''
 
     const isSelectOrPicker =
       /select|picker|radio|checkbox|cascader/i.test(widgetName) ||
       'options' in (itemSchema.props || {}) ||
-      dayjs.isDayjs(val)
+      dayjs.isDayjs(changedValues[changedKey])
 
-    const isInputCleared = /input/i.test(widgetName) && (val === undefined || val === '')
+    if (isSelectOrPicker) {
+      form.submit()
+    }
 
-    if (isSelectOrPicker || isInputCleared) {
+    const isInputWidget = /input/i.test(widgetName)
+    const isCleared = changedValues[changedKey] === undefined || changedValues[changedKey] === ''
+
+    if (isInputWidget && isCleared) {
       form.submit()
     }
   }
 }
 
 // ==========================================
-// 2. 细粒度渲染组件
+// 2. 细粒度组件
 // ==========================================
 
-/** 针对编辑/新建模式下渲染控件的解析 Hook */
-const useWidgetProps = (item: SmartFormItem) => {
+/** 渲染控件的基础属性解析 Hook */
+const useWidgetProps = (item: SmartFormItem, itemKey: string) => {
   return useMemo(() => {
-    const defaultProps: Record<string, unknown> = { allowClear: true }
-    const displayName = item.widget?.displayName
+    let defaultProps: Record<string, unknown> = { allowClear: true }
 
-    if (displayName === 'Input') {
-      defaultProps.placeholder = typeof item.title === 'string' ? `请输入${item.title}` : undefined
-      defaultProps.autoComplete = 'off'
-    } else if (displayName === 'Select') {
-      defaultProps.placeholder = typeof item.title === 'string' ? item.title : undefined
-      defaultProps.fieldNames = { value: 'id', label: 'name' }
-      defaultProps.style = { width: 80 }
+    if (item.widget?.displayName === 'Input') {
+      defaultProps = {
+        ...defaultProps,
+        placeholder: typeof item.title === 'string' ? `请输入${item.title}` : undefined,
+        autoComplete: 'off',
+      }
+    } else if (item.widget?.displayName === 'Select') {
+      defaultProps = {
+        ...defaultProps,
+        ...(typeof item.title === 'string' ? { placeholder: item.title } : {}),
+        fieldNames: { value: 'id', label: 'name' },
+      }
     }
 
-    return { ...defaultProps, ...item.props }
-  }, [item])
+    const valueSetDefault: { actualNameField?: string | boolean } = {}
+    if (item.widget?.displayName === 'ValueSetSelect') {
+      if (item.props.actualNameField && typeof item.props.actualNameField === 'string') {
+        valueSetDefault.actualNameField = item.props.actualNameField
+      } else if (item.props.actualNameField !== false) {
+        valueSetDefault.actualNameField = `${itemKey}Name`
+      }
+    }
+
+    return { ...defaultProps, ...(item.props as Record<string, unknown>), ...valueSetDefault }
+  }, [item, itemKey])
 }
 
-/** 单个表单项渲染组件 */
-const FormItemWidget: React.FC<{
+/** 辅助函数：从对象中提取展示用的 label */
+const getItemLabel = (
+  obj: Record<string, string | number | boolean>,
+  fieldNames?: { label?: string; value?: string },
+) => {
+  if (typeof obj !== 'object' || obj === null) return String(obj)
+  const labelKey = fieldNames?.label || 'label'
+  return obj[labelKey] ?? obj.name ?? obj.label ?? obj.title ?? obj.code ?? JSON.stringify(obj)
+}
+
+/** 强化版 View 模式值转换工具 */
+const formatViewValue = (
+  itemKey: string,
+  val: any,
+  item: SmartFormItem,
+  allValues: Record<string, any> = {},
+): React.ReactNode => {
+  // 1. 空值兜底
+  if (val === undefined || val === null || val === '') {
+    return '-'
+  }
+
+  const { props = {} } = item
+  const fieldNames = props.fieldNames
+
+  // =========================================================
+  // 处理情况一：值为对象或对象数组 { id: 1, name: '张三' }
+  // =========================================================
+  if (typeof val === 'object' && !dayjs.isDayjs(val)) {
+    // 多选对象数组 [{ id: 1, name: 'A' }, { id: 2, name: 'B' }]
+    if (Array.isArray(val)) {
+      if (val.length === 0) return '-'
+      return val.map((item) => getItemLabel(item, fieldNames)).join(', ')
+    }
+    // 单选对象 { id: 1, name: '张三' }
+    return getItemLabel(val, fieldNames)
+  }
+
+  // =========================================================
+  // 处理情况二：针对 ValueSetSelect 等异步组件的自动 Name 匹配
+  // 规则：如果字段叫 roleCode，优先尝试从 allValues 中获取 roleCodeName / roleCodeText
+  // =========================================================
+  if (typeof itemKey === 'string') {
+    const autoNameKeys = [`${itemKey}Name`, `${itemKey}Text`, `${itemKey}_name`]
+    for (const key of autoNameKeys) {
+      if (allValues[key] !== undefined && allValues[key] !== null) {
+        return String(allValues[key])
+      }
+    }
+  }
+
+  // =========================================================
+  // 处理常规配置了静态 props.options / props.treeData 的组件
+  // =========================================================
+  const options = (props.options || props.treeData) as Array<Record<string, any>> | undefined
+
+  if (options && Array.isArray(options)) {
+    const valueKey = fieldNames?.value || 'value'
+    const valArray = Array.isArray(val)
+      ? val
+      : typeof val === 'string' && val.includes(',')
+        ? val.split(',')
+        : [val]
+
+    const matchedLabels = valArray
+      .map((targetVal) => {
+        const matched = options.find(
+          (opt) => String(opt[valueKey] ?? opt.id ?? opt.code) === String(targetVal),
+        )
+        return matched ? getItemLabel(matched, fieldNames) : targetVal
+      })
+      .filter((v) => v !== undefined && v !== null)
+
+    return matchedLabels.length > 0 ? matchedLabels.join(', ') : '-'
+  }
+
+  // 基础类型兜底直接输出字符串
+  return String(val)
+}
+
+const SmartFormItemField: React.FC<{
   itemKey: string
   item: SmartFormItem
   mode: SmartFormMode
   form: FormInstance
 }> = ({ itemKey, item, mode, form }) => {
-  const mergedProps = useWidgetProps(item)
-  const WidgetComponent = item.widget
+  const mergedProps = useWidgetProps(item, itemKey)
+  const WidgetComponent = item.widget || Input
 
-  // 1. 详情/查看模式
+  if (item.hiddenModes?.includes(mode)) return null
+
+  // ==========================================
+  // 1. view 模式
+  // ==========================================
   if (mode === 'view') {
     return (
-      <Form.Item name={itemKey} noStyle>
-        {({ getFieldValue }) => {
-          const val = getFieldValue(itemKey)
-          if (item.viewRender) {
-            return item.viewRender(val, form.getFieldsValue())
-          }
-          if (item.widget?.displayName === 'Select' && item.props?.options) {
-            const matched = (item.props.options as Array<Record<string, unknown>>)?.find(
-              (opt) => opt.id === val,
-            )
-            return <span>{matched ? String(matched.name) : (val ?? '-')}</span>
-          }
-          return <span>{val !== undefined && val !== null ? String(val) : '-'}</span>
-        }}
+      // ⚠️ 关键点：外层 Form.Item 绝对不能传 name 属性！
+      <Form.Item key={itemKey} label={item.title} {...item.itemProps}>
+        {/* 内层 Form.Item 加 shouldUpdate，保证 setFieldsValue 时精准重新渲染 */}
+        <Form.Item noStyle shouldUpdate>
+          {() => {
+            // 直接通过传入的 form 实例实时获取最新的值
+            const val = form.getFieldValue(itemKey)
+
+            if (item.viewRender) {
+              return item.viewRender(val, form.getFieldsValue())
+            }
+            if (item.widget.displayName === 'ValueSetSelect' && item.props?.setCode) {
+              return <ValueSetViewer setCode={item.props.setCode} value={val} />
+            }
+            return <span>{formatViewValue(itemKey, val, item, form.getFieldsValue())}</span>
+          }}
+        </Form.Item>
       </Form.Item>
     )
   }
 
-  // 2. 自定义 render 逻辑
-  if (item.render) {
-    return <>{item.render(form)}</>
-  }
-
-  // 3. 基础 Widget 渲染
-  return WidgetComponent ? <WidgetComponent {...mergedProps} /> : null
+  // ==========================================
+  // 2. edit / create / query 模式
+  // ==========================================
+  return (
+    <>
+      {mergedProps.actualNameField && mode !== 'query' && (
+        <Form.Item name={mergedProps.actualNameField} hidden style={{ display: 'none' }}>
+          <Input hidden />
+        </Form.Item>
+      )}
+      <Form.Item key={itemKey} name={itemKey} label={item.title} {...item.itemProps}>
+        {item.render ? (
+          item.render(form)
+        ) : WidgetComponent ? (
+          <WidgetComponent {...mergedProps} />
+        ) : null}
+      </Form.Item>
+    </>
+  )
 }
 
-/** 操作按钮区域渲染组件 */
+/** 操作按钮组组件 */
 const FormActions: React.FC<{
   mode: SmartFormMode
   form: FormInstance
+  grid: boolean | RowProps
   actionRender?: SmartFormExtraProps['actionRender']
   children?: React.ReactNode
-}> = ({ mode, form, actionRender, children }) => {
+}> = ({ mode, form, actionRender, children, grid }) => {
   if (children) return <>{children}</>
   if (actionRender) return <>{actionRender(form, mode)}</>
 
@@ -181,8 +299,7 @@ const FormActions: React.FC<{
       </Form.Item>
     )
   }
-
-  if (mode === 'create' || mode === 'edit') {
+  const buttonsRender = () => {
     return (
       <Form.Item>
         <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
@@ -195,34 +312,48 @@ const FormActions: React.FC<{
     )
   }
 
+  if (mode === 'create' || mode === 'edit') {
+    if (grid) {
+      return <Col span={24}>{buttonsRender()}</Col>
+    }
+    return buttonsRender()
+  }
+
   return null
 }
 
 // ==========================================
-// 3. 主组件与内容组件
+// 3. 主组件及内容组件
 // ==========================================
 
 const SmartFormContent: React.FC<{
   schema: SmartSchema
   mode: SmartFormMode
+  form: FormInstance
   actionRender?: SmartFormExtraProps['actionRender']
   children?: React.ReactNode
-}> = ({ schema, mode, actionRender, children }) => {
-  const formInstance = Form.useFormInstance()
+  grid?: boolean | RowProps
+}> = ({ schema, mode, actionRender, children, form, grid = false }) => {
+  const renderItem = (key: string, item: SmartFormItem) => (
+    <SmartFormItemField key={key} itemKey={key} item={item} mode={mode} form={form} />
+  )
 
   return (
     <>
       {Object.entries(schema).map(([key, item]) => {
         if (item.hiddenModes?.includes(mode)) return null
 
-        return (
-          <Form.Item key={key} name={key} label={item.title} {...item.itemProps}>
-            <FormItemWidget itemKey={key} item={item} mode={mode} form={formInstance} />
-          </Form.Item>
+        const colSpan = item.colProps || { span: 24 }
+        return grid ? (
+          <Col key={key} {...colSpan}>
+            {renderItem(key, item)}
+          </Col>
+        ) : (
+          renderItem(key, item)
         )
       })}
 
-      <FormActions mode={mode} form={formInstance} actionRender={actionRender}>
+      <FormActions mode={mode} form={form} actionRender={actionRender} grid={grid}>
         {children}
       </FormActions>
     </>
@@ -241,13 +372,26 @@ export const SmartForm: React.FC<SmartFormProps> = ({
   initialValues,
   autoSubmit = true,
   onValuesChange,
+  grid = false,
+  labelWidth = 100,
   ...restFormProps
 }) => {
   const [internalForm] = Form.useForm()
   const activeForm = form || internalForm
-  const defaultLayout = layout || (mode === 'query' ? 'inline' : 'horizontal')
+  const rowProp = typeof grid === 'object' ? grid : { gutter: 16 }
+  const formattedLabelWidth = typeof labelWidth === 'number' ? `${labelWidth}px` : labelWidth
+  const defaultProps = {
+    labelAlign: restFormProps.labelAlign || (mode === 'query' ? 'left' : 'right'),
+    layout: layout || (mode === 'query' ? 'inline' : 'horizontal'),
+    ...(mode !== 'query'
+      ? {
+          labelCol: { flex: `0 0 ${formattedLabelWidth}` },
+          wrapperCol: { flex: '1' },
+        }
+      : {}),
+  }
 
-  // 使用拆分后的 Hook 隔离复杂副作用
+  // 副作用 Hook
   useUrlParamsSync({
     syncUrlParams,
     mode,
@@ -264,17 +408,27 @@ export const SmartForm: React.FC<SmartFormProps> = ({
     onValuesChange,
   })
 
+  const renderContent = () => (
+    <SmartFormContent
+      schema={schema}
+      mode={mode}
+      actionRender={actionRender}
+      form={activeForm}
+      grid={grid}
+    >
+      {children}
+    </SmartFormContent>
+  )
+
   return (
     <Form
       form={activeForm}
-      layout={defaultLayout}
       initialValues={initialValues}
       onValuesChange={handleValuesChange}
+      {...defaultProps}
       {...restFormProps}
     >
-      <SmartFormContent schema={schema} mode={mode} actionRender={actionRender}>
-        {children}
-      </SmartFormContent>
+      {grid ? <Row {...rowProp}>{renderContent()}</Row> : renderContent()}
     </Form>
   )
 }

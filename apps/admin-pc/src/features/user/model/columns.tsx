@@ -69,11 +69,23 @@ export const getUserColumns = (callbacks: {
       title: '家庭住址',
       dataIndex: 'address',
       ellipsis: true,
+      width: 200,
       render: (text: string, record: Backend.UserPageRespDto) => {
         const detail = record.addressDetail || ''
-        return `${text || ''}${detail ? ` - ${detail}` : ''}` || '-'
+        let addres = ''
+        if (text) {
+          try {
+            addres = JSON.parse(text)
+              .map((item: { name: string }) => item.name)
+              .join(' ')
+          } catch (e) {
+            console.error('地址转化错误', e)
+          }
+        }
+        return `${addres || ''}${detail ? ` ${detail}` : ''}` || '-'
       },
     },
+    // todo 状态列优化
     {
       title: '状态',
       dataIndex: 'status',

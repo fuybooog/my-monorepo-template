@@ -63,7 +63,7 @@ const useTableColumns = <RecordType extends object>({
       if (!key) return true
       return checkedKeys.includes(key)
     })
-  }, [columns, checkedKeys])
+  }, [columns, checkedKeys, storageKey])
 
   // 2. 处理自动包裹 link 的列
   const processedColumns = useMemo(() => {

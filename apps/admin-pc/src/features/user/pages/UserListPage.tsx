@@ -34,10 +34,10 @@ export function UserListPage() {
     () =>
       getUserColumns({
         onNameClick(record) {
-          console.warn('record', record)
+          openDrawer('view', record.id)
         },
       }),
-    [],
+    [openDrawer],
   )
 
   const onCreate = () => {
@@ -76,6 +76,7 @@ export function UserListPage() {
           onEdit,
           onDelete,
         }}
+        scroll={{ x: 'max-content' }}
       />
 
       <Drawer

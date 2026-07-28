@@ -2,10 +2,14 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import { IsIn, IsInt, IsOptional, IsString, MinLength } from 'class-validator'
 
+export const USER_UNIQUE_FIELDS = ['userName', 'mobile', 'email'] as const
+
+export type UserUniqueField = (typeof USER_UNIQUE_FIELDS)[number]
+
 export class UserCheckUniqueDto {
-  @ApiProperty({ description: '要校验的字段名', enum: ['userName', 'mobile'] })
-  @IsIn(['userName', 'mobile'])
-  field: 'userName' | 'mobile'
+  @ApiProperty({ description: '要校验的字段名', enum: USER_UNIQUE_FIELDS })
+  @IsIn(USER_UNIQUE_FIELDS)
+  field: UserUniqueField
 
   @ApiProperty({ description: '要校验的字段值', example: 'admin' })
   @IsString()

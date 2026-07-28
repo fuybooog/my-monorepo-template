@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 /**
  * 字典项对象的基础类型约束
  */
@@ -55,4 +57,27 @@ export function getDictLabel(
 
   // 兜底处理：未匹配到或发生异常时，保持原样输出
   return targetValue
+}
+
+export function transformDateFieldsValue(values: Record<string, unknown>, dateFields: string[]) {
+  if (!dateFields.length) {
+    return values
+  }
+  // 浅拷贝，避免修改原对象
+  const result = { ...values }
+
+  dateFields.forEach((field) => {
+    const raw = result[field]
+    // 如果值为空（null/undefined/''），直接设为 null（避免控件报错）
+    if (raw == null || raw === '') {
+      result[field] = null
+      return
+    }
+
+    const dateObj = dayjs(raw)
+    // 校验日期是否有效，无效时也置为 null
+    result[field] = dateObj.isValid() ? dateObj : null
+  })
+
+  return result
 }

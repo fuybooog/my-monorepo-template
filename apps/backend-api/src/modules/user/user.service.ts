@@ -108,6 +108,16 @@ export class UserService {
         throw new BusinessException('手机号重复！')
       }
     }
+
+    if (userCreateDto.email) {
+      const mobileCheck = await this.checkUserFieldUnique({
+        field: 'email',
+        value: userCreateDto.email,
+      })
+      if (!mobileCheck) {
+        throw new BusinessException('邮箱重复！')
+      }
+    }
     return await this.dataSource.transaction(async (manager) => {
       const userEntity = await this.userRepository.createUser(userCreateDto, manager)
       // todo 添加用户角色
@@ -139,6 +149,17 @@ export class UserService {
       })
       if (!mobileCheck) {
         throw new BusinessException('手机号重复！')
+      }
+    }
+
+    if (userUpdateDto.email) {
+      const mobileCheck = await this.checkUserFieldUnique({
+        field: 'email',
+        value: userUpdateDto.email,
+        id,
+      })
+      if (!mobileCheck) {
+        throw new BusinessException('邮箱重复！')
       }
     }
     return await this.dataSource.transaction(async (manager) => {

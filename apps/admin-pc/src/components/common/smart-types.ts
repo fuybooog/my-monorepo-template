@@ -7,6 +7,8 @@ import {
   FormProps,
   DropdownProps,
   ButtonProps,
+  RowProps,
+  ColProps,
 } from 'antd'
 import { ColumnType } from 'antd/es/table'
 
@@ -19,8 +21,10 @@ export type SmartFormItem<T extends React.ComponentType<any> = any> = {
   viewRender?: (value: any, record: any) => React.ReactNode
 
   hiddenModes?: SmartFormMode[]
+
+  colProps?: ColProps
 } & (
-  | { widget: T; props?: React.ComponentProps<T>; render?: never }
+  | { widget?: T; props?: React.ComponentProps<T>; render?: never }
   | { widget?: never; props?: never; render: (form: FormInstance) => React.ReactNode }
 )
 
@@ -44,6 +48,10 @@ export interface SmartFormExtraProps {
   urlParamsTransform?: (params: Record<string, unknown>) => Record<string, unknown>
   // 是否自动触发查询，查询场景：输入框清空，选择器触发变动（select,date等）
   autoSubmit?: boolean
+  // 是否启用 row/col 布局
+  grid?: boolean | RowProps
+  // label宽
+  labelWidth?: string | number
 }
 
 export type SmartFormProps = Omit<FormProps, 'children'> & SmartFormExtraProps

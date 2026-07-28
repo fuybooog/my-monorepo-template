@@ -5,6 +5,7 @@ import { serializeFormValues } from '@/components/common/smart-utils'
 import userApi from '../api/user'
 import { Backend } from '@repo/types'
 import { userFormSchema } from '../model'
+import { transformDateFieldsValue } from '@/utils/fns'
 
 interface UserFormContainerProps {
   id?: string | number
@@ -26,7 +27,8 @@ export const UserFormContainer: React.FC<UserFormContainerProps> = ({ id, mode, 
         try {
           const res = await userApi.findById(id)
           if (isMounted) {
-            form.setFieldsValue(transformValue(res.data))
+            console.log('触发 setFieldsValue')
+            form.setFieldsValue(transformResData2Form(res.data))
           }
         } finally {
           if (isMounted) setLoading(false)
@@ -41,13 +43,40 @@ export const UserFormContainer: React.FC<UserFormContainerProps> = ({ id, mode, 
     }
   }, [id, mode, form])
 
-  function transformValue(values: Backend.UserRespDto) {
-    // todo 将日期转化为dayjs类型
-    return values
+  /**
+   * 将接口返回结果转化为表单
+   * @param resData
+   * @returns
+   */
+  const transformResData2Form = (resData: Backend.UserRespDto) => {
+    const formData = transformDateFieldsValue(resData, ['birth'])
+    if (formData.address) {
+      try {
+        formData.address = JSON.parse(formData.address as string)
+      } catch (e) {
+        console.error('address 转换错误')
+      }
+    }
+    return formData
+  }
+
+  /**
+   * 将表单数据转化为请求入参
+   * @param values
+   * @returns
+   */
+  const transformForm2Params = (values: Backend.UserRespDto) => {
+    // 转化日期格式
+    const params = serializeFormValues(values, dynamicSchema)
+    // 将 params中的地址进行格式化
+    if (params.address) {
+      params.address = JSON.stringify(params.address)
+    }
+    return params
   }
 
   const handleFinish = async (values: Backend.UserRespDto) => {
-    const cleanParams = serializeFormValues(values, dynamicSchema)
+    const cleanParams = transformForm2Params(values)
 
     try {
       if (mode === 'create') {
@@ -70,8 +99,8 @@ export const UserFormContainer: React.FC<UserFormContainerProps> = ({ id, mode, 
         form={form}
         schema={dynamicSchema}
         mode={mode}
-        autoSubmit={false}
         onFinish={handleFinish}
+        grid={true}
       />
     </Spin>
   )
