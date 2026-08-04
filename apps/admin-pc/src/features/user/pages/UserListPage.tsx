@@ -7,6 +7,7 @@ import { UserFormContainer } from '../components/UserFormContainer'
 import { userSearchSchema, getUserColumns } from '../model'
 import { useDrawer } from '@/hooks/useDrawer'
 import { useUserList } from '../hooks/useUserList'
+import userApi from '../api/user'
 
 const formTitleMap = { create: '新增用户', edit: '编辑用户', view: '用户详情' }
 export function UserListPage() {
@@ -36,9 +37,21 @@ export function UserListPage() {
         onNameClick(record) {
           openDrawer('view', record.id)
         },
+        onStatusChange(record: Backend.UserPageRespDto, newStatus: string) {
+          console.log('onStatusChange', record, newStatus)
+          return updateUserStatus(record.id, newStatus)
+        },
+        async refreshList() {
+          console.log('refreshList')
+          await refreshTable()
+        },
       }),
     [openDrawer],
   )
+
+  async function updateUserStatus(id: number, newStatus: string) {
+    return userApi.updateStatus(id, newStatus)
+  }
 
   const onCreate = () => {
     handleOpenDrawer('create')

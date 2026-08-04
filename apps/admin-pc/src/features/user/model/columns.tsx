@@ -1,6 +1,6 @@
 import { SmartColumnType } from '@/components/common'
 import { Backend } from '@repo/types'
-import { commonStatusRender, commonTimeRender } from '@/utils'
+import { commonStatusRender, commonTimeRender, createStatusRender } from '@/utils'
 
 /**
  * 获取用户列表表格列配置
@@ -9,8 +9,10 @@ import { commonStatusRender, commonTimeRender } from '@/utils'
  */
 export const getUserColumns = (callbacks: {
   onNameClick: (record: Backend.UserPageRespDto) => void
+  onStatusChange: (record: Backend.UserPageRespDto, newStatus: string) => Promise<unknown>
+  refreshList: () => void
 }): SmartColumnType<Backend.UserPageRespDto>[] => {
-  const { onNameClick } = callbacks
+  const { onNameClick, onStatusChange, refreshList } = callbacks
 
   return [
     {
@@ -85,12 +87,11 @@ export const getUserColumns = (callbacks: {
         return `${addres || ''}${detail ? ` ${detail}` : ''}` || '-'
       },
     },
-    // todo 状态列优化
     {
       title: '状态',
       dataIndex: 'status',
       width: 90,
-      render: commonStatusRender,
+      render: createStatusRender({ onStatusChange, refreshList }),
     },
     {
       title: '创建时间',

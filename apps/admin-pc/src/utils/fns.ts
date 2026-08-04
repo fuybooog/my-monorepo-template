@@ -74,7 +74,7 @@ export function transformDateFieldsValue(values: Record<string, unknown>, dateFi
       return
     }
 
-    const dateObj = dayjs(raw)
+    const dateObj = dayjs(raw as string)
     // 校验日期是否有效，无效时也置为 null
     result[field] = dateObj.isValid() ? dateObj : null
   })

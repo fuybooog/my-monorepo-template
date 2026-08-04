@@ -21,5 +21,8 @@ const userApi = {
   batchDelete(ids: string): Promise<Backend.BatchRemoveUserRes> {
     return http.post('/user/batch/delete', { ids })
   },
+  updateStatus(id: string | number, status: string): Promise<Backend.UpdateUserStatusRes> {
+    return http.post('/user/updateStatus/' + id, { status })
+  },
 }
 export default userApi
