@@ -472,6 +472,28 @@ export namespace Backend {
       ? R
       : unknown
 
+  export type ListAllResourceRes =
+    operations['ResourceController_listAllResource']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ResourceController_listAllResource']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type ListResourceByUserRes =
+    operations['ResourceController_listResourceByUser']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ResourceController_listResourceByUser']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
   export type _pageResourceRes =
     operations['ResourceController__pageResource']['responses'] extends {
       '200': { content: { 'application/json': infer R } }

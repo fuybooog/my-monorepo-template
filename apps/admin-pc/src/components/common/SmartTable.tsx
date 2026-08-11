@@ -182,6 +182,7 @@ const SmartTableInner = <RecordType extends object>(
     schema = [],
     actionColumn,
     onLinkClick,
+    showPagination = true,
     ...restAntdProps
   } = props
 
@@ -322,13 +323,17 @@ const SmartTableInner = <RecordType extends object>(
         dataSource={dataSource}
         columns={finalColumns}
         onChange={handleTableChange}
-        pagination={{
-          current: pagination.page,
-          pageSize: pagination.pageSize,
-          total,
-          showSizeChanger: true,
-          showTotal: (totalCount) => `共 ${totalCount} 条数据`,
-        }}
+        pagination={
+          showPagination
+            ? {
+                current: pagination.page,
+                pageSize: pagination.pageSize,
+                total,
+                showSizeChanger: true,
+                showTotal: (totalCount) => `共 ${totalCount} 条数据`,
+              }
+            : false
+        }
         rowSelection={
           toolbar !== false
             ? {
@@ -339,6 +344,9 @@ const SmartTableInner = <RecordType extends object>(
               }
             : restAntdProps.rowSelection
         }
+        sticky={{
+          offsetHeader: 0,
+        }}
         {...restAntdProps}
       />
     </div>

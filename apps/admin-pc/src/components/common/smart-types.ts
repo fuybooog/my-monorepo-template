@@ -22,6 +22,12 @@ export type SmartFormItem<T extends React.ComponentType<any> = any> = {
 
   hiddenModes?: SmartFormMode[]
 
+  hideWhen?: any // 可以是基本类型或函数
+
+  hideDependencyField?: string
+
+  requiredWhen?: any
+
   colProps?: ColProps
 } & (
   | { widget?: T; props?: React.ComponentProps<T>; render?: never }
@@ -50,6 +56,8 @@ export interface SmartFormExtraProps {
   autoSubmit?: boolean
   // 是否启用 row/col 布局
   grid?: boolean | RowProps
+  // 启用 row/col 布局 时给表单中的col赋值
+  colProps?: ColProps
   // label宽
   labelWidth?: string | number
 }
@@ -85,6 +93,7 @@ interface BaseSmartTableProps<RecordType> {
   schema?: SmartSchema
   actionColumn?: ActionColumnConfig<RecordType> | false
   onLinkClick?: (row: RecordType, columnKey: React.Key) => void
+  showPagination?: boolean
 }
 
 interface ImpureTableProps<RecordType> extends BaseSmartTableProps<RecordType> {

@@ -15,6 +15,7 @@ import { DataSource, FindManyOptions, In, Not } from 'typeorm'
 import { Resource } from '@/modules/resource/entities/resource.entity'
 import { BusinessException } from '@/exceptions/business-exception'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
+import { ListResp } from '@/dto/base.dto'
 
 @Injectable()
 export class ResourceService {
@@ -35,6 +36,25 @@ export class ResourceService {
       total,
       page: resourcePageDto.page,
       pageSize: resourcePageDto.pageSize,
+    }
+  }
+  async listAllResource(resourcePageDto: ResourcePageDto): Promise<ListResp<ResourcePageRespDto>> {
+    const [entities] = await this.resourceRepository.searchResources(resourcePageDto)
+    const list = plainToInstance(ResourcePageRespDto, entities, {
+      excludeExtraneousValues: true,
+    })
+    return {
+      list,
+    }
+  }
+  async listByUser(userId: number): Promise<ListResp<ResourcePageRespDto>> {
+    // todo 判断userId 若非本人，则必须为管理员
+    const [entities] = await this.resourceRepository.searchResourcesByUser(userId)
+    const list = plainToInstance(ResourcePageRespDto, entities, {
+      excludeExtraneousValues: true,
+    })
+    return {
+      list,
     }
   }
   async pageOptionResource(

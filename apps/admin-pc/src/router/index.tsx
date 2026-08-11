@@ -6,6 +6,7 @@ import { LoginGard } from '@/features/auth/router/LoginGard'
 import { ProtectedLayout } from '@/features/layout/router/ProtectedLayout'
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPassword'
 import { UserListPage } from '@/features/user/pages/UserListPage'
+import { ResourceListPage } from '@/features/resource/pages/ResourceListPage'
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ export const router = createBrowserRouter([
           {
             path: 'user/list',
             element: <UserListPage />,
+          },
+          {
+            path: 'resource/list',
+            element: <ResourceListPage />,
           },
           {
             path: '*',

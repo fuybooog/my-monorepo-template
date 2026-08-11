@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
-import { message, Switch, Tag } from 'antd'
+import { Switch, Tag } from 'antd'
 import dayjs from 'dayjs'
 import type { AnyObject } from 'antd/es/_util/type'
 import { DEFAULT_STATUS_MAP, StatusConfig } from '@/constants'
+import { getMessage } from './antd-instance'
 
 const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 
@@ -134,7 +135,7 @@ export function commonStatusRender(
 //       setLoading(true);
 //       try {
 //         await onStatusChange(record, nextStatus);
-//         message.success('状态更新成功');
+//         getMessage().success('状态更新成功');
 //         refreshList?.();
 //       } catch (error) {
 //         // 请求失败自动保持原状
@@ -186,7 +187,7 @@ function InternalStatusSwitch<RecordType, StatusType>({
     setLoading(true)
     try {
       await onStatusChange(record, nextStatus)
-      message.success('状态更新成功')
+      getMessage().success('状态更新成功')
       refreshList?.()
     } catch (error) {
       console.error('更新状态失败', error)

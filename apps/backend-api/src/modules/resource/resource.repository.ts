@@ -24,6 +24,22 @@ export class ResourceRepository extends Repository<Resource> {
 
     return await qb.getManyAndCount()
   }
+  async searchResources(query: ResourcePageDto) {
+    const qb = this.createQueryBuilder('resource')
+
+    // todo 排序应该从前端传入
+    qb.orderBy('resource.createdAt', 'DESC')
+
+    return await qb.getManyAndCount()
+  }
+  async searchResourcesByUser(userId: number) {
+    const qb = this.createQueryBuilder('resource')
+
+    // todo 排序应该从前端传入
+    qb.orderBy('resource.createdAt', 'DESC')
+
+    return await qb.getManyAndCount()
+  }
   async findResourceById(id: number) {
     const queryBuilder = this.createQueryBuilder('resource')
     const storage = getMetadataArgsStorage()

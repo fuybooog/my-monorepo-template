@@ -58,10 +58,26 @@ export class ResourceGenerated {
   @Column('varchar', {
     name: 'type',
     nullable: true,
-    comment: '资源类型：1-页面 2-按钮 3-列',
+    comment: '资源类型：0-目录 1-页面 2-按钮 3-列',
     length: 2,
   })
   type: string | null
+
+  @Column('varchar', {
+    name: 'menu_path',
+    nullable: true,
+    comment: '菜单路径',
+    length: 100,
+  })
+  menuPath: string | null
+
+  @Column('varchar', {
+    name: 'not_in_menu',
+    nullable: true,
+    comment: '是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示',
+    length: 2,
+  })
+  notInMenu: string | null
 
   @Column('int', { name: 'sort_number', nullable: true, comment: '排序号' })
   sortNumber: number | null

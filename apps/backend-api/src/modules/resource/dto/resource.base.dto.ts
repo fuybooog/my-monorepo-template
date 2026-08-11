@@ -25,15 +25,28 @@ export class ResourceBaseDto {
   @IsOptional()
   status?: string | null
 
-  @ApiPropertyOptional({ description: '资源类型：1-页面 2-按钮 3-列', type: String })
+  @ApiPropertyOptional({ description: '资源类型：0-目录 1-页面 2-按钮 3-列', type: String })
   @IsString()
   @IsOptional()
   type?: string | null
+
+  @ApiPropertyOptional({
+    description: '是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示',
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  notInMenu?: string | null
 
   @ApiPropertyOptional({ description: '排序号', type: Number })
   @IsInt()
   @IsOptional()
   sortNumber?: number | null
+
+  @ApiPropertyOptional({ description: '菜单路径', type: String })
+  @IsString()
+  @IsOptional()
+  menuPath?: string | null
 
   @ApiPropertyOptional({ description: '创建时间', type: String })
   @IsOptional()

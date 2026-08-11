@@ -685,8 +685,42 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** 分页查询用户列表 */
+    /** 分页查询资源列表 */
     get: operations['ResourceController_pageResource']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/list': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 查询全量资源列表 */
+    get: operations['ResourceController_listAllResource']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/listByUser': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 查询用户的菜单资源 */
+    get: operations['ResourceController_listResourceByUser']
     put?: never
     post?: never
     delete?: never
@@ -722,7 +756,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** 分页查询用户列表(可选字段) */
+    /** 分页查询资源列表(可选字段) */
     get: operations['ResourceController_pageOptionResource']
     put?: never
     post?: never
@@ -759,7 +793,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** 按id查询用户 */
+    /** 按id查询资源 */
     get: operations['ResourceController_findResourceById']
     put?: never
     post?: never
@@ -776,7 +810,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** 按ids查询用户 */
+    /** 按ids查询资源 */
     get: operations['ResourceController_findResourceListByIds']
     put?: never
     post?: never
@@ -795,7 +829,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 创建用户 */
+    /** 创建资源 */
     post: operations['ResourceController_createResource']
     delete?: never
     options?: never
@@ -812,7 +846,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 修改用户 */
+    /** 修改资源 */
     post: operations['ResourceController_updateResource']
     delete?: never
     options?: never
@@ -829,7 +863,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 删除用户 */
+    /** 删除资源 */
     post: operations['ResourceController_removeResource']
     delete?: never
     options?: never
@@ -846,7 +880,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 批量删除用户 */
+    /** 批量删除资源 */
     post: operations['ResourceController_batchRemoveResource']
     delete?: never
     options?: never
@@ -863,7 +897,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 修改用户状态 */
+    /** 修改资源状态 */
     post: operations['ResourceController_updateResourceStatus']
     delete?: never
     options?: never
@@ -880,7 +914,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 批量修改用户状态 */
+    /** 批量修改资源状态 */
     post: operations['ResourceController_batchUpdateResourceStatus']
     delete?: never
     options?: never
@@ -897,7 +931,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 下载导入用户模板 */
+    /** 下载导入资源模板 */
     post: operations['ResourceController_downloadResourceTemplate']
     delete?: never
     options?: never
@@ -914,7 +948,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 导入用户数据 */
+    /** 导入资源数据 */
     post: operations['ResourceController_importResource']
     delete?: never
     options?: never
@@ -931,7 +965,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 导出用户数据 */
+    /** 导出资源数据 */
     post: operations['ResourceController_exportResource']
     delete?: never
     options?: never
@@ -1253,7 +1287,7 @@ export interface components {
        * @description 用户ID
        * @example testId
        */
-      id: string
+      id: number
       /**
        * @description 用户名
        * @example testName
@@ -1792,8 +1826,12 @@ export interface components {
       parentUniqueProp?: string
       /** @description 状态：0-禁用，1-启用 */
       status?: string
-      /** @description 资源类型：1-页面 2-按钮 3-列 */
+      /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
       type?: string
+      /** @description 菜单路径 */
+      menuPath?: string
+      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
+      notInMenu?: string
       /** @description 排序号 */
       sortNumber?: number
       /** @description 创建时间 */
@@ -1812,10 +1850,14 @@ export interface components {
       parentUniqueProp?: string
       /** @description 状态：0-禁用，1-启用 */
       status?: string
-      /** @description 资源类型：1-页面 2-按钮 3-列 */
+      /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
       type?: string
+      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
+      notInMenu?: string
       /** @description 排序号 */
       sortNumber?: number
+      /** @description 菜单路径 */
+      menuPath?: string
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -1874,8 +1916,12 @@ export interface components {
       parentUniqueProp?: string
       /** @description 状态：0-禁用，1-启用 */
       status?: string
-      /** @description 资源类型：1-页面 2-按钮 3-列 */
+      /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
       type?: string
+      /** @description 菜单路径 */
+      menuPath?: string
+      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
+      notInMenu?: string
       /** @description 排序号 */
       sortNumber?: number
       /** @description 创建时间 */
@@ -1903,10 +1949,14 @@ export interface components {
       parentUniqueProp?: string
       /** @description 状态：0-禁用，1-启用 */
       status?: string
-      /** @description 资源类型：1-页面 2-按钮 3-列 */
+      /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
       type?: string
+      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
+      notInMenu?: string
       /** @description 排序号 */
       sortNumber?: number
+      /** @description 菜单路径 */
+      menuPath?: string
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -1923,10 +1973,14 @@ export interface components {
       parentUniqueProp?: string
       /** @description 状态：0-禁用，1-启用 */
       status?: string
-      /** @description 资源类型：1-页面 2-按钮 3-列 */
+      /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
       type?: string
+      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
+      notInMenu?: string
       /** @description 排序号 */
       sortNumber?: number
+      /** @description 菜单路径 */
+      menuPath?: string
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -3189,10 +3243,14 @@ export interface operations {
         parentUniqueProp?: string
         /** @description 状态：0-禁用，1-启用 */
         status?: string
-        /** @description 资源类型：1-页面 2-按钮 3-列 */
+        /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
         type?: string
+        /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
+        notInMenu?: string
         /** @description 排序号 */
         sortNumber?: number
+        /** @description 菜单路径 */
+        menuPath?: string
         /** @description 创建时间 */
         createdAt?: string
         /** @description 修改时间 */
@@ -3243,6 +3301,103 @@ export interface operations {
               pageSize: number
               list: components['schemas']['ResourcePageRespDto'][]
             }
+          }
+        }
+      }
+    }
+  }
+  ResourceController_listAllResource: {
+    parameters: {
+      query?: {
+        /** @description 资源名称 */
+        label?: string
+        /** @description 唯一编码 */
+        uniqueProp?: string
+        /** @description 唯一父编码 */
+        parentUniqueProp?: string
+        /** @description 状态：0-禁用，1-启用 */
+        status?: string
+        /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
+        type?: string
+        /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
+        notInMenu?: string
+        /** @description 排序号 */
+        sortNumber?: number
+        /** @description 菜单路径 */
+        menuPath?: string
+        /** @description 创建时间 */
+        createdAt?: string
+        /** @description 修改时间 */
+        updatedAt?: string
+        /** @description 删除时间 */
+        deletedAt?: string
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 创建时间开始 */
+        createdAtStart?: string
+        /** @description 创建时间结束 */
+        createdAtEnd?: string
+        /** @description 修改时间开始 */
+        updatedAtStart?: string
+        /** @description 修改时间结束 */
+        updatedAtEnd?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 分页成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['PaginatedResult'] & {
+              /**
+               * @description 总条数
+               * @example 100
+               */
+              total: number
+              /**
+               * @description 当前页码
+               * @example 1
+               */
+              page: number
+              /**
+               * @description 每页条数
+               * @example 10
+               */
+              pageSize: number
+              list: components['schemas']['ResourcePageRespDto'][]
+            }
+          }
+        }
+      }
+    }
+  }
+  ResourceController_listResourceByUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
           }
         }
       }

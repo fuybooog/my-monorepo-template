@@ -8,7 +8,7 @@ import { UserListRespDto } from '@/modules/user/dto/user.list.resp.dto'
 import { UserCreateDto } from '@/modules/user/dto/user.create.dto'
 import { UserUpdateDto } from '@/modules/user/dto/user.update.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
-import { ApiOperation } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import {
   ApiSuccessBooleanResponse,
   ApiSuccessPageResponse,
@@ -18,6 +18,7 @@ import { BatchDto, BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { UserCheckUniqueDto } from './dto/user.check.unique.dto'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
 
+@ApiTags('用户模块')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

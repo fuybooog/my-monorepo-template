@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useMemo, useEffect } from 'react'
-import { Button, Col, Form, FormInstance, Input, Row, RowProps, Space } from 'antd'
+import React, { useMemo, useEffect, useState } from 'react'
+import { Button, Col, ColProps, Form, FormInstance, Input, Row, RowProps, Space } from 'antd'
 import dayjs from 'dayjs'
 import {
   SmartFormExtraProps,
@@ -67,6 +67,21 @@ const useAutoSubmitHandler = ({
   return (changedValues: Record<string, unknown>, allValues: Record<string, unknown>) => {
     onValuesChange?.(changedValues, allValues)
 
+    Object.entries(schema).forEach(([key, item]) => {
+      if (item.hideDependencyField && item.hideWhen !== undefined) {
+        const depValue = allValues[item.hideDependencyField]
+        const hide = Array.isArray(item.hideWhen)
+          ? item.hideWhen.some((v) => v === depValue)
+          : depValue === item.hideWhen
+        if (hide) {
+          const currentVal = form.getFieldValue(key)
+          if (currentVal !== undefined && currentVal !== null) {
+            form.setFieldValue(key, undefined)
+          }
+        }
+      }
+    })
+
     if (mode !== 'query' || !autoSubmit) return
 
     const changedKey = Object.keys(changedValues)[0]
@@ -75,7 +90,7 @@ const useAutoSubmitHandler = ({
     const itemSchema = schema[changedKey]
     if (!itemSchema) return
 
-    const widgetName = itemSchema.widget?.displayName || itemSchema.widget?.name || ''
+    const widgetName = itemSchema.widget?.displayName || itemSchema.widget?.name || 'Input'
 
     const isSelectOrPicker =
       /select|picker|radio|checkbox|cascader/i.test(widgetName) ||
@@ -100,26 +115,51 @@ const useAutoSubmitHandler = ({
 // ==========================================
 
 /** 渲染控件的基础属性解析 Hook */
-const useWidgetProps = (item: SmartFormItem, itemKey: string) => {
+const useWidgetProps = (item: SmartFormItem, itemKey: string, grid: boolean | RowProps) => {
   return useMemo(() => {
-    let defaultProps: Record<string, unknown> = { allowClear: true }
+    let defaultProps: Record<string, unknown> = {}
+    const WidgetComponent = item.widget || Input
 
-    if (item.widget?.displayName === 'Input') {
+    if (
+      ['Input', 'Select', 'Cascader', 'DatePicker', 'TreeSelect'].some(
+        (name) => name === WidgetComponent?.displayName,
+      )
+    ) {
+      defaultProps = { ...defaultProps, allowClear: true }
+    }
+    if (grid) {
+      defaultProps = {
+        ...defaultProps,
+        style: { width: '100%' },
+      }
+    }
+    let options = item.props?.options
+    if (options && options.length) {
+      if ('id' in options[0] && 'name' in options[0]) {
+        options = options.map((optionItem: any) => ({
+          ...optionItem,
+          label: optionItem.name,
+          value: optionItem.id,
+        }))
+      }
+    }
+
+    if (WidgetComponent?.displayName === 'Input') {
       defaultProps = {
         ...defaultProps,
         placeholder: typeof item.title === 'string' ? `请输入${item.title}` : undefined,
         autoComplete: 'off',
+        allowClear: true,
       }
-    } else if (item.widget?.displayName === 'Select') {
+    } else if (WidgetComponent?.displayName === 'Select') {
       defaultProps = {
         ...defaultProps,
         ...(typeof item.title === 'string' ? { placeholder: item.title } : {}),
-        fieldNames: { value: 'id', label: 'name' },
       }
     }
 
     const valueSetDefault: { actualNameField?: string | boolean } = {}
-    if (item.widget?.displayName === 'ValueSetSelect') {
+    if (WidgetComponent?.displayName === 'ValueSetSelect') {
       if (item.props.actualNameField && typeof item.props.actualNameField === 'string') {
         valueSetDefault.actualNameField = item.props.actualNameField
       } else if (item.props.actualNameField !== false) {
@@ -127,8 +167,13 @@ const useWidgetProps = (item: SmartFormItem, itemKey: string) => {
       }
     }
 
-    return { ...defaultProps, ...(item.props as Record<string, unknown>), ...valueSetDefault }
-  }, [item, itemKey])
+    return {
+      ...defaultProps,
+      ...(item.props as Record<string, unknown>),
+      ...valueSetDefault,
+      ...(options && options.length ? { options } : {}),
+    }
+  }, [item, itemKey, grid])
 }
 
 /** 辅助函数：从对象中提取展示用的 label */
@@ -216,8 +261,9 @@ const SmartFormItemField: React.FC<{
   item: SmartFormItem
   mode: SmartFormMode
   form: FormInstance
-}> = ({ itemKey, item, mode, form }) => {
-  const mergedProps = useWidgetProps(item, itemKey)
+  grid: boolean | RowProps
+}> = ({ itemKey, item, mode, form, grid }) => {
+  const mergedProps = useWidgetProps(item, itemKey, grid)
   const WidgetComponent = item.widget || Input
 
   if (item.hiddenModes?.includes(mode)) return null
@@ -232,14 +278,23 @@ const SmartFormItemField: React.FC<{
         {/* 内层 Form.Item 加 shouldUpdate，保证 setFieldsValue 时精准重新渲染 */}
         <Form.Item noStyle shouldUpdate>
           {() => {
-            // 直接通过传入的 form 实例实时获取最新的值
+            // 注意 shouldUpdate 内必须是函数子元素 直接通过传入的 form 实例实时获取最新的值
             const val = form.getFieldValue(itemKey)
 
             if (item.viewRender) {
               return item.viewRender(val, form.getFieldsValue())
             }
-            if (item.widget.displayName === 'ValueSetSelect' && item.props?.setCode) {
+            if (WidgetComponent.displayName === 'ValueSetSelect' && item.props?.setCode) {
               return <ValueSetViewer setCode={item.props.setCode} value={val} />
+            }
+            if (WidgetComponent.displayName === 'DatePicker' && val) {
+              const formatPattern = item.props?.showTime ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'
+
+              const displayVal = dayjs.isDayjs(val)
+                ? val.format(formatPattern)
+                : dayjs(val).format(formatPattern)
+
+              return <span>{displayVal}</span>
             }
             return <span>{formatViewValue(itemKey, val, item, form.getFieldsValue())}</span>
           }}
@@ -276,7 +331,9 @@ const FormActions: React.FC<{
   grid: boolean | RowProps
   actionRender?: SmartFormExtraProps['actionRender']
   children?: React.ReactNode
-}> = ({ mode, form, actionRender, children, grid }) => {
+  loading?: boolean
+  buttonDisabled?: boolean
+}> = ({ mode, form, actionRender, children, grid, loading, buttonDisabled }) => {
   if (children) return <>{children}</>
   if (actionRender) return <>{actionRender(form, mode)}</>
 
@@ -284,7 +341,7 @@ const FormActions: React.FC<{
     return (
       <Form.Item>
         <Space>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading} disabled={buttonDisabled}>
             查询
           </Button>
           <Button
@@ -304,7 +361,7 @@ const FormActions: React.FC<{
       <Form.Item>
         <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
           <Button onClick={() => form.resetFields()}>重置</Button>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading} disabled={buttonDisabled}>
             提交
           </Button>
         </Space>
@@ -333,27 +390,86 @@ const SmartFormContent: React.FC<{
   actionRender?: SmartFormExtraProps['actionRender']
   children?: React.ReactNode
   grid?: boolean | RowProps
-}> = ({ schema, mode, actionRender, children, form, grid = false }) => {
-  const renderItem = (key: string, item: SmartFormItem) => (
-    <SmartFormItemField key={key} itemKey={key} item={item} mode={mode} form={form} />
-  )
+  colProps: ColProps
+  loading?: boolean
+  buttonDisabled?: boolean
+}> = ({
+  schema,
+  mode,
+  actionRender,
+  children,
+  form,
+  grid = false,
+  colProps,
+  loading,
+  buttonDisabled,
+}) => {
+  const renderField = (key: string, item: SmartFormItem) => {
+    const hasDependency = item.hideDependencyField && item.hideWhen !== undefined
+    const colSpan = item.colProps || colProps
+
+    const fieldElement = (
+      <SmartFormItemField key={key} itemKey={key} item={item} mode={mode} form={form} grid={grid} />
+    )
+
+    const colElement = grid ? (
+      <Col key={key} {...colSpan}>
+        {fieldElement}
+      </Col>
+    ) : (
+      fieldElement
+    )
+
+    // 无依赖：直接返回，不包裹 shouldUpdate
+    if (!hasDependency) {
+      return colElement
+    }
+
+    // 有依赖：用 shouldUpdate 包裹，仅当依赖变化时重新渲染
+    return (
+      <Form.Item
+        key={key}
+        noStyle
+        shouldUpdate={(prev, cur) => {
+          // 当任意一个依赖字段的值发生变化时返回 true
+          return prev[item.hideDependencyField!] !== cur[item.hideDependencyField!]
+        }}
+      >
+        {() => {
+          // 检查是否应该隐藏
+          const depValue = form.getFieldValue(item.hideDependencyField) // 假设只取第一个
+          let hide
+          if (depValue === undefined || depValue === null) {
+            hide = true
+          } else if (Array.isArray(item.hideWhen)) {
+            hide = item.hideWhen.some((val) => val === depValue)
+          } else {
+            hide = depValue === item.hideWhen || depValue === undefined || depValue === null
+          }
+
+          if (hide) {
+            return null // 不渲染 Col
+          }
+          return colElement
+        }}
+      </Form.Item>
+    )
+  }
 
   return (
     <>
       {Object.entries(schema).map(([key, item]) => {
         if (item.hiddenModes?.includes(mode)) return null
-
-        const colSpan = item.colProps || { span: 24 }
-        return grid ? (
-          <Col key={key} {...colSpan}>
-            {renderItem(key, item)}
-          </Col>
-        ) : (
-          renderItem(key, item)
-        )
+        return renderField(key, item)
       })}
-
-      <FormActions mode={mode} form={form} actionRender={actionRender} grid={grid}>
+      <FormActions
+        mode={mode}
+        form={form}
+        actionRender={actionRender}
+        grid={grid}
+        loading={loading}
+        buttonDisabled={buttonDisabled}
+      >
         {children}
       </FormActions>
     </>
@@ -374,10 +490,13 @@ export const SmartForm: React.FC<SmartFormProps> = ({
   onValuesChange,
   grid = false,
   labelWidth = 100,
+  colProps = { span: 12 },
   ...restFormProps
 }) => {
   const [internalForm] = Form.useForm()
   const activeForm = form || internalForm
+  const [submitting, setSubmitting] = useState(false)
+  const [disabled, setDisabled] = useState(false)
   const rowProp = typeof grid === 'object' ? grid : { gutter: 16 }
   const formattedLabelWidth = typeof labelWidth === 'number' ? `${labelWidth}px` : labelWidth
   const defaultProps = {
@@ -415,11 +534,41 @@ export const SmartForm: React.FC<SmartFormProps> = ({
       actionRender={actionRender}
       form={activeForm}
       grid={grid}
+      colProps={colProps}
+      loading={submitting}
+      buttonDisabled={disabled}
     >
       {children}
     </SmartFormContent>
   )
 
+  const formContent = () => {
+    return grid ? <Row {...rowProp}>{renderContent()}</Row> : renderContent()
+  }
+  const handleFinish = async (values: any) => {
+    if (submitting) return
+    if (disabled) return
+    if (restFormProps.onFinish) {
+      setSubmitting(true)
+      setDisabled(true)
+      setTimeout(() => {
+        setDisabled(false)
+      }, 2000)
+      try {
+        await restFormProps.onFinish(values)
+      } catch (error) {
+        console.error('表单提交错误', error)
+      } finally {
+        setSubmitting(false)
+      }
+    }
+  }
+  const handleFinishFailed = (errorInfo: any) => {
+    if (restFormProps.onFinishFailed) {
+      restFormProps.onFinishFailed(errorInfo)
+    }
+    setSubmitting(false)
+  }
   return (
     <Form
       form={activeForm}
@@ -427,8 +576,10 @@ export const SmartForm: React.FC<SmartFormProps> = ({
       onValuesChange={handleValuesChange}
       {...defaultProps}
       {...restFormProps}
+      onFinish={handleFinish}
+      onFinishFailed={handleFinishFailed}
     >
-      {grid ? <Row {...rowProp}>{renderContent()}</Row> : renderContent()}
+      {formContent()}
     </Form>
   )
 }

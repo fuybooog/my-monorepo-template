@@ -62,7 +62,7 @@ export class AuthGuard implements CanActivate {
       const permissions = ['sys:user:delete', 'sys:user:edit']
 
       request.user = {
-        id: payload.sub,
+        id: Number(payload.sub),
         userName: payload.userName,
         roles: payload.roles,
         permissions,

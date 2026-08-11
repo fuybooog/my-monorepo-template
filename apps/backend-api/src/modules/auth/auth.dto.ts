@@ -27,7 +27,7 @@ export class PhoneLoginDto {
 
 export class CurrentLoginResponseDto {
   @ApiProperty({ description: '用户ID', example: 'testId' })
-  id!: string
+  id!: number
   @ApiProperty({ description: '用户名', example: 'testName' })
   userName!: string
   @ApiProperty({ description: '用户角色列表', example: '["admin"]' })

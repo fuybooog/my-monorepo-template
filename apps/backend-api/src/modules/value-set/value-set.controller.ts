@@ -8,11 +8,12 @@ import { ValueSetListRespDto } from '@/modules/value-set/dto/value-set.list.resp
 import { ValueSetCreateDto } from '@/modules/value-set/dto/value-set.create.dto'
 import { ValueSetUpdateDto } from '@/modules/value-set/dto/value-set.update.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
-import { ApiOperation } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { ApiSuccessPageResponse, ApiSuccessResponse } from '@/decorators/api-response.decorator'
 import { BatchDto, BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
 
+@ApiTags('值集模块')
 @Controller('value-set')
 export class ValueSetController {
   constructor(private readonly valueSetService: ValueSetService) {}

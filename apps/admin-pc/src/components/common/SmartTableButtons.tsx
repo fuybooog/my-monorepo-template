@@ -74,6 +74,7 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
       icon, // icon 保留
       disabled: finalDisabled,
       size: nativeProps.size || 'small', // 默认 small
+      type: nativeProps.type || 'link',
     }
 
     // 4. 处理点击事件

@@ -471,7 +471,7 @@
           }
         },
         "summary": "分页查询用户列表",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/schema-generator-holder-page-user": {
@@ -495,7 +495,7 @@
           }
         },
         "summary": "请勿调用，用于生成前端DTO",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/option": {
@@ -596,7 +596,7 @@
           }
         },
         "summary": "分页查询用户列表(可选字段)",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/schema-generator-holder-page-option-user": {
@@ -620,7 +620,7 @@
           }
         },
         "summary": "请勿调用，用于生成前端DTO",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/find/{id}": {
@@ -661,7 +661,7 @@
           }
         },
         "summary": "按id查询用户",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/batch/query": {
@@ -704,7 +704,7 @@
           }
         },
         "summary": "按ids查询用户",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/create": {
@@ -746,7 +746,7 @@
           }
         },
         "summary": "创建用户",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/update/{id}": {
@@ -797,7 +797,7 @@
           }
         },
         "summary": "修改用户",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/delete/{id}": {
@@ -840,7 +840,7 @@
           }
         },
         "summary": "删除用户",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/batch/delete": {
@@ -882,7 +882,7 @@
           }
         },
         "summary": "批量删除用户",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/updateStatus/{id}": {
@@ -935,7 +935,7 @@
           }
         },
         "summary": "修改用户状态",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/batch/status": {
@@ -977,7 +977,7 @@
           }
         },
         "summary": "批量修改用户状态",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/template": {
@@ -1011,7 +1011,7 @@
           }
         },
         "summary": "下载导入用户模板",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/import": {
@@ -1045,7 +1045,7 @@
           }
         },
         "summary": "导入用户数据",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/export": {
@@ -1079,7 +1079,7 @@
           }
         },
         "summary": "导出用户数据",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/user/check-unique": {
@@ -1113,7 +1113,7 @@
           }
         },
         "summary": "检测字段是否唯一",
-        "tags": ["User"]
+        "tags": ["用户模块"]
       }
     },
     "/value-set/page": {
@@ -1364,7 +1364,7 @@
           }
         },
         "summary": "分页查询值集列表",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/schema-generator-holder-page-value-set": {
@@ -1388,7 +1388,7 @@
           }
         },
         "summary": "请勿调用，用于生成前端DTO",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/option": {
@@ -1489,7 +1489,7 @@
           }
         },
         "summary": "分页查询值集列表(可选字段)",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/schema-generator-holder-page-option-value-set": {
@@ -1513,7 +1513,7 @@
           }
         },
         "summary": "请勿调用，用于生成前端DTO",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/by-set-codes": {
@@ -1555,7 +1555,7 @@
           }
         },
         "summary": "按集code查询值集",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/schema-generator-holder-by-set-codes": {
@@ -1579,7 +1579,7 @@
           }
         },
         "summary": "请勿调用，用于生成前端DTO",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/find/{id}": {
@@ -1620,7 +1620,7 @@
           }
         },
         "summary": "按id查询值集",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/batch/query": {
@@ -1663,7 +1663,7 @@
           }
         },
         "summary": "按ids查询值集",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/create": {
@@ -1705,7 +1705,7 @@
           }
         },
         "summary": "创建值集",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/update/{id}": {
@@ -1756,7 +1756,7 @@
           }
         },
         "summary": "修改值集",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/delete/{id}": {
@@ -1799,7 +1799,7 @@
           }
         },
         "summary": "删除值集",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/batch/delete": {
@@ -1841,7 +1841,7 @@
           }
         },
         "summary": "批量删除值集",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/updateStatus/{id}": {
@@ -1894,7 +1894,7 @@
           }
         },
         "summary": "修改值集状态",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/batch/status": {
@@ -1936,7 +1936,7 @@
           }
         },
         "summary": "批量修改值集状态",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/template": {
@@ -1970,7 +1970,7 @@
           }
         },
         "summary": "下载导入值集模板",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/import": {
@@ -2004,7 +2004,7 @@
           }
         },
         "summary": "导入值集数据",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/value-set/export": {
@@ -2038,7 +2038,7 @@
           }
         },
         "summary": "导出值集数据",
-        "tags": ["ValueSet"]
+        "tags": ["值集模块"]
       }
     },
     "/resource/page": {
@@ -2085,7 +2085,16 @@
             "name": "type",
             "required": false,
             "in": "query",
-            "description": "资源类型：1-页面 2-按钮 3-列",
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "notInMenu",
+            "required": false,
+            "in": "query",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示",
             "schema": {
               "type": "string"
             }
@@ -2097,6 +2106,15 @@
             "description": "排序号",
             "schema": {
               "type": "number"
+            }
+          },
+          {
+            "name": "menuPath",
+            "required": false,
+            "in": "query",
+            "description": "菜单路径",
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -2239,7 +2257,261 @@
             }
           }
         },
-        "summary": "分页查询用户列表",
+        "summary": "分页查询资源列表",
+        "tags": ["Resource"]
+      }
+    },
+    "/resource/list": {
+      "get": {
+        "operationId": "ResourceController_listAllResource",
+        "parameters": [
+          {
+            "name": "label",
+            "required": false,
+            "in": "query",
+            "description": "资源名称",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "uniqueProp",
+            "required": false,
+            "in": "query",
+            "description": "唯一编码",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parentUniqueProp",
+            "required": false,
+            "in": "query",
+            "description": "唯一父编码",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "状态：0-禁用，1-启用",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "notInMenu",
+            "required": false,
+            "in": "query",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortNumber",
+            "required": false,
+            "in": "query",
+            "description": "排序号",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "menuPath",
+            "required": false,
+            "in": "query",
+            "description": "菜单路径",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAt",
+            "required": false,
+            "in": "query",
+            "description": "创建时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "required": false,
+            "in": "query",
+            "description": "修改时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deletedAt",
+            "required": false,
+            "in": "query",
+            "description": "删除时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "页码",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "createdAtStart",
+            "required": false,
+            "in": "query",
+            "description": "创建时间开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "创建时间结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtStart",
+            "required": false,
+            "in": "query",
+            "description": "修改时间开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "修改时间结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "分页成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/PaginatedResult"
+                            },
+                            {
+                              "required": ["total", "page", "pageSize", "list"],
+                              "properties": {
+                                "total": {
+                                  "type": "number",
+                                  "description": "总条数",
+                                  "example": 100
+                                },
+                                "page": {
+                                  "type": "number",
+                                  "description": "当前页码",
+                                  "example": 1
+                                },
+                                "pageSize": {
+                                  "type": "number",
+                                  "description": "每页条数",
+                                  "example": 10
+                                },
+                                "list": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/components/schemas/ResourcePageRespDto"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "查询全量资源列表",
+        "tags": ["Resource"]
+      }
+    },
+    "/resource/listByUser": {
+      "get": {
+        "operationId": "ResourceController_listResourceByUser",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "查询用户的菜单资源",
         "tags": ["Resource"]
       }
     },
@@ -2364,7 +2636,7 @@
             }
           }
         },
-        "summary": "分页查询用户列表(可选字段)",
+        "summary": "分页查询资源列表(可选字段)",
         "tags": ["Resource"]
       }
     },
@@ -2429,7 +2701,7 @@
             }
           }
         },
-        "summary": "按id查询用户",
+        "summary": "按id查询资源",
         "tags": ["Resource"]
       }
     },
@@ -2472,7 +2744,7 @@
             }
           }
         },
-        "summary": "按ids查询用户",
+        "summary": "按ids查询资源",
         "tags": ["Resource"]
       }
     },
@@ -2514,7 +2786,7 @@
             }
           }
         },
-        "summary": "创建用户",
+        "summary": "创建资源",
         "tags": ["Resource"]
       }
     },
@@ -2565,7 +2837,7 @@
             }
           }
         },
-        "summary": "修改用户",
+        "summary": "修改资源",
         "tags": ["Resource"]
       }
     },
@@ -2608,7 +2880,7 @@
             }
           }
         },
-        "summary": "删除用户",
+        "summary": "删除资源",
         "tags": ["Resource"]
       }
     },
@@ -2650,7 +2922,7 @@
             }
           }
         },
-        "summary": "批量删除用户",
+        "summary": "批量删除资源",
         "tags": ["Resource"]
       }
     },
@@ -2703,7 +2975,7 @@
             }
           }
         },
-        "summary": "修改用户状态",
+        "summary": "修改资源状态",
         "tags": ["Resource"]
       }
     },
@@ -2745,7 +3017,7 @@
             }
           }
         },
-        "summary": "批量修改用户状态",
+        "summary": "批量修改资源状态",
         "tags": ["Resource"]
       }
     },
@@ -2779,7 +3051,7 @@
             }
           }
         },
-        "summary": "下载导入用户模板",
+        "summary": "下载导入资源模板",
         "tags": ["Resource"]
       }
     },
@@ -2813,7 +3085,7 @@
             }
           }
         },
-        "summary": "导入用户数据",
+        "summary": "导入资源数据",
         "tags": ["Resource"]
       }
     },
@@ -2847,7 +3119,7 @@
             }
           }
         },
-        "summary": "导出用户数据",
+        "summary": "导出资源数据",
         "tags": ["Resource"]
       }
     },
@@ -3726,7 +3998,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
+            "type": "number",
             "description": "用户ID",
             "example": "testId"
           },
@@ -4724,7 +4996,15 @@
           },
           "type": {
             "type": "string",
-            "description": "资源类型：1-页面 2-按钮 3-列"
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
           },
           "sortNumber": {
             "type": "number",
@@ -4766,11 +5046,19 @@
           },
           "type": {
             "type": "string",
-            "description": "资源类型：1-页面 2-按钮 3-列"
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
           },
           "sortNumber": {
             "type": "number",
             "description": "排序号"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
           },
           "createdAt": {
             "type": "string",
@@ -4862,7 +5150,15 @@
           },
           "type": {
             "type": "string",
-            "description": "资源类型：1-页面 2-按钮 3-列"
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
           },
           "sortNumber": {
             "type": "number",
@@ -4925,11 +5221,19 @@
           },
           "type": {
             "type": "string",
-            "description": "资源类型：1-页面 2-按钮 3-列"
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
           },
           "sortNumber": {
             "type": "number",
             "description": "排序号"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
           },
           "createdAt": {
             "type": "string",
@@ -4966,11 +5270,19 @@
           },
           "type": {
             "type": "string",
-            "description": "资源类型：1-页面 2-按钮 3-列"
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
           },
           "sortNumber": {
             "type": "number",
             "description": "排序号"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
           },
           "createdAt": {
             "type": "string",
