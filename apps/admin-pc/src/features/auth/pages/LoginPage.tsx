@@ -1,5 +1,9 @@
-import { LoginCard } from "@/features/auth/components/LoginCard";
+import { LoginCard } from '@/features/auth/components/LoginCard'
 
 export function LoginPage() {
-  return <><LoginCard></LoginCard></>
+  return (
+    <>
+      <LoginCard></LoginCard>
+    </>
+  )
 }

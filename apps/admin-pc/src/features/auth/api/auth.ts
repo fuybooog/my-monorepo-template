@@ -13,6 +13,6 @@ const authApi = {
   },
   logout(): Promise<Backend.LogoutRes> {
     return http.post('/auth/logout')
-  }
+  },
 }
 export default authApi

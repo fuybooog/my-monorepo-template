@@ -1,7 +1,5 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react'
 
-export function PageLayout({children}: {children: ReactNode}) {
-  return (
-    <div className="">{children}</div>
-  )
+export function PageLayout({ children }: { children: ReactNode }) {
+  return <div className="">{children}</div>
 }

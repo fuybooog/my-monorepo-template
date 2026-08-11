@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom"
-import authApi from "@/features/auth/api/auth"
+import { useNavigate } from 'react-router-dom'
+import authApi from '@/features/auth/api/auth'
 
 export function LoginCard() {
   const navigate = useNavigate()
@@ -10,10 +10,12 @@ export function LoginCard() {
       type: 'password',
     })
     if (res.head.errCode === 0) {
-      navigate('/dashboard', {replace: true})
+      navigate('/dashboard', { replace: true })
     }
   }
-  return <>
-    <button onClick={handleLogin}>登录</button>
-  </>
+  return (
+    <>
+      <button onClick={handleLogin}>登录</button>
+    </>
+  )
 }

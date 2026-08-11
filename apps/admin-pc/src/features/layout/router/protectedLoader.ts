@@ -18,6 +18,6 @@ export async function protectedLoader() {
     }
   } catch {
     authState.clearAuth()
-      return redirect('/login')
+    return redirect('/login')
   }
 }
