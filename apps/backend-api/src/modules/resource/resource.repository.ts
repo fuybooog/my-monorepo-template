@@ -5,6 +5,7 @@ import { ResourcePageDto } from '@/modules/resource/dto/resource.page.dto'
 import { isTargetOrParent } from '@/utils/fns'
 import { ResourceCreateDto } from './dto/resource.create.dto'
 import { ResourceUpdateDto } from './dto/resource.update.dto'
+import { ResourcePartialDto } from './dto/resource.base.dto'
 
 @Injectable()
 export class ResourceRepository extends Repository<Resource> {
@@ -94,5 +95,43 @@ export class ResourceRepository extends Repository<Resource> {
       resource.status = status
     })
     return await manager.save(resources)
+  }
+  async batchUpdateSortNumber(resource: Resource, manager: EntityManager) {
+    const qb = manager
+      .createQueryBuilder()
+      .update(Resource)
+      .set({
+        sortNumber: () => 'sortNumber - 1',
+      })
+      .where('sortNumber > :sortNumber', { sortNumber: resource.sortNumber })
+
+    if (!resource.parentUniqueProp) {
+      qb.andWhere('parentUniqueProp IS NULL')
+    } else {
+      qb.andWhere('parentUniqueProp = :parentUniqueProp', {
+        parentUniqueProp: resource.parentUniqueProp,
+      })
+    }
+
+    await qb.execute()
+  }
+  async resetSortNumber(manager: EntityManager) {
+    const sql = `
+      UPDATE system_resource r
+      JOIN (
+          SELECT 
+              id,
+              ROW_NUMBER() OVER (
+                  PARTITION BY COALESCE(parent_unique_prop, '') 
+                  ORDER BY sort_number ASC, created_at ASC, id ASC
+              ) AS new_sort
+          FROM system_resource
+          WHERE deleted_at IS NULL
+      ) tmp ON r.id = tmp.id
+      SET r.sort_number = tmp.new_sort
+      WHERE r.sort_number != tmp.new_sort;
+    `
+
+    await manager.query(sql)
   }
 }

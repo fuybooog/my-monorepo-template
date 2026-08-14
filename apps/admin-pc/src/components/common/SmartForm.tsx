@@ -68,8 +68,8 @@ const useAutoSubmitHandler = ({
     onValuesChange?.(changedValues, allValues)
 
     Object.entries(schema).forEach(([key, item]) => {
-      if (item.hideDependencyField && item.hideWhen !== undefined) {
-        const depValue = allValues[item.hideDependencyField]
+      if (item.dependencyField && item.hideWhen !== undefined) {
+        const depValue = allValues[item.dependencyField]
         const hide = Array.isArray(item.hideWhen)
           ? item.hideWhen.some((v) => v === depValue)
           : depValue === item.hideWhen
@@ -262,9 +262,18 @@ const SmartFormItemField: React.FC<{
   mode: SmartFormMode
   form: FormInstance
   grid: boolean | RowProps
-}> = ({ itemKey, item, mode, form, grid }) => {
+  dynamicRules?: any[]
+}> = ({ itemKey, item, mode, form, grid, dynamicRules }) => {
   const mergedProps = useWidgetProps(item, itemKey, grid)
   const WidgetComponent = item.widget || Input
+
+  const mergeRules = useMemo(() => {
+    const baseRules = item.itemProps?.rules || []
+    if (dynamicRules && dynamicRules.length) {
+      return [...baseRules, ...dynamicRules]
+    }
+    return baseRules
+  }, [item.itemProps?.rules, dynamicRules])
 
   if (item.hiddenModes?.includes(mode)) return null
 
@@ -306,6 +315,7 @@ const SmartFormItemField: React.FC<{
   // ==========================================
   // 2. edit / create / query 模式
   // ==========================================
+
   return (
     <>
       {mergedProps.actualNameField && mode !== 'query' && (
@@ -313,7 +323,13 @@ const SmartFormItemField: React.FC<{
           <Input hidden />
         </Form.Item>
       )}
-      <Form.Item key={itemKey} name={itemKey} label={item.title} {...item.itemProps}>
+      <Form.Item
+        key={itemKey}
+        name={itemKey}
+        label={item.title}
+        {...item.itemProps}
+        rules={mergeRules}
+      >
         {item.render ? (
           item.render(form)
         ) : WidgetComponent ? (
@@ -333,7 +349,8 @@ const FormActions: React.FC<{
   children?: React.ReactNode
   loading?: boolean
   buttonDisabled?: boolean
-}> = ({ mode, form, actionRender, children, grid, loading, buttonDisabled }) => {
+  handleCancel?: () => void
+}> = ({ mode, form, actionRender, children, grid, loading, buttonDisabled, handleCancel }) => {
   if (children) return <>{children}</>
   if (actionRender) return <>{actionRender(form, mode)}</>
 
@@ -360,6 +377,7 @@ const FormActions: React.FC<{
     return (
       <Form.Item>
         <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+          {handleCancel && <Button onClick={() => handleCancel()}>取消</Button>}
           <Button onClick={() => form.resetFields()}>重置</Button>
           <Button type="primary" htmlType="submit" loading={loading} disabled={buttonDisabled}>
             提交
@@ -393,6 +411,7 @@ const SmartFormContent: React.FC<{
   colProps: ColProps
   loading?: boolean
   buttonDisabled?: boolean
+  handleCancel?: () => void
 }> = ({
   schema,
   mode,
@@ -403,26 +422,37 @@ const SmartFormContent: React.FC<{
   colProps,
   loading,
   buttonDisabled,
+  handleCancel,
 }) => {
   const renderField = (key: string, item: SmartFormItem) => {
-    const hasDependency = item.hideDependencyField && item.hideWhen !== undefined
+    const hasDependency =
+      item.dependencyField && (item.hideWhen !== undefined || item.requiredWhen !== undefined)
     const colSpan = item.colProps || colProps
 
-    const fieldElement = (
-      <SmartFormItemField key={key} itemKey={key} item={item} mode={mode} form={form} grid={grid} />
-    )
+    const renderFieldContent = (dynamicRules?: any[]) => {
+      const fieldElement = (
+        <SmartFormItemField
+          key={key}
+          itemKey={key}
+          item={item}
+          mode={mode}
+          form={form}
+          grid={grid}
+          dynamicRules={dynamicRules}
+        />
+      )
+      return grid ? (
+        <Col key={key} {...colSpan}>
+          {fieldElement}
+        </Col>
+      ) : (
+        fieldElement
+      )
+    }
 
-    const colElement = grid ? (
-      <Col key={key} {...colSpan}>
-        {fieldElement}
-      </Col>
-    ) : (
-      fieldElement
-    )
-
-    // 无依赖：直接返回，不包裹 shouldUpdate
+    // 无依赖：直接渲染，不包裹 shouldUpdate
     if (!hasDependency) {
-      return colElement
+      return renderFieldContent()
     }
 
     // 有依赖：用 shouldUpdate 包裹，仅当依赖变化时重新渲染
@@ -432,12 +462,12 @@ const SmartFormContent: React.FC<{
         noStyle
         shouldUpdate={(prev, cur) => {
           // 当任意一个依赖字段的值发生变化时返回 true
-          return prev[item.hideDependencyField!] !== cur[item.hideDependencyField!]
+          return prev[item.dependencyField!] !== cur[item.dependencyField!]
         }}
       >
         {() => {
           // 检查是否应该隐藏
-          const depValue = form.getFieldValue(item.hideDependencyField) // 假设只取第一个
+          const depValue = form.getFieldValue(item.dependencyField) // 假设只取第一个
           let hide
           if (depValue === undefined || depValue === null) {
             hide = true
@@ -450,7 +480,17 @@ const SmartFormContent: React.FC<{
           if (hide) {
             return null // 不渲染 Col
           }
-          return colElement
+          let required = false
+          if (item.requiredWhen !== undefined) {
+            if (Array.isArray(item.requiredWhen)) {
+              required = item.requiredWhen.some((v) => v === depValue)
+            } else {
+              required = depValue === item.requiredWhen
+            }
+          }
+          const dynamicRules = required ? [{ required: true, message: '必填项不能为空' }] : []
+
+          return renderFieldContent(dynamicRules)
         }}
       </Form.Item>
     )
@@ -469,6 +509,7 @@ const SmartFormContent: React.FC<{
         grid={grid}
         loading={loading}
         buttonDisabled={buttonDisabled}
+        handleCancel={handleCancel}
       >
         {children}
       </FormActions>
@@ -491,6 +532,7 @@ export const SmartForm: React.FC<SmartFormProps> = ({
   grid = false,
   labelWidth = 100,
   colProps = { span: 12 },
+  handleCancel,
   ...restFormProps
 }) => {
   const [internalForm] = Form.useForm()
@@ -537,6 +579,7 @@ export const SmartForm: React.FC<SmartFormProps> = ({
       colProps={colProps}
       loading={submitting}
       buttonDisabled={disabled}
+      handleCancel={handleCancel}
     >
       {children}
     </SmartFormContent>

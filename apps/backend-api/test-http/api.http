@@ -105,3 +105,27 @@ GET http://localhost:3000/api/value-set/by-set-codes?setCodes=SYS_GENDER,SYS_MAR
 Content-Type: application/json
 Cookie: {{authCookie}}
 
+### 批量更新资源顺序
+
+POST http://localhost:3000/api/resource/batchUpdate
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+{
+  "list": [
+    {
+      "id": 17,
+      "sortNumber": 90
+    },
+    {"label":"test7","uniqueProp":"test7","parentUniqueProp":"noMenuResource","type":"1","notInMenu":"1"}
+  ]
+}
+
+
+### 新增时，判断要新增的数据是否为已删除数据，如果是已删除的，则需要复活此数据
+
+POST http://localhost:3000/api/resource/create
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+{"label":"用户管理","uniqueProp":"user","parentUniqueProp":"","type":"0","notInMenu":"0"}

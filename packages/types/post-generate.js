@@ -35,7 +35,7 @@ function visit(node) {
       }
     })
   }
-  
+
   ts.forEachChild(node, visit)
 }
 
@@ -47,7 +47,7 @@ if (dtoList.length > 0 || operationList.length > 0) {
   indexContent += `export type { components, operations };\n\n`
 
   indexContent += 'export namespace Backend {\n'
-  
+
   dtoList.forEach((dto) => {
     indexContent += `  export type ${dto} = components['schemas']['${dto}'];\n`
   })
@@ -55,7 +55,7 @@ if (dtoList.length > 0 || operationList.length > 0) {
   if (operationList.length > 0) {
     indexContent += '\n  /* ====== 动态 AST 自动桥接的 Response 类型 ====== */\n'
     operationList.forEach((op) => {
-      const cleanName = op.replace(/^\w+Controller_/, '') 
+      const cleanName = op.replace(/^\w+Controller_/, '')
       const resTypeName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1) + 'Res'
 
       indexContent += `  export type ${resTypeName} = \n`

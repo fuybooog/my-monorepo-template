@@ -9,6 +9,7 @@ export function SmartTableToolbar<T>({
   selectedRows,
   onClearSelection,
   actions = ['create', 'batchDelete', 'export', 'import', 'clearSelection'],
+  additionalActions = [],
   hideSettings = false,
   rawColumns,
   checkedKeys,
@@ -68,19 +69,20 @@ export function SmartTableToolbar<T>({
       }}
     >
       <Space wrap>
-        {actions.map((action) => {
+        {[...actions, ...additionalActions].map((action) => {
           if (typeof action === 'string') return builtInActionsMap[action] || null
+          const { key, label, actionType, onClick, ...buttonProps } = action
 
-          const isBtnDisabled = action.actionType === 'batch' && !hasSelected
+          const isBtnDisabled = actionType === 'batch' && !hasSelected
+
           return (
             <Button
-              key={action.key}
-              type={action.type || 'default'}
-              danger={action.danger}
+              key={key}
+              {...buttonProps}
               disabled={isBtnDisabled}
-              onClick={() => action.onClick(selectedRowKeys, selectedRows)}
+              onClick={() => onClick(selectedRowKeys, selectedRows)}
             >
-              {action.label}
+              {label}
             </Button>
           )
         })}

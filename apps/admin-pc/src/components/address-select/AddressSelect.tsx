@@ -127,7 +127,7 @@ function AddressSelect<T extends keyof ReturnTypeMap = 'leaf'>(
   // 受控模式：直接用 useMemo 计算值
   const controlledValue = useMemo(
     () => normalizeValue(externalValue, multiple),
-    [externalValue, multiple, pathMap, normalizeValue], // pathMap 稳定，不需要额外依赖
+    [externalValue, multiple, normalizeValue],
   )
 
   // 非受控模式：使用 useState 初始化

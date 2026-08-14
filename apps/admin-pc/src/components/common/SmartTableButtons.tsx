@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Space, Button, Dropdown, Popconfirm } from 'antd'
-import { MoreOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons'
 import type { ActionColumnConfig, CustomAction } from './smart-types'
 import type { ButtonProps } from 'antd'
 
@@ -11,19 +11,40 @@ export interface SmartTableButtonsProps<RecordType> {
 
 export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<RecordType>) {
   const { record, actionColumn } = props
-  const { buttons, onEdit, onDelete, onAction, maxVisible, moreText, moreIcon, moreDropdownProps } =
-    actionColumn
+  const {
+    buttons,
+    onEdit,
+    onDelete,
+    onAction,
+    maxVisible,
+    moreText,
+    moreIcon,
+    moreDropdownProps,
+    onlyIcon = false,
+  } = actionColumn
 
   // 将预设按钮转为 CustomAction
   const allActions = useMemo<CustomAction<RecordType>[]>(() => {
     const result: CustomAction<RecordType>[] = []
-    buttons.forEach((item) => {
+    const buttonResult = Array.isArray(buttons)
+      ? buttons
+      : typeof buttons === 'function'
+        ? buttons(record)
+        : []
+    buttonResult.forEach((item) => {
       if (item === 'edit') {
         if (onEdit) {
           result.push({
             key: 'edit',
-            label: '编辑',
-            // icon: <EditOutlined />,
+            ...(onlyIcon
+              ? {
+                  icon: <EditOutlined />,
+                  label: '',
+                  title: '编辑',
+                }
+              : {
+                  label: '编辑',
+                }),
           })
         }
         return
@@ -32,9 +53,16 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
         if (onDelete) {
           result.push({
             key: 'delete',
-            label: '删除',
-            // icon: <DeleteOutlined />,
             danger: true,
+            ...(onlyIcon
+              ? {
+                  icon: <DeleteOutlined />,
+                  label: '',
+                  title: '删除',
+                }
+              : {
+                  label: '删除',
+                }),
           })
         }
         return
@@ -42,7 +70,7 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
       result.push(item as CustomAction<RecordType>)
     })
     return result
-  }, [buttons, onEdit, onDelete])
+  }, [buttons, onEdit, onDelete, onlyIcon])
 
   // 过滤隐藏
   const visibleActions = useMemo(() => {
@@ -81,8 +109,13 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
     // 编辑按钮
     if (key === 'edit') {
       return (
-        <Button type="link" {...buttonNativeProps} onClick={() => onEdit?.(record)}>
-          {label}
+        <Button
+          type="link"
+          icon={<EditOutlined />}
+          {...buttonNativeProps}
+          onClick={() => onEdit?.(record)}
+        >
+          {onlyIcon ? '' : label}
         </Button>
       )
     }
@@ -97,8 +130,8 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
           okText="确定"
           cancelText="取消"
         >
-          <Button type="link" danger {...buttonNativeProps}>
-            {label}
+          <Button type="link" danger icon={<DeleteOutlined />} {...buttonNativeProps}>
+            {onlyIcon ? '' : label}
           </Button>
         </Popconfirm>
       )
@@ -133,8 +166,13 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
     }))
     moreNode = (
       <Dropdown menu={{ items: menuItems }} trigger={['click']} {...moreDropdownProps}>
-        <Button type="link" size="small" icon={moreIcon || <MoreOutlined />}>
-          {moreText || '更多'}
+        <Button
+          type="link"
+          size="small"
+          icon={moreIcon || <MoreOutlined />}
+          title={moreText || '更多'}
+        >
+          {onlyIcon ? '' : moreText || '更多'}
         </Button>
       </Dropdown>
     )

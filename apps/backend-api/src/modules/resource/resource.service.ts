@@ -11,11 +11,12 @@ import { PaginatedResult } from '@/dto/pagination-response.dto'
 import { BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { ResourceRepository } from '@/modules/resource/resource.repository'
 import { plainToInstance } from 'class-transformer'
-import { DataSource, FindManyOptions, In, Not } from 'typeorm'
+import { DataSource, EntityManager, FindManyOptions, In, Not } from 'typeorm'
 import { Resource } from '@/modules/resource/entities/resource.entity'
 import { BusinessException } from '@/exceptions/business-exception'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
 import { ListResp } from '@/dto/base.dto'
+import { ResourcePartialDto } from './dto/resource.base.dto'
 
 @Injectable()
 export class ResourceService {
@@ -113,13 +114,35 @@ export class ResourceService {
   }
   async createResource(resourceCreateDto: ResourceCreateDto): Promise<ResourceRespDto | null> {
     // todo 检查是否唯一
+    const resourceEntity = await this.resourceRepository.findOne({
+      where: { uniqueProp: resourceCreateDto.uniqueProp! },
+      select: { id: true, deletedAt: true },
+      withDeleted: true,
+    })
+    if (resourceEntity) {
+      if (!resourceEntity.deletedAt) {
+        throw new BusinessException('uniqueProp 重复，无法新增！')
+      }
+    }
     return await this.dataSource.transaction(async (manager) => {
-      const resourceEntity = await this.resourceRepository.createResource(
-        resourceCreateDto,
-        manager,
-      )
-      // todo 添加资源角色
-      return resourceEntity
+      let createResourceEntity
+      if (resourceEntity) {
+        // 将此数据恢复
+        createResourceEntity = await this.resourceRepository.updateResource(
+          resourceEntity,
+          {
+            ...resourceCreateDto,
+            deletedAt: null,
+          },
+          manager,
+        )
+      } else {
+        createResourceEntity = await this.resourceRepository.createResource(
+          resourceCreateDto,
+          manager,
+        )
+      }
+      return createResourceEntity
     })
   }
   async updateResource(
@@ -142,6 +165,43 @@ export class ResourceService {
       return updatedResourceEntity
     })
   }
+  async batchUpdateResource(list: ResourcePartialDto[]) {
+    if (!list || list.length === 0) {
+      throw new BusinessException(`参数list不能为空`)
+    }
+    const updateItems = list.filter((item) => item.id && item.sortNumber !== undefined)
+    const insertItems = list.filter((item) => !item.id)
+    const ids = updateItems.map((item) => item.id)
+    let invalidIds = []
+    if (updateItems.length > 0) {
+      const existing = await this.resourceRepository.find({
+        where: { id: In(ids) },
+        select: { id: true },
+      })
+      const existingIds = new Set(existing.map((r) => r.id))
+      invalidIds = ids.filter((id) => !existingIds.has(id!))
+    }
+    return await this.dataSource.transaction(async (manager) => {
+      for (const item of list) {
+        if (item.id && item.sortNumber) {
+          // 更新顺序
+          if (!invalidIds.length) {
+            // 有部分资源被删除了，无法批量更新顺序
+            await manager.update(Resource, item.id, { sortNumber: item.sortNumber })
+          }
+        } else {
+          await this.resourceRepository.createResource(item, manager)
+        }
+      }
+      let messageList = invalidIds.length ? ['有部分资源被删除了，无法批量更新顺序'] : []
+      if (insertItems.length && invalidIds.length) {
+        messageList.push('数据插入成功，请手动进行排序')
+      }
+      return {
+        info: messageList.length ? messageList.join('，') : null,
+      }
+    })
+  }
   async removeResource(id: number): Promise<null> {
     const resourceEntity = await this.resourceRepository.findOne({
       where: { id },
@@ -150,6 +210,7 @@ export class ResourceService {
       throw new BusinessException(`未找到id为${id}的资源`)
     }
     return await this.dataSource.transaction(async (manager) => {
+      await this.resourceRepository.batchUpdateSortNumber(resourceEntity, manager)
       await this.resourceRepository.removeResource(resourceEntity, manager)
       return null
     })
@@ -163,6 +224,7 @@ export class ResourceService {
     }
     return await this.dataSource.transaction(async (manager) => {
       await this.resourceRepository.batchRemoveResource(resources, manager)
+      await this.resourceRepository.resetSortNumber(manager)
       return {
         notFoundIds: missingIds,
       }
@@ -202,6 +264,13 @@ export class ResourceService {
       return {
         notFoundIds: missingIds,
       }
+    })
+  }
+
+  async resetResourceListSort() {
+    return await this.dataSource.transaction(async (manager) => {
+      await this.resourceRepository.resetSortNumber(manager)
+      return null
     })
   }
 

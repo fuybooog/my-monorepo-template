@@ -2,6 +2,7 @@ import { SmartColumnType } from '@/components/common'
 import { Backend } from '@repo/types'
 import { commonTimeRender, createStatusRender, MetaTreeNode } from '@/utils'
 import { MetaItemTagList } from '../components/MetaItemTagList'
+import { ResourcePageRespDto } from '../types'
 
 /**
  * 获取用户列表表格列配置
@@ -11,9 +12,9 @@ import { MetaItemTagList } from '../components/MetaItemTagList'
 export const getResourceColumns = (callbacks: {
   handleEditMeta: (item: MetaTreeNode) => void
   handleDeleteMeta: (item: MetaTreeNode) => void
-  onStatusChange: (record: Backend.ResourcePageRespDto, newStatus: string) => Promise<unknown>
+  onStatusChange: (record: ResourcePageRespDto, newStatus: string) => Promise<unknown>
   refreshList: () => void
-}): SmartColumnType<Backend.ResourcePageRespDto>[] => {
+}): SmartColumnType<ResourcePageRespDto>[] => {
   const { onStatusChange, refreshList, handleEditMeta, handleDeleteMeta } = callbacks
 
   return [
@@ -85,11 +86,11 @@ export const getResourceColumns = (callbacks: {
       width: 160,
       render: (value) => <span>{value === '1' ? '是' : ''}</span>,
     },
-    {
-      title: '排序号',
-      dataIndex: 'sortNumber',
-      width: 80,
-    },
+    // {
+    //   title: '排序号',
+    //   dataIndex: 'sortNumber',
+    //   width: 80,
+    // },
     {
       title: '状态',
       dataIndex: 'status',

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import dayjs from 'dayjs'
 
 /**
@@ -59,7 +60,7 @@ export function getDictLabel(
   return targetValue
 }
 
-export function transformDateFieldsValue(values: Record<string, unknown>, dateFields: string[]) {
+export function transformDateFieldsValue(values: any, dateFields: string[]) {
   if (!dateFields.length) {
     return values
   }

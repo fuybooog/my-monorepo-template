@@ -12,10 +12,16 @@ import { getMessage } from '@/utils/antd-instance'
 interface UserFormContainerProps {
   id?: string | number
   mode: SmartFormEditMode
+  closeDrawer?: () => void
   onSuccess: () => void
 }
 
-export const UserFormContainer: React.FC<UserFormContainerProps> = ({ id, mode, onSuccess }) => {
+export const UserFormContainer: React.FC<UserFormContainerProps> = ({
+  id,
+  mode,
+  closeDrawer,
+  onSuccess,
+}) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [dynamicSchema] = useState(
@@ -114,6 +120,7 @@ export const UserFormContainer: React.FC<UserFormContainerProps> = ({ id, mode, 
         mode={mode}
         onFinish={handleFinish}
         grid={true}
+        handleCancel={closeDrawer}
       />
     </Spin>
   )

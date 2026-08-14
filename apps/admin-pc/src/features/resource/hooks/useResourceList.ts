@@ -3,11 +3,16 @@ import { Backend } from '@repo/types'
 import { useCallback, useRef, useState } from 'react'
 import resourceApi from '../api/resource'
 import { ERROR_MESSAGE, SUCCESS_MESSAGE } from '@/constants'
-import { arrayToTreeWithMeta } from '@/utils'
-import { getMessage } from '@/utils/antd-instance'
+import { arrayToTreeWithMeta, getMessage } from '@/utils'
+import { ResourcePageRespDto } from '../types'
 
 export function useResourceList() {
   const [searchParams, setSearchParams] = useState<Backend.ResourcePageDto>({})
+  const [originList, setOriginList] = useState<Backend.ResourcePageRespDto[]>([])
+  const [resourceTree, setResourceTree] = useState<ResourcePageRespDto[]>([])
+  const [resourceParentMap, setResourceParentMap] = useState<
+    Map<string | number, ResourcePageRespDto>
+  >(new Map())
   const smartTable = useRef<SmartTableInstance>(null)
 
   const refreshTable = useCallback(() => {
@@ -18,23 +23,25 @@ export function useResourceList() {
     const res = await resourceApi.list({
       ...params,
     })
-    const { tree } = arrayToTreeWithMeta(res.data.list, {
+    setOriginList(res.data.list)
+    const { tree, parentMap } = arrayToTreeWithMeta(res.data.list, {
       idKey: 'uniqueProp',
       parentKey: 'parentUniqueProp',
     })
-    console.log('tree', tree)
+    setResourceTree(tree)
+    setResourceParentMap(parentMap)
     return {
       data: tree,
       total: 99999,
     }
   }, [])
 
-  const searchTable = useCallback((formParams: Backend.ResourcePageDto) => {
+  const searchTable = useCallback((formParams: ResourcePageRespDto) => {
     setSearchParams(formParams)
   }, [])
 
-  const onDelete = async (record: Backend.ResourcePageRespDto) => {
-    const res = await resourceApi.delete(record.id)
+  const onDelete = async (record: ResourcePageRespDto) => {
+    const res = await resourceApi.delete(record.id!)
     if (res.head.errCode === 0) {
       getMessage().success(SUCCESS_MESSAGE.DELETE)
       refreshTable()
@@ -54,6 +61,9 @@ export function useResourceList() {
   }
 
   return {
+    originList,
+    resourceTree,
+    resourceParentMap,
     searchParams,
     setSearchParams,
     smartTable,

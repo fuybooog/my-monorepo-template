@@ -41,6 +41,8 @@ export namespace Backend {
   export type ResourceListRespDto = components['schemas']['ResourceListRespDto']
   export type ResourceCreateDto = components['schemas']['ResourceCreateDto']
   export type ResourceUpdateDto = components['schemas']['ResourceUpdateDto']
+  export type ResourcePartialDto = components['schemas']['ResourcePartialDto']
+  export type ResourceBatchUpdateDto = components['schemas']['ResourceBatchUpdateDto']
   export type RolePageRespDto = components['schemas']['RolePageRespDto']
   export type RolePageDto = components['schemas']['RolePageDto']
   export type RolePageOptionDto = components['schemas']['RolePageOptionDto']
@@ -571,6 +573,17 @@ export namespace Backend {
         ? R
         : unknown
 
+  export type BatchUpdateResourceRes =
+    operations['ResourceController_batchUpdateResource']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ResourceController_batchUpdateResource']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
   export type RemoveResourceRes =
     operations['ResourceController_removeResource']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
@@ -610,6 +623,17 @@ export namespace Backend {
     }
       ? R
       : operations['ResourceController_batchUpdateResourceStatus']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type ResetResourceListSortRes =
+    operations['ResourceController_resetResourceListSort']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ResourceController_resetResourceListSort']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R

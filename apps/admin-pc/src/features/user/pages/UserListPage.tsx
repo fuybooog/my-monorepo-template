@@ -41,11 +41,10 @@ export function UserListPage() {
           return updateUserStatus(record.id, newStatus)
         },
         async refreshList() {
-          console.log('refreshList')
           await refreshTable()
         },
       }),
-    [openDrawer],
+    [openDrawer, refreshTable],
   )
 
   async function updateUserStatus(id: number, newStatus: string) {
@@ -101,6 +100,7 @@ export function UserListPage() {
         <UserFormContainer
           id={currentId as number}
           mode={formMode}
+          closeDrawer={closeDrawer}
           onSuccess={() => {
             closeDrawer()
             refreshTable()

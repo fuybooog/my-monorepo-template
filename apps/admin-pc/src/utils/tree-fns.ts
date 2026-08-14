@@ -79,8 +79,9 @@ export function arrayToTree<T extends TreeNode = TreeNode>(
     }
   }
 
-  // 递归处理节点排序与清理空的 children 字段
+  // 递归处理节点排序、计算层级位置与清理空的 children 字段
   const processNode = (nodes: T[]) => {
+    // 1. 先进行当前层级的排序
     if (sortKey) {
       nodes.sort((a, b) => {
         const valA = a[sortKey] ?? Infinity
@@ -89,11 +90,24 @@ export function arrayToTree<T extends TreeNode = TreeNode>(
       })
     }
 
-    for (const node of nodes) {
-      if (node[childrenKey]?.length === 0) {
+    const total = nodes.length
+
+    // 2. 遍历当前层级，计算并注入位置属性，然后递归处理子节点
+    for (let i = 0; i < total; i++) {
+      const node = nodes[i]
+
+      // 注入位置信息：索引、是否第一位、是否最后一位
+      Object.assign(node, {
+        _index: i,
+        _isFirst: i === 0,
+        _isLast: i === total - 1,
+      })
+
+      const children = node[childrenKey]
+      if (Array.isArray(children) && children.length === 0) {
         delete node[childrenKey]
-      } else if (node[childrenKey]) {
-        processNode(node[childrenKey])
+      } else if (children && children.length > 0) {
+        processNode(children)
       }
     }
   }
@@ -101,6 +115,94 @@ export function arrayToTree<T extends TreeNode = TreeNode>(
   processNode(tree)
 
   return { tree, nodeMap, parentMap }
+}
+
+/**
+ * 获取所有兄弟节点
+ */
+export function getSiblings<T extends TreeNode = TreeNode>(
+  record: T,
+  parentMap: Map<string | number, T>,
+  tree: T[],
+  config: TreeConfig<T> = {},
+): T[] {
+  const { idKey = 'id' } = config
+  const parentNode = parentMap.get(record[idKey])
+  // 如果有父节点，返回父节点的 children；如果没有，说明是根节点，返回顶级 tree 数组
+  return parentNode ? parentNode.children : tree
+}
+
+/**
+ * 获取上一个兄弟节点
+ */
+export function getPrevNode<T extends TreeNode = TreeNode>(
+  record: T,
+  parentMap: Map<string | number, T>,
+  tree: T[],
+  config: TreeConfig<T> = {},
+) {
+  const siblings = getSiblings(record, parentMap, tree, config)
+  const prevNode = siblings[record._index - 1]
+
+  if (!prevNode) return null
+
+  return prevNode
+}
+
+/**
+ * 获取下一个兄弟节点
+ */
+export function getNextNode<T extends TreeNode = TreeNode>(
+  record: T,
+  parentMap: Map<string | number, T>,
+  tree: T[],
+  config: TreeConfig<T> = {},
+) {
+  const siblings = getSiblings(record, parentMap, tree, config)
+  const nextNode = siblings[record._index + 1]
+
+  if (!nextNode) return null
+
+  return nextNode
+}
+
+/**
+ * 获取排在其之前的所有兄弟节点
+ */
+export function getPrevNodes<T extends TreeNode = TreeNode>(
+  record: T,
+  parentMap: Map<string | number, T>,
+  tree: T[],
+  config: TreeConfig<T> = {},
+) {
+  if (record._index === 0) return null
+  const siblings = getSiblings(record, parentMap, tree, config)
+
+  const firstNode = siblings[0]
+  const prevNodes = siblings.slice(1, record._index)
+  return {
+    firstNode,
+    prevNodes,
+  }
+}
+/**
+ * 获取排在其之后的所有兄弟节点
+ */
+export function getNextNodes<T extends TreeNode = TreeNode>(
+  record: T,
+  parentMap: Map<string | number, T>,
+  tree: T[],
+  config: TreeConfig<T> = {},
+) {
+  if (record._isLast) return null
+  const siblings = getSiblings(record, parentMap, tree, config)
+
+  const lastNode = siblings[siblings.length - 1]
+  const nextNodes = siblings.slice(record._index + 1)
+  return {
+    lastNode,
+    nextNodes,
+  }
 }
 
 /**
@@ -243,6 +345,34 @@ export function getExpandedKeys<T extends TreeNode = TreeNode>(
 
   collect(tree)
   return keys
+}
+export function getParentNode<T extends TreeNode = TreeNode>(
+  tree: T[],
+  id: string | number,
+  config: TreeConfig<T> = {},
+): T | null {
+  const { idKey = 'id', childrenKey = 'children' } = config
+
+  // 递归查找父节点
+  function search(nodes: T[], parent: T | null = null): T | null {
+    for (const node of nodes) {
+      // 如果当前节点的 id 匹配目标，返回其父节点
+      if (node[idKey] === id) {
+        return parent
+      }
+      // 获取子节点数组（可能为 undefined）
+      const children = node[childrenKey] as T[] | undefined
+      if (Array.isArray(children) && children.length > 0) {
+        const result = search(children, node)
+        if (result !== null) {
+          return result
+        }
+      }
+    }
+    return null
+  }
+
+  return search(tree, null)
 }
 
 /**

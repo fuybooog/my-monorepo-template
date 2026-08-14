@@ -30,6 +30,9 @@ const resourceApi = {
   ): Promise<Backend.UpdateResourceRes> {
     return http.post('/resource/update/' + id, params)
   },
+  batchUpdate(params: Backend.ResourceBatchUpdateDto): Promise<Backend.BatchUpdateResourceRes> {
+    return http.post('/resource/batchUpdate', params)
+  },
   delete(id: string | number): Promise<Backend.RemoveResourceRes> {
     return http.post('/resource/delete/' + id)
   },
@@ -38,6 +41,9 @@ const resourceApi = {
   },
   updateStatus(id: string | number, status: string): Promise<Backend.UpdateResourceStatusRes> {
     return http.post('/resource/updateStatus/' + id, { status })
+  },
+  resetSort() {
+    return http.post('/resource/resetSort')
   },
 }
 export default resourceApi

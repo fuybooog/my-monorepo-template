@@ -2841,6 +2841,50 @@
         "tags": ["Resource"]
       }
     },
+    "/resource/batchUpdate": {
+      "post": {
+        "operationId": "ResourceController_batchUpdateResource",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResourceBatchUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "批量修改资源",
+        "tags": ["Resource"]
+      }
+    },
     "/resource/delete/{id}": {
       "post": {
         "operationId": "ResourceController_removeResource",
@@ -3018,6 +3062,40 @@
           }
         },
         "summary": "批量修改资源状态",
+        "tags": ["Resource"]
+      }
+    },
+    "/resource/resetSort": {
+      "post": {
+        "operationId": "ResourceController_resetResourceListSort",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "重置列表顺序",
         "tags": ["Resource"]
       }
     },
@@ -5297,6 +5375,71 @@
             "description": "删除时间"
           }
         }
+      },
+      "ResourcePartialDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "资源id"
+          },
+          "label": {
+            "type": "string",
+            "description": "资源名称"
+          },
+          "uniqueProp": {
+            "type": "string",
+            "description": "唯一编码"
+          },
+          "parentUniqueProp": {
+            "type": "string",
+            "description": "唯一父编码"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "type": {
+            "type": "string",
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          }
+        }
+      },
+      "ResourceBatchUpdateDto": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResourcePartialDto"
+            }
+          }
+        },
+        "required": ["list"]
       },
       "RolePageRespDto": {
         "type": "object",

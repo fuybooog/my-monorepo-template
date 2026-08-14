@@ -304,16 +304,14 @@ const SmartTableInner = <RecordType extends object>(
     <div>
       {toolbar !== false && (
         <SmartTableToolbar<RecordType>
+          {...toolbar}
           selectedRowKeys={selectedRowKeys}
           selectedRows={selectedRows}
           onClearSelection={clearSelection}
           rawColumns={columns}
           checkedKeys={checkedKeys}
           onCheckedKeysChange={handleCheckedKeysChange}
-          actions={toolbar?.actions}
           hideSettings={!storageKey || toolbar?.hideSettings}
-          onCreate={toolbar?.onCreate}
-          onBatchDelete={toolbar?.onBatchDelete}
         />
       )}
 

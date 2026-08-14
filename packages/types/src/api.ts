@@ -854,6 +854,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/resource/batchUpdate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 批量修改资源 */
+    post: operations['ResourceController_batchUpdateResource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/resource/delete/{id}': {
     parameters: {
       query?: never
@@ -916,6 +933,23 @@ export interface paths {
     put?: never
     /** 批量修改资源状态 */
     post: operations['ResourceController_batchUpdateResourceStatus']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resource/resetSort': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 重置列表顺序 */
+    post: operations['ResourceController_resetResourceListSort']
     delete?: never
     options?: never
     head?: never
@@ -1987,6 +2021,35 @@ export interface components {
       updatedAt?: string
       /** @description 删除时间 */
       deletedAt?: string
+    }
+    ResourcePartialDto: {
+      /** @description 资源id */
+      id?: number
+      /** @description 资源名称 */
+      label?: string
+      /** @description 唯一编码 */
+      uniqueProp?: string
+      /** @description 唯一父编码 */
+      parentUniqueProp?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: string
+      /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
+      type?: string
+      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
+      notInMenu?: string
+      /** @description 排序号 */
+      sortNumber?: number
+      /** @description 菜单路径 */
+      menuPath?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 修改时间 */
+      updatedAt?: string
+      /** @description 删除时间 */
+      deletedAt?: string
+    }
+    ResourceBatchUpdateDto: {
+      list: components['schemas']['ResourcePartialDto'][]
     }
     RolePageRespDto: {
       /** @description 角色id */
@@ -3596,6 +3659,33 @@ export interface operations {
       }
     }
   }
+  ResourceController_batchUpdateResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResourceBatchUpdateDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
   ResourceController_removeResource: {
     parameters: {
       query?: never
@@ -3697,6 +3787,29 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
             data: components['schemas']['BatchRespDto']
+          }
+        }
+      }
+    }
+  }
+  ResourceController_resetResourceListSort: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
           }
         }
       }

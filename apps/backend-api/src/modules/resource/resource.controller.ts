@@ -6,7 +6,10 @@ import { ResourcePageOptionDto } from '@/modules/resource/dto/resource.page.opti
 import { ResourceRespDto } from '@/modules/resource/dto/resource.resp.dto'
 import { ResourceListRespDto } from '@/modules/resource/dto/resource.list.resp.dto'
 import { ResourceCreateDto } from '@/modules/resource/dto/resource.create.dto'
-import { ResourceUpdateDto } from '@/modules/resource/dto/resource.update.dto'
+import {
+  ResourceBatchUpdateDto,
+  ResourceUpdateDto,
+} from '@/modules/resource/dto/resource.update.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
 import { ApiOperation } from '@nestjs/swagger'
 import { ApiSuccessPageResponse, ApiSuccessResponse } from '@/decorators/api-response.decorator'
@@ -101,6 +104,15 @@ export class ResourceController {
     return await this.resourceService.updateResource(id, body)
   }
 
+  @Post('batchUpdate')
+  @ApiOperation({ summary: '批量修改资源' })
+  @ApiSuccessResponse()
+  async batchUpdateResource(
+    @Body() body: ResourceBatchUpdateDto,
+  ): Promise<{ info?: string | null }> {
+    return await this.resourceService.batchUpdateResource(body.list)
+  }
+
   @Post('delete/:id')
   @ApiOperation({ summary: '删除资源' })
   @ApiSuccessResponse()
@@ -129,6 +141,12 @@ export class ResourceController {
     @Body() body: BatchUpdateStatusDto,
   ): Promise<BatchRespDto | null> {
     return await this.resourceService.batchUpdateResourceStatus(body)
+  }
+  @Post('resetSort')
+  @ApiOperation({ summary: '重置列表顺序' })
+  @ApiSuccessResponse()
+  async resetResourceListSort(): Promise<null> {
+    return await this.resourceService.resetResourceListSort()
   }
 
   @Post('template')

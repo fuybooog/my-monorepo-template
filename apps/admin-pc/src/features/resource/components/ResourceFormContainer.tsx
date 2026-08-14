@@ -1,90 +1,114 @@
-import React, { useEffect, useState } from 'react'
-import { Form, Spin } from 'antd'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { Form } from 'antd'
 import { SmartForm, SmartFormEditMode } from '@/components/common'
 import { serializeFormValues } from '@/components/common/smart-utils'
 import userApi from '../api/resource'
 import { Backend } from '@repo/types'
 import { getResourceFormSchema } from '../model'
-import { transformDateFieldsValue } from '@/utils/fns'
 import { getMessage } from '@/utils/antd-instance'
+import { ResourcePageRespDto } from '../types'
+import { typeList } from '../model/model'
 
 interface ResourceFormContainerProps {
-  id?: string | number
+  drawerData?: ResourcePageRespDto
   mode: SmartFormEditMode
-  isSub?: boolean
-  defaultValue?: Backend.ResourceRespDto
+  defaultValue?: ResourcePageRespDto
+  formType?: string
+  sameLevelList?: ResourcePageRespDto[]
+  closeDrawer: () => void
   onSuccess: () => void
 }
 
 export const ResourceFormContainer: React.FC<ResourceFormContainerProps> = ({
-  id,
+  drawerData,
   mode,
-  isSub,
-  defaultValue,
+  formType,
+  sameLevelList,
+  closeDrawer,
   onSuccess,
 }) => {
   const [form] = Form.useForm()
-  const [loading, setLoading] = useState(false)
-  const [dynamicSchema] = useState(getResourceFormSchema())
 
-  useEffect(() => {
-    let isMounted = true
-
-    const fetchData = async () => {
-      if ((mode === 'edit' || mode === 'view') && id) {
-        setLoading(true)
-        try {
-          const res = await userApi.findById(id)
-          if (isMounted) {
-            form.setFieldsValue(transformResData2Form(res.data))
-          }
-        } finally {
-          if (isMounted) setLoading(false)
-        }
+  const dynamicSchema = useMemo(() => {
+    let filterdOptions = [...typeList]
+    const schema = getResourceFormSchema()
+    if (formType === 'createSub' && drawerData) {
+      const parentType = drawerData.type
+      let allowedTypes: string[] = []
+      if (parentType === '0') {
+        allowedTypes = ['0', '1']
+      } else if (parentType === '1') {
+        allowedTypes = ['2', '3']
       } else {
-        if (isMounted) {
-          // 新增时，将是否隐藏设置为 '0'
-          form.setFieldsValue({ notInMenu: '0' })
-        }
+        allowedTypes = []
       }
-      if (isMounted) {
-        if (defaultValue) {
-          form.setFieldsValue(defaultValue)
-        }
-      }
+      filterdOptions = typeList.filter((typeItem) => allowedTypes.includes(typeItem.id))
+    } else if (formType === 'createLast' || formType === 'createPrev' || formType === 'copyPrev') {
+      filterdOptions = typeList.filter((typeItem) => ['0', '1'].includes(typeItem.id))
     }
-
-    fetchData()
-
-    return () => {
-      isMounted = false
+    schema.type = {
+      ...schema.type,
+      props: {
+        ...schema.type.props,
+        options: filterdOptions,
+        disabled: mode === 'edit',
+      },
     }
-  }, [id, mode, form])
+    return schema
+  }, [formType, drawerData])
 
   /**
    * 将接口返回结果转化为表单
    * @param resData
    * @returns
    */
-  const transformResData2Form = (resData: Backend.ResourceRespDto) => {
-    const formData = transformDateFieldsValue(resData, ['birth'])
-    if (formData.address) {
-      try {
-        formData.address = JSON.parse(formData.address as string)
-      } catch (e) {
-        console.error('address 转换错误')
-      }
-    }
+  const transformResData2Form = useCallback((resData: ResourcePageRespDto) => {
+    const formData = { ...resData }
     formData.notInMenu = resData.notInMenu === '1' ? '1' : '0'
     return formData
-  }
+  }, [])
+
+  // 1. 顶层直接计算派生值（不需要 useState，也不需要在 effect 里 setInitialValues）
+  const initialValues = useMemo(() => {
+    if (drawerData) {
+      const { children, buttons, columns, ...restData } = drawerData
+      if (mode === 'edit' || formType === 'copyPrev') {
+        return transformResData2Form(restData)
+      }
+      if (formType === 'createSub') {
+        return {
+          notInMenu: '0',
+          parentUniqueProp: restData.uniqueProp,
+        }
+      }
+      if (formType === 'createPrev') {
+        return {
+          notInMenu: '0',
+          parentUniqueProp: restData.parentUniqueProp,
+        }
+      }
+    } else if (formType === 'createLast') {
+      return {
+        notInMenu: '0',
+        parentUniqueProp: '',
+      }
+    }
+    return undefined
+  }, [drawerData, mode, formType, transformResData2Form])
+
+  // 2. useEffect 只负责与 Form（外部系统/DOM）同步
+  useEffect(() => {
+    if (initialValues) {
+      form.setFieldsValue(initialValues)
+    }
+  }, [initialValues, form])
 
   /**
    * 将表单数据转化为请求入参
    * @param values
    * @returns
    */
-  const transformForm2Params = (values: Backend.ResourceRespDto) => {
+  const transformForm2Params = (values: ResourcePageRespDto) => {
     // 转化日期格式
     const params = serializeFormValues(values, dynamicSchema)
     // 将 params中的地址进行格式化
@@ -94,32 +118,49 @@ export const ResourceFormContainer: React.FC<ResourceFormContainerProps> = ({
     return params
   }
 
-  const handleFinish = async (values: Backend.ResourceRespDto) => {
+  const handleFinish = async (values: ResourcePageRespDto) => {
     const cleanParams = transformForm2Params(values)
-
     try {
-      if (mode === 'create') {
-        await userApi.create(cleanParams as Backend.ResourceCreateDto)
+      if (formType === 'createLast' || formType === 'createSub') {
+        await userApi.create({
+          ...cleanParams,
+          sortNumber: (sameLevelList?.length ?? 0) + 1,
+        } as Backend.ResourceCreateDto)
         getMessage().success('创建资源成功')
-      } else if (mode === 'edit') {
-        await userApi.update(id!, cleanParams as Backend.ResourceUpdateDto)
+      } else if (formType === 'edit') {
+        await userApi.update(drawerData!.id!, cleanParams as Backend.ResourceUpdateDto)
         getMessage().success('更新资源成功')
+      } else if (formType === 'createPrev' || formType === 'copyPrev') {
+        let index = 0
+        let rest: Backend.ResourcePartialDto[] = []
+        if (sameLevelList?.length) {
+          index = sameLevelList?.findIndex((item) => item.uniqueProp === drawerData?.uniqueProp)
+          rest =
+            sameLevelList
+              ?.slice(index)
+              .map((item) => ({ id: item.id, sortNumber: item.sortNumber! + 1 })) || []
+        }
+        const paramList: Backend.ResourcePartialDto[] = [
+          { ...cleanParams, sortNumber: index + 1 },
+          ...rest,
+        ]
+        await userApi.batchUpdate({ list: paramList })
       }
       onSuccess()
-    } catch (err) {
-      console.error(err)
+    } catch (e) {
+      console.error('表单提交失败', e)
     }
   }
 
   return (
-    <Spin spinning={loading}>
-      <SmartForm
-        form={form}
-        schema={dynamicSchema}
-        mode={mode}
-        onFinish={handleFinish}
-        grid={true}
-      />
-    </Spin>
+    <SmartForm
+      form={form}
+      initialValues={initialValues}
+      schema={dynamicSchema}
+      mode={mode}
+      onFinish={handleFinish}
+      grid={true}
+      handleCancel={closeDrawer}
+    />
   )
 }

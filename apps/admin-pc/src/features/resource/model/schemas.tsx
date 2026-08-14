@@ -42,13 +42,16 @@ export const getResourceFormSchema = (): SmartSchema => {
     type: {
       title: '类型',
       widget: Select,
+      itemProps: {
+        rules: [{ required: true, message: '请选择类型' }],
+      },
       props: {
         options: typeList,
       },
     },
     menuPath: {
       title: '菜单路径',
-      hideDependencyField: 'type',
+      dependencyField: 'type',
       hideWhen: ['0', '2', '3'],
       requiredWhen: ['1'],
     },
@@ -59,9 +62,9 @@ export const getResourceFormSchema = (): SmartSchema => {
         options: notInMenuList,
       },
     },
-    sortNumber: {
-      title: '排序号',
-      widget: InputNumber,
-    },
+    // sortNumber: {
+    //   title: '排序号',
+    //   widget: InputNumber,
+    // },
   }
 }

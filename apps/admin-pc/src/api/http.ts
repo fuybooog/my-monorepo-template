@@ -11,6 +11,12 @@ const http = new HttpClient({
     // 鉴权错误，跳转登录
     // 系统错误，对应处理
     console.error('onError', error)
+    if (error.head.errCode === -2) {
+      // 权限认证失败，跳转到登录页面
+      if (window.location.pathname !== '/login') {
+        window.location.replace('/login')
+      }
+    }
   },
 })
 

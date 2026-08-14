@@ -24,7 +24,7 @@ export type SmartFormItem<T extends React.ComponentType<any> = any> = {
 
   hideWhen?: any // 可以是基本类型或函数
 
-  hideDependencyField?: string
+  dependencyField?: string
 
   requiredWhen?: any
 
@@ -60,6 +60,8 @@ export interface SmartFormExtraProps {
   colProps?: ColProps
   // label宽
   labelWidth?: string | number
+  // 取消按钮事件
+  handleCancel?: () => void
 }
 
 export type SmartFormProps = Omit<FormProps, 'children'> & SmartFormExtraProps
@@ -77,14 +79,7 @@ export interface SmartColumnType<RecordType> extends ColumnType<RecordType> {
 
 interface BaseSmartTableProps<RecordType> {
   storageKey?: string // 开启本地列持久化存储的唯一 key
-  toolbar?:
-    | {
-        actions?: (SmartToolbarBuiltInAction | SmartToolbarCustomAction<RecordType>)[]
-        hideSettings?: boolean
-        onCreate?: () => void
-        onBatchDelete?: (keys: React.Key[], rows?: RecordType[]) => void
-      }
-    | false // 如果传 false 则彻底关闭工具栏
+  toolbar?: Partial<SmartTableToolbarProps<RecordType>> | false // 如果传 false 则彻底关闭工具栏
   // 是否使用默认排序规则
   defaultSort?: boolean
   // 首次渲染时是否自动查询
@@ -136,13 +131,11 @@ export type SmartToolbarBuiltInAction =
   | 'import'
   | 'clearSelection'
 
-export interface SmartToolbarCustomAction<T = any> {
+export interface SmartToolbarCustomAction<T = any> extends Omit<ButtonProps, 'onClick'> {
   key: string
   label: string
-  type?: 'primary' | 'default' | 'dashed' | 'link'
-  danger?: boolean
-  // batch 表示这是一个批量操作按钮（没勾选时禁用/隐藏），normal 表示普通按钮
-  actionType: 'normal' | 'batch'
+  // batch 表示这是一个批量操作按钮（没勾选时禁用/隐藏），normal 表示普通按钮(默认)
+  actionType?: 'normal' | 'batch'
   onClick: (selectedRowKeys: React.Key[], selectedRows: T[]) => void | Promise<void>
 }
 
@@ -152,6 +145,7 @@ export interface SmartTableToolbarProps<T> {
   onClearSelection: () => void
   // 核心对外接口
   actions?: (SmartToolbarBuiltInAction | SmartToolbarCustomAction<T>)[]
+  additionalActions?: SmartToolbarCustomAction<T>[]
   hideSettings?: boolean
   // 列控制相关
   rawColumns: any[]
@@ -191,11 +185,12 @@ export type ActionItem<RecordType> = PresetAction | CustomAction<RecordType>
 
 // 操作列配置：继承 ColumnType
 export interface ActionColumnConfig<RecordType> extends ColumnType<RecordType> {
-  buttons: ActionItem<RecordType>[]
+  buttons: ActionItem<RecordType>[] | ((record: RecordType) => ActionItem<RecordType>[])
   maxVisible?: number
   moreText?: string
   moreIcon?: React.ReactNode
   moreDropdownProps?: DropdownProps
+  onlyIcon?: boolean
   onEdit?: (record: RecordType) => void
   onDelete?: (record: RecordType) => void
   onAction?: (key: string, record: RecordType) => void

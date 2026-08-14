@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger'
 import { IsInt, IsOptional, IsString } from 'class-validator'
 export class ResourceBaseDto {
   @ApiProperty({ description: '资源id', type: Number })
@@ -60,3 +60,5 @@ export class ResourceBaseDto {
   @IsOptional()
   deletedAt?: Date | null
 }
+
+export class ResourcePartialDto extends PartialType(ResourceBaseDto) {}
