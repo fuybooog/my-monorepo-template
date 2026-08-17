@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useCallback,
   useRef,
+  useContext,
 } from 'react'
 import { Table, TableProps } from 'antd'
 import { SorterResult } from 'antd/es/table/interface'
@@ -15,6 +16,9 @@ import { SmartTableToolbar } from './SmartTableToolbar'
 import { SmartTableButtons } from './SmartTableButtons'
 import { formatSortParams } from '@/utils'
 import { getColumnKey, serializeFormValues } from './smart-utils'
+import { SmartTableSortableWrapper } from './SmartTableSortableWrapper'
+import { HolderOutlined } from '@ant-design/icons'
+import { DragHandleContext } from './SmartTableRow'
 
 // ==========================================
 // 1. Custom Hooks 拆分
@@ -25,11 +29,13 @@ const useTableColumns = <RecordType extends object>({
   columns = [],
   storageKey,
   actionColumn,
+  isDragSortable,
   onLinkClick,
 }: {
   columns?: SmartTableProps<RecordType>['columns']
   storageKey?: string
   actionColumn?: SmartTableProps<RecordType>['actionColumn']
+  isDragSortable?: boolean
   onLinkClick?: SmartTableProps<RecordType>['onLinkClick']
 }) => {
   const [checkedKeys, setCheckedKeys] = useState<React.Key[]>(() => {
@@ -46,6 +52,32 @@ const useTableColumns = <RecordType extends object>({
     }
     return allKeys
   })
+
+  const DragHandle: React.FC = () => {
+    const { attributes, listeners } = useContext(DragHandleContext)
+
+    return (
+      <HolderOutlined
+        {...attributes}
+        {...listeners}
+        style={{
+          cursor: 'grab',
+          color: 'inherit',
+          float: 'left',
+          marginRight: 8,
+          width: 'var(--ant-table-expand-icon-size)',
+          height: 'var(--ant-table-expand-icon-size)',
+          lineHeight: 'var(--ant-table-expand-icon-size)',
+          textAlign: 'center',
+          background: 'var(--ant-table-expand-icon-bg)',
+          border: 'var(--ant-line-width) var(--ant-line-type) var(--ant-table-border-color)',
+          borderRadius: 'var(--ant-border-radius)',
+          transform: 'scale(var(--ant-table-expand-icon-scale))',
+          userSelect: 'none',
+        }}
+      />
+    )
+  }
 
   const handleCheckedKeysChange = (nextKeys: React.Key[]) => {
     if (!storageKey) return
@@ -65,33 +97,55 @@ const useTableColumns = <RecordType extends object>({
     })
   }, [columns, checkedKeys, storageKey])
 
-  // 2. 处理自动包裹 link 的列
   const processedColumns = useMemo(() => {
-    return filteredColumns.map((col) => {
+    return filteredColumns.map((col, index) => {
       const linkConfig = col.link
-      if (!linkConfig || col.render) return col
+      const isFirstColumn = index === 0
 
-      const onClick = typeof linkConfig === 'object' ? linkConfig.onClick : undefined
-      const target = typeof linkConfig === 'object' ? linkConfig.target : '_self'
+      // 如果既不是第一列，也没有配置 link，直接返回原列定义
+      if (!isFirstColumn && !linkConfig) return col
 
       return {
         ...col,
-        render: (text: string, record: RecordType) => (
-          <a
-            onClick={(e) => {
-              e.stopPropagation()
-              if (onClick) onClick(record)
-              else onLinkClick?.(record, col.key as string)
-            }}
-            target={target}
-            style={{ color: '#1890ff', cursor: 'pointer' }}
-          >
-            {text}
-          </a>
-        ),
+        render: (text: unknown, record: RecordType, recordIndex: number) => {
+          // 获取原始的文字/节点内容
+          let content: React.ReactNode = text as React.ReactNode
+
+          if (col.render) {
+            content = col.render(text, record, recordIndex) as React.ReactNode
+          } else if (linkConfig) {
+            const onClick = typeof linkConfig === 'object' ? linkConfig.onClick : undefined
+            const target = typeof linkConfig === 'object' ? linkConfig.target : '_self'
+            content = (
+              <a
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (onClick) onClick(record)
+                  else onLinkClick?.(record, col.key as string)
+                }}
+                target={target}
+                style={{ color: '#1890ff', cursor: 'pointer' }}
+              >
+                {text as string | number}
+              </a>
+            )
+          }
+
+          // 如果是开启拖拽时的第一列，在内容前面拼接拖拽手柄
+          if (isFirstColumn && isDragSortable) {
+            return (
+              <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                <DragHandle />
+                {content}
+              </div>
+            )
+          }
+
+          return content
+        },
       }
     })
-  }, [filteredColumns, onLinkClick])
+  }, [filteredColumns, isDragSortable, onLinkClick])
 
   // 3. 拼接操作列
   const finalColumns = useMemo(() => {
@@ -183,6 +237,9 @@ const SmartTableInner = <RecordType extends object>(
     actionColumn,
     onLinkClick,
     showPagination = true,
+    isDragSortable = false,
+    handleOrderChange,
+    treeConfig,
     ...restAntdProps
   } = props
 
@@ -193,6 +250,8 @@ const SmartTableInner = <RecordType extends object>(
 
   const [loading, setLoading] = useState(false)
   const [dataSource, setDataSource] = useState<RecordType[]>([])
+  const [idNodeMap, setIdNodeMap] = useState<Map<string | number, RecordType> | undefined>()
+  const [parentMap, setParentMap] = useState<Map<string | number, RecordType> | undefined>()
   const [total, setTotal] = useState(0)
   const [pagination, setPagination] = useState({ page: 1, pageSize: 10 })
   const [sorter, setSorter] = useState<SorterResult | SorterResult[]>({})
@@ -208,6 +267,7 @@ const SmartTableInner = <RecordType extends object>(
     columns,
     storageKey,
     actionColumn,
+    isDragSortable,
     onLinkClick,
   })
 
@@ -230,6 +290,8 @@ const SmartTableInner = <RecordType extends object>(
         }
         const res = await request(mergedParams, targetSorter)
         setDataSource(res?.data || [])
+        setIdNodeMap(res?.idNodeMap)
+        setParentMap(res?.parentMap)
         setTotal(res?.total || 0)
       } catch (error) {
         console.error('请求表格数据报错：', error)
@@ -295,9 +357,77 @@ const SmartTableInner = <RecordType extends object>(
     setSorter(newSorter)
   }
 
+  function InnerTable() {
+    const rawRowSelection = restAntdProps.rowSelection
+
+    const computedRowSelection = useMemo(() => {
+      if (!rawRowSelection) return undefined
+      if (toolbar !== false) {
+        return {
+          selectedRowKeys,
+          preserveSelectedRowKeys: true,
+          onChange: handleRowSelectionChange,
+          ...rawRowSelection,
+        }
+      }
+      return rawRowSelection
+    }, [rawRowSelection, toolbar, selectedRowKeys, handleRowSelectionChange])
+
+    const commonProps: TableProps<RecordType> = {
+      ...restAntdProps,
+      columns: finalColumns,
+      rowSelection: computedRowSelection,
+    }
+    if (pure) {
+      return <Table {...commonProps} />
+    } else {
+      return (
+        <Table
+          rowKey={finalRowKey}
+          loading={loading}
+          dataSource={dataSource}
+          columns={finalColumns}
+          onChange={handleTableChange}
+          pagination={
+            showPagination
+              ? {
+                  current: pagination.page,
+                  pageSize: pagination.pageSize,
+                  total,
+                  showSizeChanger: true,
+                  showTotal: (totalCount) => `共 ${totalCount} 条数据`,
+                }
+              : false
+          }
+          rowSelection={computedRowSelection}
+          sticky={{
+            offsetHeader: 0,
+          }}
+          {...commonProps}
+        />
+      )
+    }
+  }
+
+  function renderFinalTable() {
+    return isDragSortable ? (
+      <SmartTableSortableWrapper
+        idNodeMap={idNodeMap}
+        parentMap={parentMap}
+        treeConfig={treeConfig}
+        setDataSource={setDataSource}
+        onOrderChange={handleOrderChange}
+      >
+        <InnerTable />
+      </SmartTableSortableWrapper>
+    ) : (
+      <InnerTable />
+    )
+  }
+
   // Pure 模式简易渲染
   if (pure) {
-    return <Table columns={finalColumns} {...restAntdProps} />
+    return renderFinalTable()
   }
 
   return (
@@ -314,39 +444,7 @@ const SmartTableInner = <RecordType extends object>(
           hideSettings={!storageKey || toolbar?.hideSettings}
         />
       )}
-
-      <Table
-        rowKey={finalRowKey}
-        loading={loading}
-        dataSource={dataSource}
-        columns={finalColumns}
-        onChange={handleTableChange}
-        pagination={
-          showPagination
-            ? {
-                current: pagination.page,
-                pageSize: pagination.pageSize,
-                total,
-                showSizeChanger: true,
-                showTotal: (totalCount) => `共 ${totalCount} 条数据`,
-              }
-            : false
-        }
-        rowSelection={
-          toolbar !== false
-            ? {
-                selectedRowKeys,
-                preserveSelectedRowKeys: true,
-                onChange: handleRowSelectionChange,
-                ...restAntdProps.rowSelection,
-              }
-            : restAntdProps.rowSelection
-        }
-        sticky={{
-          offsetHeader: 0,
-        }}
-        {...restAntdProps}
-      />
+      {renderFinalTable()}
     </div>
   )
 }

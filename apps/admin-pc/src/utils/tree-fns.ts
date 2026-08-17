@@ -22,7 +22,9 @@ export interface TreeConfig<T extends TreeNode = TreeNode> {
 export interface TreeResult<T extends TreeNode = TreeNode> {
   tree: T[]
   nodeMap: Map<string | number, T>
+  idNodeMap: Map<string | number, T>
   parentMap: Map<string | number, T>
+  idParentMap: Map<string | number, T>
 }
 
 export interface MetaTreeNode extends TreeNode {
@@ -49,14 +51,22 @@ export function arrayToTree<T extends TreeNode = TreeNode>(
 
   const tree: T[] = []
   const nodeMap = new Map<string | number, T>()
+  const idNodeMap = new Map<string | number, T>()
   const parentMap = new Map<string | number, T>()
+  const idParentMap = new Map<string | number, T>()
   const rootValueSet = new Set(rootParentValues)
 
   // 第一遍遍历：深拷贝节点并建立节点映射表
   for (const item of list) {
     const id = item[idKey]
     if (id !== undefined && id !== null) {
-      nodeMap.set(id, { ...item, [childrenKey]: [] })
+      const nodeCopy = { ...item, [childrenKey]: [] }
+      nodeMap.set(id, nodeCopy)
+
+      // 新增：如果原始数据有 'id' 字段，则同时存入 idNodeMap
+      if (item.id !== undefined && item.id !== null) {
+        idNodeMap.set(item.id, nodeCopy)
+      }
     }
   }
 
@@ -74,6 +84,9 @@ export function arrayToTree<T extends TreeNode = TreeNode>(
     if (parentNode) {
       parentNode[childrenKey].push(currentNode)
       parentMap.set(id, parentNode)
+      if (item.id) {
+        idParentMap.set(item.id, parentNode)
+      }
     } else {
       tree.push(currentNode)
     }
@@ -114,7 +127,7 @@ export function arrayToTree<T extends TreeNode = TreeNode>(
 
   processNode(tree)
 
-  return { tree, nodeMap, parentMap }
+  return { tree, nodeMap, parentMap, idNodeMap, idParentMap }
 }
 
 /**

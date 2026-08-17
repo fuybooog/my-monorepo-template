@@ -10,6 +10,12 @@ export function useResourceList() {
   const [searchParams, setSearchParams] = useState<Backend.ResourcePageDto>({})
   const [originList, setOriginList] = useState<Backend.ResourcePageRespDto[]>([])
   const [resourceTree, setResourceTree] = useState<ResourcePageRespDto[]>([])
+  const [resourceNodeMap, setResourceNodeMap] = useState<Map<string | number, ResourcePageRespDto>>(
+    new Map(),
+  )
+  const [resourceIdNodeMap, setResourceIdNodeMap] = useState<
+    Map<string | number, ResourcePageRespDto>
+  >(new Map())
   const [resourceParentMap, setResourceParentMap] = useState<
     Map<string | number, ResourcePageRespDto>
   >(new Map())
@@ -24,14 +30,18 @@ export function useResourceList() {
       ...params,
     })
     setOriginList(res.data.list)
-    const { tree, parentMap } = arrayToTreeWithMeta(res.data.list, {
+    const { tree, parentMap, nodeMap, idNodeMap } = arrayToTreeWithMeta(res.data.list, {
       idKey: 'uniqueProp',
       parentKey: 'parentUniqueProp',
     })
     setResourceTree(tree)
+    setResourceNodeMap(nodeMap)
+    setResourceIdNodeMap(idNodeMap)
     setResourceParentMap(parentMap)
     return {
       data: tree,
+      idNodeMap,
+      parentMap,
       total: 99999,
     }
   }, [])
@@ -63,6 +73,8 @@ export function useResourceList() {
   return {
     originList,
     resourceTree,
+    resourceIdNodeMap,
+    resourceNodeMap,
     resourceParentMap,
     searchParams,
     setSearchParams,

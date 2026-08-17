@@ -11,6 +11,7 @@ import {
   ColProps,
 } from 'antd'
 import { ColumnType } from 'antd/es/table'
+import type { TreeConfig } from '@/utils'
 
 // form属
 
@@ -89,6 +90,11 @@ interface BaseSmartTableProps<RecordType> {
   actionColumn?: ActionColumnConfig<RecordType> | false
   onLinkClick?: (row: RecordType, columnKey: React.Key) => void
   showPagination?: boolean
+  // 是否允许拖拽排序（垂直方向）
+  isDragSortable?: boolean
+  // 拖拽排序完成之后处理
+  handleOrderChange?: (sourceData: RecordType[]) => void
+  treeConfig?: TreeConfig
 }
 
 interface ImpureTableProps<RecordType> extends BaseSmartTableProps<RecordType> {
@@ -97,7 +103,14 @@ interface ImpureTableProps<RecordType> extends BaseSmartTableProps<RecordType> {
   request: (
     params: { page: number; pageSize: number; [key: string]: any },
     sorter: any,
-  ) => Promise<{ data: RecordType[]; total: number }>
+  ) => Promise<{
+    data: RecordType[]
+    total: number
+    nodeMap?: Map<string | number, RecordType>
+    idNodeMap?: Map<string | number, RecordType>
+    idParentMap?: Map<string | number, RecordType>
+    parentMap?: Map<string | number, RecordType>
+  }>
 }
 
 interface PureTableProps<RecordType> extends BaseSmartTableProps<RecordType> {

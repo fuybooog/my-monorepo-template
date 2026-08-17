@@ -27,6 +27,7 @@ import {
 } from '@/utils'
 import { ResourcePageRespDto } from '../types'
 import resourceApi from '../api/resource'
+import { DragOrderChangeInfo } from '@/components/common/SmartTableSortableWrapper'
 
 const formTitleMap = {
   createLast: '新增资源',
@@ -253,6 +254,26 @@ export function ResourceListPage() {
     },
   })
 
+  const handleOrderChange = async (
+    newDataSource: ResourcePageRespDto[],
+    info?: DragOrderChangeInfo,
+  ) => {
+    const paramsList = info?.parentItem ? info?.parentChildren : newDataSource
+    try {
+      await resourceApi.batchUpdate({
+        list: (paramsList as ResourcePageRespDto[]).map((item, index) => ({
+          id: item.id,
+          sortNumber: index + 1,
+        })),
+      })
+      // 注意，这里是拖拽排序，一般来讲是乐观更新，成功后不需要重新请求最新列表
+      getMessage().success('排序完成')
+    } catch (e) {
+      refreshTable()
+      getMessage().error('排序失败')
+    }
+  }
+
   return (
     <PageLayout>
       <SmartForm
@@ -265,10 +286,14 @@ export function ResourceListPage() {
 
       <SmartTable<ResourcePageRespDto>
         ref={smartTable}
+        isDragSortable={true}
         searchParams={searchParams}
         schema={resourceSearchSchema}
         request={handleFetchData}
         columns={columns}
+        rowSelection={{}}
+        handleOrderChange={handleOrderChange}
+        treeConfig={{ idKey: 'uniqueProp', parentKey: 'parentUniqueProp' }}
         toolbar={{
           onCreate,
           onBatchDelete,
