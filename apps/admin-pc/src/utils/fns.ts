@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import dayjs from 'dayjs'
+import { isObject } from 'lodash-es'
 
 /**
  * 字典项对象的基础类型约束
@@ -81,4 +81,66 @@ export function transformDateFieldsValue(values: any, dateFields: string[]) {
   })
 
   return result
+}
+
+export interface FilterKeysOptions {
+  /** 保留模式：仅提取 keys 中指定的字段 */
+  include?: boolean
+  /** 排除模式：仅剔除 keys 中指定的字段 */
+  exclude?: boolean
+  /** 是否剔除 undefined 值的字段，默认 false */
+  ignoreUndefined?: boolean
+  /** 是否剔除 null 值的字段，默认 false */
+  ignoreNull?: boolean
+  /** 当 include 和 exclude 冲突时抛出 Error，若为 false 则返回 null，默认 false */
+  throwOnConflict?: boolean
+}
+
+/**
+ * 根据键数组及配置项筛选对象字段
+ */
+export const filterObjectKeys = <T extends Record<string, any>>(
+  source: T | null | undefined,
+  keys: string[],
+  options: FilterKeysOptions = {},
+): Partial<T> | null => {
+  const {
+    include = true,
+    exclude = false,
+    ignoreUndefined = false,
+    ignoreNull = false,
+    throwOnConflict = false,
+  } = options
+
+  // 1. 冲突检测：include 和 exclude 不能同时为 true
+  if (include && exclude) {
+    if (throwOnConflict) {
+      throw new Error('[filterObjectKeys] "include" and "exclude" cannot both be true.')
+    }
+    return null
+  }
+
+  // 2. 边界检查：若数据源不合法或非对象，直接返回空对象
+  if (!source || !isObject(source)) {
+    return {}
+  }
+
+  // 3. 将 keys 转换为 Set，优化判断效率从 O(n) 到 O(1)
+  const keySet = new Set(keys)
+  const result: Record<string, any> = {}
+
+  for (const [k, v] of Object.entries(source)) {
+    // 检查 include/exclude 条件
+    const isTargetKey = keySet.has(k)
+    if (include && !isTargetKey) continue
+    if (exclude && isTargetKey) continue
+
+    // 检查空值剔除逻辑
+    if (ignoreUndefined && v === undefined) continue
+    if (ignoreNull && v === null) continue
+
+    result[k] = v
+  }
+
+  return result as Partial<T>
 }

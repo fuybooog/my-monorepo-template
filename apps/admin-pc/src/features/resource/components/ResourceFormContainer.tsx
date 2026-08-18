@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { Form } from 'antd'
 import { SmartForm, SmartFormEditMode } from '@/components/common'
 import { serializeFormValues } from '@/components/common/smart-utils'
@@ -55,7 +55,7 @@ export const ResourceFormContainer: React.FC<ResourceFormContainerProps> = ({
       },
     }
     return schema
-  }, [formType, drawerData])
+  }, [formType, drawerData, mode])
 
   /**
    * 将接口返回结果转化为表单

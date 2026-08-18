@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * 树节点通用类型接口
  */
@@ -261,7 +260,7 @@ export type FilterCondition<T> = {
   [K in keyof T]?: any
 }
 
-export interface MultiSearchOptions<T> {
+export interface MultiSearchOptions {
   childrenKey?: string
   mode?: 'AND' | 'OR'
 }
@@ -269,7 +268,7 @@ export interface MultiSearchOptions<T> {
 export function filterTreeMulti<T extends TreeNode = TreeNode>(
   tree: T[],
   conditions: FilterCondition<T>,
-  options: MultiSearchOptions<T> = {},
+  options: MultiSearchOptions = {},
 ): T[] {
   const { childrenKey = 'children', mode = 'AND' } = options
 
@@ -447,7 +446,7 @@ export function arrayToTreeWithMeta<T extends MetaTreeNode = MetaTreeNode>(
   })
 }
 
-function matchFieldWithMeta(node: TreeNode, key: string, targetValue: any): boolean {
+export function matchFieldWithMeta(node: TreeNode, key: string, targetValue: any): boolean {
   const nodeValue = node[key]
 
   // 1. 尝试直接匹配当前节点的属性（例如：匹配页面自身的 label）

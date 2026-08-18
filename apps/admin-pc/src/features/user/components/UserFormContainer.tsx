@@ -74,7 +74,7 @@ export const UserFormContainer: React.FC<UserFormContainerProps> = ({
       try {
         formData.address = JSON.parse(formData.address as string)
       } catch (e) {
-        console.error('address 转换错误')
+        console.error('address 转换错误', e)
       }
     }
     return formData

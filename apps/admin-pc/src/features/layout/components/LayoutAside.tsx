@@ -4,8 +4,8 @@ import { useEffect } from 'react'
 export function LayoutAside() {
   useEffect(() => {
     async function fetchResource() {
-      const res = await resourceApi.listByUser()
-      console.log('fetchResource:res', res)
+      await resourceApi.listByUser()
+      // console.log('fetchResource:res', res)
     }
     // 查询菜单数据
     fetchResource()

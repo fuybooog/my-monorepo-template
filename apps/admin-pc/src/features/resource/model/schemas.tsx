@@ -1,5 +1,5 @@
 import { SmartSchema } from '@/components/common'
-import { InputNumber, Radio, Select } from 'antd'
+import { Radio, Select } from 'antd'
 import { defaultStatusList } from '@/constants'
 import { notInMenuList, typeList } from './model'
 

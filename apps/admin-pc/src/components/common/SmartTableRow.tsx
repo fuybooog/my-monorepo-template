@@ -1,18 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { createContext, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
-
-interface DragHandleContextProps {
-  attributes: React.HTMLAttributes<any>
-  listeners: SyntheticListenerMap | undefined
-}
-
-export const DragHandleContext = createContext<DragHandleContextProps>({
-  attributes: {},
-  listeners: undefined,
-})
+import { DragHandleContext } from './SmartTableRowContext'
 
 interface SmartTableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
   'data-row-key': string

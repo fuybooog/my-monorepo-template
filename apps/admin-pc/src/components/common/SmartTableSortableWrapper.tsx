@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { TableProps } from 'antd'
 import type { Key } from 'antd/es/table/interface'
 import type { UniqueIdentifier } from '@dnd-kit/core'
@@ -8,13 +7,7 @@ import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-ki
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SmartTableRow } from './SmartTableRow'
 import type { TreeConfig } from '@/utils'
-
-export interface DragOrderChangeInfo<T = any> {
-  activeItem?: T // 被拖拽的节点
-  overItem?: T // 放置位置的目标节点
-  parentItem?: T | null // 父节点（顶层拖拽时为 null）
-  parentChildren?: T[] // 本层级排序调整后的最新数组列表
-}
+import { DragOrderChangeInfo } from '@/components/common/smart-types'
 
 interface SmartTableSortableWrapperProps {
   children: React.ReactElement<TableProps<any>>
@@ -23,6 +16,23 @@ interface SmartTableSortableWrapperProps {
   parentMap?: Map<Key, any>
   setDataSource?: (newDataSource: any[]) => void
   onOrderChange?: (newDataSource: any[], info?: DragOrderChangeInfo) => void
+}
+
+const getExpandedFlattenRowKeys = (
+  list: any[],
+  expandedKeysSet: Set<Key>,
+  getRowKey: (record: any) => Key,
+): Key[] => {
+  return list.flatMap((node) => {
+    const currentKey = getRowKey(node)
+    const children = node.children // 假设你的子级属性名为 children
+
+    if (Array.isArray(children) && children.length > 0 && expandedKeysSet.has(currentKey)) {
+      return [currentKey, ...getExpandedFlattenRowKeys(children, expandedKeysSet, getRowKey)]
+    }
+
+    return [currentKey]
+  })
 }
 
 export const SmartTableSortableWrapper: React.FC<SmartTableSortableWrapperProps> = ({
@@ -54,45 +64,27 @@ export const SmartTableSortableWrapper: React.FC<SmartTableSortableWrapperProps>
   const currentExpandedKeys = (expandedRowKeys ?? internalExpandedKeys) as Key[]
 
   // 辅助函数：提取 Key
-  const getRecordRowKey = (record: any): Key => {
-    if (typeof rowKey === 'function') {
-      return rowKey(record)
-    }
-    return record[rowKey]
-  }
+  const getRecordRowKey = useCallback(
+    (record: any): Key => {
+      if (typeof rowKey === 'function') {
+        return rowKey(record)
+      }
+      return record[rowKey]
+    },
+    [rowKey],
+  )
 
   const treeIdKey = (treeConfig?.idKey as string) || 'id'
   const treeParentKey = (treeConfig?.parentKey as string) || 'parentId'
   const isTreeTable = Boolean(idNodeMap)
-
-  // 3. 递归获取展开行的 Key 列表
-  const getExpandedFlattenRowKeys = (list: any[], expandedKeysSet: Set<Key>): Key[] => {
-    return list.flatMap((node) => {
-      const currentKey = getRecordRowKey(node)
-      const children = node.children
-
-      if (Array.isArray(children) && children.length > 0 && expandedKeysSet.has(currentKey)) {
-        return [currentKey, ...getExpandedFlattenRowKeys(children, expandedKeysSet)]
-      }
-
-      return [currentKey]
-    })
-  }
 
   const items = useMemo(() => {
     if (!isTreeTable) {
       return dataSource.map((record: any) => getRecordRowKey(record))
     }
     const expandedKeysSet = new Set(currentExpandedKeys)
-    return getExpandedFlattenRowKeys(dataSource as any[], expandedKeysSet)
-  }, [
-    dataSource,
-    isTreeTable,
-    currentExpandedKeys,
-    rowKey,
-    getRecordRowKey,
-    getExpandedFlattenRowKeys,
-  ])
+    return getExpandedFlattenRowKeys(dataSource as any[], expandedKeysSet, getRecordRowKey)
+  }, [dataSource, isTreeTable, currentExpandedKeys, getRecordRowKey])
 
   const moveTreeNode = (
     list: any[],

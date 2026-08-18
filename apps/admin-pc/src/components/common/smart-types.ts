@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import {
   FormItemProps,
@@ -207,4 +206,11 @@ export interface ActionColumnConfig<RecordType> extends ColumnType<RecordType> {
   onEdit?: (record: RecordType) => void
   onDelete?: (record: RecordType) => void
   onAction?: (key: string, record: RecordType) => void
+}
+
+export interface DragOrderChangeInfo<T = any> {
+  activeItem?: T // 被拖拽的节点
+  overItem?: T // 放置位置的目标节点
+  parentItem?: T | null // 父节点（顶层拖拽时为 null）
+  parentChildren?: T[] // 本层级排序调整后的最新数组列表
 }

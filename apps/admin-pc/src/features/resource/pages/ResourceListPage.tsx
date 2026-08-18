@@ -1,7 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Drawer, Form } from 'antd'
 import { PageLayout } from '@/components/PageLayout'
-import { SmartTable, SmartForm, SmartFormEditMode, CustomAction } from '@/components/common'
+import {
+  SmartTable,
+  SmartForm,
+  SmartFormEditMode,
+  CustomAction,
+  DragOrderChangeInfo,
+} from '@/components/common'
 import { ResourceFormContainer } from '../components/ResourceFormContainer'
 import { resourceSearchSchema, getResourceColumns } from '../model'
 import { useDrawer } from '@/hooks/useDrawer'
@@ -27,7 +33,6 @@ import {
 } from '@/utils'
 import { ResourcePageRespDto } from '../types'
 import resourceApi from '../api/resource'
-import { DragOrderChangeInfo } from '@/components/common/SmartTableSortableWrapper'
 
 const formTitleMap = {
   createLast: '新增资源',
@@ -59,6 +64,21 @@ export function ResourceListPage() {
 
   const [form] = Form.useForm()
 
+  const handleOpenDrawer = useCallback(
+    (mode: SmartFormEditMode, record?: ResourcePageRespDto) => {
+      openDrawer(mode, record)
+    },
+    [openDrawer],
+  )
+
+  const onEdit = useCallback(
+    (record: ResourcePageRespDto) => {
+      setFormType('edit')
+      handleOpenDrawer('edit', record)
+    },
+    [handleOpenDrawer],
+  )
+
   const columns = useMemo(
     () =>
       getResourceColumns({
@@ -66,16 +86,27 @@ export function ResourceListPage() {
           return updateResourceStatus(record.id!, newStatus)
         },
         handleDeleteMeta(record) {
-          console.log('handleDeleteMeta', record)
+          // console.log('handleDeleteMeta', record)
+          onEdit(record as ResourcePageRespDto)
         },
         handleEditMeta(record) {
-          console.log('handleEditMeta', record)
+          // console.log('handleEditMeta', record)
+          getModal().confirm({
+            title: '提示',
+            content: '确定要删除吗？',
+            okText: '确认',
+            cancelText: '取消',
+            okButtonProps: { danger: true },
+            onOk: async () => {
+              onDelete(record as ResourcePageRespDto)
+            },
+          })
         },
         async refreshList() {
           await refreshTable()
         },
       }),
-    [refreshTable],
+    [refreshTable, onEdit, onDelete],
   )
 
   async function updateResourceStatus(id: number, newStatus: string) {
@@ -86,14 +117,6 @@ export function ResourceListPage() {
     setFormType('createLast')
     setSameLevelList(resourceTree)
     handleOpenDrawer('create')
-  }
-  const onEdit = (record: ResourcePageRespDto) => {
-    setFormType('edit')
-    handleOpenDrawer('edit', record)
-  }
-
-  const handleOpenDrawer = (mode: SmartFormEditMode, record?: ResourcePageRespDto) => {
-    openDrawer(mode, record)
   }
 
   const createSubButton: CustomAction<ResourcePageRespDto> = {
@@ -271,6 +294,7 @@ export function ResourceListPage() {
     } catch (e) {
       refreshTable()
       getMessage().error('排序失败')
+      console.error('排序失败', e)
     }
   }
 

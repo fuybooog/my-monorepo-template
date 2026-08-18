@@ -10,7 +10,7 @@ import {
 
 import authApi from '@/features/auth/api/auth'
 import { useAuthStore } from '@/store/authStore'
-import { useThemeStore, ThemeMode } from '@/store/themStore'
+import { useThemeStore } from '@/store/themStore'
 import reactSvg from '@/assets/react.svg'
 
 export function LayoutTop() {

@@ -70,7 +70,7 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
       result.push(item as CustomAction<RecordType>)
     })
     return result
-  }, [buttons, onEdit, onDelete, onlyIcon])
+  }, [buttons, onEdit, onDelete, onlyIcon, record])
 
   // 过滤隐藏
   const visibleActions = useMemo(() => {

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { Cascader } from 'antd'
 import { getCascaderDataWithCode } from 'cn-division'
 import type { DefaultOptionType } from 'antd/es/cascader'
@@ -59,70 +58,76 @@ function AddressSelect<T extends keyof ReturnTypeMap = 'leaf'>(
   }, [options])
 
   // 归一化单个输入
-  const normalizeSingle = (input: unknown): string[] => {
-    if (input == null) return []
+  const normalizeSingle = useCallback(
+    (input: unknown): string[] => {
+      if (input == null) return []
 
-    if (typeof input === 'string') {
-      const path = pathMap.get(input)
-      return path ? [...path] : []
-    }
-
-    if (Array.isArray(input)) {
-      if (input.length === 0) return []
-
-      if (isStringArray(input)) {
-        const last = input[input.length - 1]
-        const path = pathMap.get(last)
-        if (path && path.length === input.length && path.every((v, i) => v === input[i])) {
-          return input
-        }
-        const foundPath = pathMap.get(last)
-        return foundPath ? [...foundPath] : []
+      if (typeof input === 'string') {
+        const path = pathMap.get(input)
+        return path ? [...path] : []
       }
 
-      if (input.every((item) => isCodeObject(item))) {
-        const codes = input.map((item) => (item as { code: string }).code).filter(Boolean)
-        if (codes.length === 0) return []
-        const lastCode = codes[codes.length - 1]
-        const path = pathMap.get(lastCode)
+      if (Array.isArray(input)) {
+        if (input.length === 0) return []
+
+        if (isStringArray(input)) {
+          const last = input[input.length - 1]
+          const path = pathMap.get(last)
+          if (path && path.length === input.length && path.every((v, i) => v === input[i])) {
+            return input
+          }
+          const foundPath = pathMap.get(last)
+          return foundPath ? [...foundPath] : []
+        }
+
+        if (input.every((item) => isCodeObject(item))) {
+          const codes = input.map((item) => (item as { code: string }).code).filter(Boolean)
+          if (codes.length === 0) return []
+          const lastCode = codes[codes.length - 1]
+          const path = pathMap.get(lastCode)
+          return path ? [...path] : []
+        }
+
+        return []
+      }
+
+      if (isCodeObject(input)) {
+        const path = pathMap.get(input.code)
         return path ? [...path] : []
       }
 
       return []
-    }
-
-    if (isCodeObject(input)) {
-      const path = pathMap.get(input.code)
-      return path ? [...path] : []
-    }
-
-    return []
-  }
+    },
+    [pathMap],
+  )
 
   const isControlled = externalValue !== undefined
 
   // 归一化外部值
-  const normalizeValue = (val: unknown, mult: boolean): InternalCascaderValue => {
-    if (val == null) {
-      return mult ? [] : []
-    }
+  const normalizeValue = useCallback(
+    (val: unknown, mult: boolean): InternalCascaderValue => {
+      if (val == null) {
+        return mult ? [] : []
+      }
 
-    if (!mult) {
-      return normalizeSingle(val)
-    } else {
-      if (!Array.isArray(val)) {
-        return [normalizeSingle(val)]
-      }
-      const result: string[][] = []
-      for (const item of val) {
-        const normalized = normalizeSingle(item)
-        if (normalized.length > 0) {
-          result.push(normalized)
+      if (!mult) {
+        return normalizeSingle(val)
+      } else {
+        if (!Array.isArray(val)) {
+          return [normalizeSingle(val)]
         }
+        const result: string[][] = []
+        for (const item of val) {
+          const normalized = normalizeSingle(item)
+          if (normalized.length > 0) {
+            result.push(normalized)
+          }
+        }
+        return result
       }
-      return result
-    }
-  }
+    },
+    [normalizeSingle],
+  )
 
   // 受控模式：直接用 useMemo 计算值
   const controlledValue = useMemo(

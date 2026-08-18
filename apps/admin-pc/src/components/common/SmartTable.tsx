@@ -18,7 +18,7 @@ import { formatSortParams } from '@/utils'
 import { getColumnKey, serializeFormValues } from './smart-utils'
 import { SmartTableSortableWrapper } from './SmartTableSortableWrapper'
 import { HolderOutlined } from '@ant-design/icons'
-import { DragHandleContext } from './SmartTableRow'
+import { DragHandleContext } from '@/components/common/SmartTableRowContext'
 
 // ==========================================
 // 1. Custom Hooks 拆分
@@ -371,7 +371,7 @@ const SmartTableInner = <RecordType extends object>(
         }
       }
       return rawRowSelection
-    }, [rawRowSelection, toolbar, selectedRowKeys, handleRowSelectionChange])
+    }, [rawRowSelection])
 
     const commonProps: TableProps<RecordType> = {
       ...restAntdProps,

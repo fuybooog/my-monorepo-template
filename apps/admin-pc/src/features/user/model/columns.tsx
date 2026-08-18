@@ -1,6 +1,6 @@
 import { SmartColumnType } from '@/components/common'
 import { Backend } from '@repo/types'
-import { commonStatusRender, commonTimeRender, createStatusRender } from '@/utils'
+import { commonTimeRender, createStatusRender } from '@/utils'
 
 /**
  * 获取用户列表表格列配置

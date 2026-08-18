@@ -3,14 +3,14 @@ import { Drawer, Form } from 'antd'
 import { PageLayout } from '@/components/PageLayout'
 import { SmartTable, SmartForm, SmartFormEditMode } from '@/components/common'
 import { Backend } from '@repo/types'
-import { UserFormContainer } from '../components/UserFormContainer'
-import { userSearchSchema, getUserColumns } from '../model'
+import { RoleFormContainer } from '../components/RoleFormContainer'
+import { roleSearchSchema, getRoleColumns } from '../model'
 import { useDrawer } from '@/hooks/useDrawer'
-import { useUserList } from '../hooks/useUserList'
-import userApi from '../api/user'
+import { useRoleList } from '../hooks/useRoleList'
+import roleApi from '../api/role'
 
-const formTitleMap = { create: '新增用户', edit: '编辑用户', view: '用户详情' }
-export function UserListPage() {
+const formTitleMap = { create: '新增角色', edit: '编辑角色', view: '角色详情' }
+export function RoleListPage() {
   const {
     searchParams,
     smartTable,
@@ -19,64 +19,58 @@ export function UserListPage() {
     refreshTable,
     onDelete,
     onBatchDelete,
-  } = useUserList()
+  } = useRoleList()
 
-  const {
-    drawerVisible,
-    formMode,
-    openDrawer,
-    closeDrawer,
-    drawerData: currentId,
-  } = useDrawer<Backend.UserPageRespDto>()
+  const { drawerVisible, formMode, openDrawer, closeDrawer, drawerData } =
+    useDrawer<Backend.RolePageRespDto>()
 
   const [form] = Form.useForm()
 
   const columns = useMemo(
     () =>
-      getUserColumns({
+      getRoleColumns({
         onNameClick(record) {
-          openDrawer('view', record.id)
+          openDrawer('view', record)
         },
-        onStatusChange(record: Backend.UserPageRespDto, newStatus: string) {
-          return updateUserStatus(record.id, newStatus)
+        onStatusChange(record: Backend.RolePageRespDto, newStatus: string) {
+          return updateRoleStatus(record.id, newStatus)
         },
         async refreshList() {
-          console.log('refreshList')
           await refreshTable()
         },
       }),
-    [openDrawer],
+    [openDrawer, refreshTable],
   )
 
-  async function updateUserStatus(id: number, newStatus: string) {
-    return userApi.updateStatus(id, newStatus)
+  async function updateRoleStatus(id: number, newStatus: string) {
+    return roleApi.updateStatus(id, newStatus)
   }
 
   const onCreate = () => {
     handleOpenDrawer('create')
   }
-  const onEdit = (record: Backend.UserPageRespDto) => {
-    handleOpenDrawer('edit', record.id)
+  const onEdit = (record: Backend.RolePageRespDto) => {
+    handleOpenDrawer('edit', record)
   }
 
-  const handleOpenDrawer = (mode: SmartFormEditMode, id?: number) => {
-    openDrawer(mode, id)
+  const handleOpenDrawer = (mode: SmartFormEditMode, record?: Backend.RolePageRespDto) => {
+    openDrawer(mode, record)
   }
 
   return (
     <PageLayout>
       <SmartForm
         form={form}
-        schema={userSearchSchema}
+        schema={roleSearchSchema}
         layout="inline"
         onFinish={searchTable}
         style={{ marginBottom: 16 }}
       ></SmartForm>
 
-      <SmartTable<Backend.UserPageRespDto>
+      <SmartTable<Backend.RolePageRespDto>
         ref={smartTable}
         searchParams={searchParams}
-        schema={userSearchSchema}
+        schema={roleSearchSchema}
         request={handleFetchData}
         columns={columns}
         toolbar={{
@@ -98,8 +92,8 @@ export function UserListPage() {
         size={'large'}
         destroyOnHidden
       >
-        <UserFormContainer
-          id={currentId as number}
+        <RoleFormContainer
+          drawerData={drawerData as Backend.RolePageRespDto}
           mode={formMode}
           onSuccess={() => {
             closeDrawer()

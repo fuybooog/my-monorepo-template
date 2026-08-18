@@ -1,5 +1,4 @@
 import { SmartColumnType } from '@/components/common'
-import { Backend } from '@repo/types'
 import { commonTimeRender, createStatusRender, MetaTreeNode } from '@/utils'
 import { MetaItemTagList } from '../components/MetaItemTagList'
 import { ResourcePageRespDto } from '../types'

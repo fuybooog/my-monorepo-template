@@ -1,20 +1,20 @@
 import { SmartTableInstance } from '@/components/common'
 import { Backend } from '@repo/types'
 import { useCallback, useRef, useState } from 'react'
-import userApi from '../api/user'
+import roleApi from '../api/role'
 import { ERROR_MESSAGE, SUCCESS_MESSAGE } from '@/constants'
 import { getMessage } from '@/utils/antd-instance'
 
-export function useUserList() {
-  const [searchParams, setSearchParams] = useState<Backend.UserPageDto>({})
+export function useRoleList() {
+  const [searchParams, setSearchParams] = useState<Partial<Backend.RolePageDto>>({})
   const smartTable = useRef<SmartTableInstance>(null)
 
   const refreshTable = useCallback(() => {
     smartTable.current?.refresh(true)
   }, [])
 
-  const handleFetchData = useCallback(async (params: Backend.UserPageDto) => {
-    const res = await userApi.page({
+  const handleFetchData = useCallback(async (params: Partial<Backend.RolePageDto>) => {
+    const res = await roleApi.page({
       ...params,
     })
     return {
@@ -23,12 +23,12 @@ export function useUserList() {
     }
   }, [])
 
-  const searchTable = useCallback((formParams: Backend.UserPageDto) => {
+  const searchTable = useCallback((formParams: Backend.RolePageDto) => {
     setSearchParams(formParams)
   }, [])
 
-  const onDelete = async (record: Backend.UserPageRespDto) => {
-    const res = await userApi.delete(record.id)
+  const onDelete = async (record: Backend.RolePageRespDto) => {
+    const res = await roleApi.delete(record.id)
     if (res.head.errCode === 0) {
       getMessage().success(SUCCESS_MESSAGE.DELETE)
       refreshTable()
@@ -36,7 +36,7 @@ export function useUserList() {
   }
 
   const onBatchDelete = async (keys: React.Key[]) => {
-    const res = await userApi.batchDelete(keys.join())
+    const res = await roleApi.batchDelete(keys.join())
     if (res.head.errCode === 0) {
       if (res.data.notFoundIds?.length) {
         getMessage().error(ERROR_MESSAGE.DELETE)
