@@ -20,6 +20,7 @@
     "@repo/api": "workspace:*",
     "@repo/types": "workspace:*",
     "antd": "^6.4.4",
+    "axios": "^1.19.0",
     "cn-division": "^2026.0.0",
     "dayjs": "^1.11.21",
     "json-schema-to-ts": "^3.1.1",
