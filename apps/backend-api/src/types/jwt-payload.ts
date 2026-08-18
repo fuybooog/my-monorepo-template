@@ -1,4 +1,4 @@
-import { CurrentLoginResponseDto } from "@/modules/auth/auth.dto"
+import { CurrentLoginResponseDto } from '@/modules/auth/auth.dto'
 
 export interface JwtPayload {
   sub: string

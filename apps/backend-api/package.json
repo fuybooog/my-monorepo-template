@@ -23,11 +23,10 @@
     "delete:module": "pnpm exec tsx ./scripts/delete-module.ts",
     "start:redis": "redis-server",
     "build:openapi": "ts-node -r tsconfig-paths/register -P tsconfig.build.json scripts/generate-openapi.ts",
-    "dev": "concurrently \"nest start --watch\" \"npm run watch:openapi\" ",
-    "watch:openapi": "chokidar \"src/**/*.dto.ts\" \"src/**/*.controller.ts\" \"src/**/*.entity.ts\" -c \"npm run build:openapi && pnpm --filter @repo/types generate\" "
+    "dev": "concurrently \"nest start --watch\" \"pnpm run watch:openapi\" ",
+    "watch:openapi": "chokidar \"src/**/*.dto.ts\" \"src/**/*.controller.ts\" \"src/**/*.entity.ts\" -c \"pnpm run build:openapi && pnpm --filter @repo/types generate\" "
   },
   "dependencies": {
-    "@jest/globals": "^30.4.1",
     "@nestjs-modules/ioredis": "^2.2.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.4",
@@ -37,7 +36,6 @@
     "@nestjs/swagger": "^11.4.4",
     "@nestjs/typeorm": "^11.0.1",
     "@repo/types": "workspace:*",
-    "chokidar-cli": "^3.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "concurrently": "^10.0.3",
@@ -54,6 +52,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
+    "@jest/globals": "^30.4.1",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
@@ -63,6 +62,7 @@
     "@types/node": "^24.0.0",
     "@types/qs": "^6.15.1",
     "@types/supertest": "^7.2.0",
+    "chokidar-cli": "^3.0.0",
     "dotenv": "^17.4.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",

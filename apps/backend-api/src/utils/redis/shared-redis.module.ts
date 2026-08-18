@@ -16,7 +16,7 @@ import { RedisService } from '@/utils/redis/redisService'
           options: {
             password: configService.get<string>('REDIS_PASSWORD'),
             db: configService.get<number>('REDIS_DB', 0),
-            
+
             retryStrategy(times) {
               if (times > 3) {
                 logger.error('Redis 连接彻底失败，已启动熔断降级。不影响后端主工程启动。')

@@ -19,22 +19,25 @@ export class HttpExceptionFilter implements ExceptionFilter {
       errCode = exception.getErrCode()
     } else if (exception instanceof HttpException) {
       const res = exception.getResponse() as any
-      
+
       errMsg = typeof res === 'object' ? res.message || res.error : res
-      
-      errCode = status === HttpStatus.UNAUTHORIZED ? -2 : status 
+
+      errCode = status === HttpStatus.UNAUTHORIZED ? -2 : status
     } else {
       console.error('Unhandled System Exception:', exception)
-      errMsg = process.env.NODE_ENV === 'production' ? '服务器开小差了，请稍后再试' : (exception.message || 'Server Internal Error')
+      errMsg =
+        process.env.NODE_ENV === 'production'
+          ? '服务器开小差了，请稍后再试'
+          : exception.message || 'Server Internal Error'
       errCode = -1
     }
 
     response.status(status).json({
       head: {
-        errCode: errCode, 
-        errMsg: Array.isArray(errMsg) ? errMsg.join(', ') : errMsg, 
+        errCode: errCode,
+        errMsg: Array.isArray(errMsg) ? errMsg.join(', ') : errMsg,
       },
-      data: null, 
+      data: null,
     })
   }
 }

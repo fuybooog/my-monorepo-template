@@ -10,7 +10,7 @@ const __dirname = dirname(__filename)
 export default defineConfig({
   optimizeDeps: {
     include: ['react-is'],
-    disabled: false,
+    // disabled: false,
   },
   build: {
     commonjsOptions: {

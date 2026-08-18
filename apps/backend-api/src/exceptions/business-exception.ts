@@ -11,6 +11,10 @@ export class BusinessException extends HttpException {
     super({ errCode, errMsg }, HttpStatus.BAD_REQUEST)
   }
 
-  getErrCode() { return this.errCode }
-  getErrMsg() { return this.errMsg }
+  getErrCode() {
+    return this.errCode
+  }
+  getErrMsg() {
+    return this.errMsg
+  }
 }

@@ -1,107 +1,107 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity("v3_cos", { schema: "mydb" })
+@Entity('v3_cos', { schema: 'mydb' })
 export class V3Cos {
-  @PrimaryGeneratedColumn({ type: "bigint", name: "id", comment: "主键" })
-  id: string;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'id', comment: '主键' })
+  id: string
 
-  @Column("varchar", {
-    name: "bucket",
+  @Column('varchar', {
+    name: 'bucket',
     nullable: true,
-    comment: "存储桶",
+    comment: '存储桶',
     length: 100,
   })
-  bucket: string | null;
+  bucket: string | null
 
-  @Column("varchar", {
-    name: "obj_key",
+  @Column('varchar', {
+    name: 'obj_key',
     nullable: true,
-    comment: "对象key",
+    comment: '对象key',
     length: 512,
   })
-  objKey: string | null;
+  objKey: string | null
 
-  @Column("varchar", {
-    name: "file_id",
+  @Column('varchar', {
+    name: 'file_id',
     nullable: true,
-    comment: "文件id",
+    comment: '文件id',
     length: 32,
   })
-  fileId: string | null;
+  fileId: string | null
 
-  @Column("varchar", {
-    name: "type",
+  @Column('varchar', {
+    name: 'type',
     nullable: true,
-    comment: "存储类型 AWZ",
+    comment: '存储类型 AWZ',
     length: 16,
   })
-  type: string | null;
+  type: string | null
 
-  @Column("varchar", {
-    name: "file_name",
+  @Column('varchar', {
+    name: 'file_name',
     nullable: true,
-    comment: "文件名",
+    comment: '文件名',
     length: 256,
   })
-  fileName: string | null;
+  fileName: string | null
 
-  @Column("varchar", {
-    name: "tenant_id",
+  @Column('varchar', {
+    name: 'tenant_id',
     nullable: true,
-    comment: "租户ID",
+    comment: '租户ID',
     length: 100,
   })
-  tenantId: string | null;
+  tenantId: string | null
 
-  @Column("varchar", {
-    name: "org_id",
+  @Column('varchar', {
+    name: 'org_id',
     nullable: true,
-    comment: "机构ID",
+    comment: '机构ID',
     length: 100,
   })
-  orgId: string | null;
+  orgId: string | null
 
-  @Column("tinyint", {
-    name: "del_flag",
-    comment: "删除状态：0=否，1=是",
+  @Column('tinyint', {
+    name: 'del_flag',
+    comment: '删除状态：0=否，1=是',
     default: () => "'0'",
   })
-  delFlag: number;
+  delFlag: number
 
-  @Column("int", {
-    name: "upload_flag",
-    comment: "上传到S3标记 0 未上传 1 已上传",
+  @Column('int', {
+    name: 'upload_flag',
+    comment: '上传到S3标记 0 未上传 1 已上传',
     default: () => "'0'",
   })
-  uploadFlag: number;
+  uploadFlag: number
 
-  @Column("varchar", {
-    name: "business",
+  @Column('varchar', {
+    name: 'business',
     nullable: true,
-    comment: "业务域",
+    comment: '业务域',
     length: 32,
   })
-  business: string | null;
+  business: string | null
 
-  @Column("varchar", {
-    name: "content_type",
+  @Column('varchar', {
+    name: 'content_type',
     nullable: true,
-    comment: "文档类型",
+    comment: '文档类型',
     length: 100,
   })
-  contentType: string | null;
+  contentType: string | null
 
-  @Column("datetime", {
-    name: "created_at",
+  @Column('datetime', {
+    name: 'created_at',
     nullable: true,
-    comment: "创建时间",
+    comment: '创建时间',
   })
-  createdAt: Date | null;
+  createdAt: Date | null
 
-  @Column("datetime", {
-    name: "updated_at",
+  @Column('datetime', {
+    name: 'updated_at',
     nullable: true,
-    comment: "更新时间",
+    comment: '更新时间',
   })
-  updatedAt: Date | null;
+  updatedAt: Date | null
 }

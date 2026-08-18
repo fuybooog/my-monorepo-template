@@ -1,135 +1,135 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity("v3_news", { schema: "mydb" })
+@Entity('v3_news', { schema: 'mydb' })
 export class V3News {
-  @PrimaryGeneratedColumn({ type: "bigint", name: "id" })
-  id: string;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'id' })
+  id: string
 
-  @Column("varchar", { name: "title", length: 100 })
-  title: string;
+  @Column('varchar', { name: 'title', length: 100 })
+  title: string
 
-  @Column("varchar", { name: "summary", nullable: true, length: 300 })
-  summary: string | null;
+  @Column('varchar', { name: 'summary', nullable: true, length: 300 })
+  summary: string | null
 
-  @Column("text", {
-    name: "content",
+  @Column('text', {
+    name: 'content',
     nullable: true,
-    comment: "内容，HTML，或纯文本，或空，为空时，文章以其他形式展现",
+    comment: '内容，HTML，或纯文本，或空，为空时，文章以其他形式展现',
   })
-  content: string | null;
+  content: string | null
 
-  @Column("varchar", {
-    name: "cover_image",
+  @Column('varchar', {
+    name: 'cover_image',
     nullable: true,
-    comment: "封面图片文件ID",
+    comment: '封面图片文件ID',
     length: 100,
   })
-  coverImage: string | null;
+  coverImage: string | null
 
-  @Column("datetime", {
-    name: "publish_date",
+  @Column('datetime', {
+    name: 'publish_date',
     nullable: true,
-    comment: "发布时间",
+    comment: '发布时间',
   })
-  publishDate: Date | null;
+  publishDate: Date | null
 
-  @Column("tinyint", {
-    name: "status",
+  @Column('tinyint', {
+    name: 'status',
     nullable: true,
-    comment: "0: 草稿；1: 发布；2: 下架",
+    comment: '0: 草稿；1: 发布；2: 下架',
   })
-  status: number | null;
+  status: number | null
 
-  @Column("bigint", {
-    name: "view_count",
+  @Column('bigint', {
+    name: 'view_count',
     nullable: true,
-    comment: "浏览量",
+    comment: '浏览量',
     default: () => "'0'",
   })
-  viewCount: string | null;
+  viewCount: string | null
 
-  @Column("datetime", { name: "created_at", nullable: true })
-  createdAt: Date | null;
+  @Column('datetime', { name: 'created_at', nullable: true })
+  createdAt: Date | null
 
-  @Column("datetime", { name: "updated_at", nullable: true })
-  updatedAt: Date | null;
+  @Column('datetime', { name: 'updated_at', nullable: true })
+  updatedAt: Date | null
 
-  @Column("varchar", {
-    name: "author",
+  @Column('varchar', {
+    name: 'author',
     nullable: true,
-    comment: "作者/署名",
+    comment: '作者/署名',
     length: 100,
   })
-  author: string | null;
+  author: string | null
 
-  @Column("varchar", {
-    name: "type",
+  @Column('varchar', {
+    name: 'type',
     nullable: true,
-    comment: "取值集 V3_NEWS_TYPE",
+    comment: '取值集 V3_NEWS_TYPE',
     length: 100,
   })
-  type: string | null;
+  type: string | null
 
-  @Column("varchar", {
-    name: "remark",
+  @Column('varchar', {
+    name: 'remark',
     nullable: true,
-    comment: "备注；下架原因；",
+    comment: '备注；下架原因；',
     length: 200,
   })
-  remark: string | null;
+  remark: string | null
 
-  @Column("varchar", {
-    name: "created_by_id",
+  @Column('varchar', {
+    name: 'created_by_id',
     nullable: true,
-    comment: "创建人id",
+    comment: '创建人id',
     length: 100,
   })
-  createdById: string | null;
+  createdById: string | null
 
-  @Column("varchar", {
-    name: "created_by_name",
+  @Column('varchar', {
+    name: 'created_by_name',
     nullable: true,
-    comment: "创建人姓名",
+    comment: '创建人姓名',
     length: 100,
   })
-  createdByName: string | null;
+  createdByName: string | null
 
-  @Column("varchar", {
-    name: "updated_by_id",
+  @Column('varchar', {
+    name: 'updated_by_id',
     nullable: true,
-    comment: "修改人id",
+    comment: '修改人id',
     length: 100,
   })
-  updatedById: string | null;
+  updatedById: string | null
 
-  @Column("varchar", {
-    name: "updated_by_name",
+  @Column('varchar', {
+    name: 'updated_by_name',
     nullable: true,
-    comment: "修改人姓名",
+    comment: '修改人姓名',
     length: 100,
   })
-  updatedByName: string | null;
+  updatedByName: string | null
 
-  @Column("varchar", {
-    name: "field1",
+  @Column('varchar', {
+    name: 'field1',
     nullable: true,
-    comment: "扩展字段1",
+    comment: '扩展字段1',
     length: 1000,
   })
-  field1: string | null;
+  field1: string | null
 
-  @Column("varchar", {
-    name: "field2",
+  @Column('varchar', {
+    name: 'field2',
     nullable: true,
-    comment: "扩展字段2",
+    comment: '扩展字段2',
     length: 1000,
   })
-  field2: string | null;
+  field2: string | null
 
-  @Column("text", {
-    name: "field3",
+  @Column('text', {
+    name: 'field3',
     nullable: true,
-    comment: "扩展字段3，存储json数据",
+    comment: '扩展字段3，存储json数据',
   })
-  field3: string | null;
+  field3: string | null
 }

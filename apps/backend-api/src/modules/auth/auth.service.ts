@@ -1,6 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Injectable } from '@nestjs/common'
-import { CurrentLoginResponseDto, LoginResponseDto, PasswordLoginDto, PhoneLoginDto } from '@/modules/auth/auth.dto'
+import {
+  CurrentLoginResponseDto,
+  LoginResponseDto,
+  PasswordLoginDto,
+  PhoneLoginDto,
+} from '@/modules/auth/auth.dto'
 import type { Response } from 'express'
 import { BusinessException } from '@/exceptions/business-exception'
 import { JwtService } from '@nestjs/jwt'
@@ -8,7 +12,10 @@ import { RedisService } from '@/utils/redis/redisService'
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService, private readonly redisService: RedisService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly redisService: RedisService,
+  ) {}
   async passwordLogin(loginDto: PasswordLoginDto, res: Response): Promise<LoginResponseDto> {
     if (loginDto.password !== '111111') {
       throw new BusinessException('账号或密码错误')
@@ -17,7 +24,7 @@ export class AuthService {
     const user = {
       id: 'testId',
       userName: 'testName',
-      roles: ['admin']
+      roles: ['admin'],
     }
     const payload = {
       sub: user.id,
@@ -59,7 +66,7 @@ export class AuthService {
       sameSite: 'lax',
       maxAge: 0,
       path: '/',
-    });
+    })
     return null
   }
 }
