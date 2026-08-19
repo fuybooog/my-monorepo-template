@@ -1,6 +1,7 @@
 import { SmartColumnType } from '@/components/common'
 import { Backend } from '@repo/types'
 import { commonTimeRender, createStatusRender } from '@/utils'
+import { PERMISSIONS } from '@repo/shared'
 
 /**
  * 获取用户列表表格列配置
@@ -91,7 +92,11 @@ export const getUserColumns = (callbacks: {
       title: '状态',
       dataIndex: 'status',
       width: 90,
-      render: createStatusRender({ onStatusChange, refreshList }),
+      render: createStatusRender({
+        onStatusChange,
+        refreshList,
+        permission: [PERMISSIONS.SYS_USER_LIST_EDIT],
+      }),
     },
     {
       title: '创建时间',

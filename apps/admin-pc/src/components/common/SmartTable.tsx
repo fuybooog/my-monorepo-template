@@ -418,10 +418,10 @@ const SmartTableInner = <RecordType extends object>(
         setDataSource={setDataSource}
         onOrderChange={handleOrderChange}
       >
-        <InnerTable />
+        {InnerTable()}
       </SmartTableSortableWrapper>
     ) : (
-      <InnerTable />
+      InnerTable()
     )
   }
 

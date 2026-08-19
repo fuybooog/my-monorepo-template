@@ -2,6 +2,7 @@ import { SmartColumnType } from '@/components/common'
 import { commonTimeRender, createStatusRender, MetaTreeNode } from '@/utils'
 import { MetaItemTagList } from '../components/MetaItemTagList'
 import { ResourcePageRespDto } from '../types'
+import { PERMISSIONS } from '@repo/shared'
 
 /**
  * 获取用户列表表格列配置
@@ -26,18 +27,15 @@ export const getResourceColumns = (callbacks: {
     {
       title: '唯一编码',
       dataIndex: 'uniqueProp',
-      width: 160,
     },
-    {
-      title: '唯一父编码',
-      dataIndex: 'parentUniqueProp',
-      width: 160,
-    },
+    // {
+    //   title: '唯一父编码',
+    //   dataIndex: 'parentUniqueProp',
+    //   width: 160,
+    // },
     {
       title: '菜单路径',
       dataIndex: 'menuPath',
-      width: 160,
-      ellipsis: true,
     },
     // {
     //   title: '类型',
@@ -49,13 +47,14 @@ export const getResourceColumns = (callbacks: {
       title: '包含按钮',
       dataIndex: 'buttons',
       key: 'buttons',
+      width: 120,
       render: (buttons?: MetaTreeNode[]) => {
         if (!buttons || buttons.length === 0) return <span style={{ color: '#ccc' }}>-</span>
         return (
           <MetaItemTagList
             items={buttons}
             color="orange"
-            maxCount={3}
+            maxCount={2}
             onEdit={handleEditMeta}
             onDelete={handleDeleteMeta}
           />
@@ -66,13 +65,14 @@ export const getResourceColumns = (callbacks: {
       title: '包含数据列',
       dataIndex: 'columns',
       key: 'columns',
+      width: 120,
       render: (cols?: MetaTreeNode[]) => {
         if (!cols || cols.length === 0) return <span style={{ color: '#ccc' }}>-</span>
         return (
           <MetaItemTagList
             items={cols}
             color="orange"
-            maxCount={3}
+            maxCount={2}
             onEdit={handleEditMeta}
             onDelete={handleDeleteMeta}
           />
@@ -82,20 +82,19 @@ export const getResourceColumns = (callbacks: {
     {
       title: '菜单是否隐藏',
       dataIndex: 'notInMenu',
-      width: 160,
+      width: 110,
       render: (value) => <span>{value === '1' ? '是' : ''}</span>,
     },
-    // {
-    //   title: '排序号',
-    //   dataIndex: 'sortNumber',
-    //   width: 80,
-    // },
     {
       title: '状态',
       dataIndex: 'status',
       width: 90,
       fixed: 'right',
-      render: createStatusRender({ onStatusChange, refreshList }),
+      render: createStatusRender({
+        onStatusChange,
+        refreshList,
+        permission: [PERMISSIONS.SYS_RESOURCE_LIST_EDIT],
+      }),
     },
     {
       title: '创建时间',

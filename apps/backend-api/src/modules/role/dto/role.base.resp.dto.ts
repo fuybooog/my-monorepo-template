@@ -4,18 +4,21 @@ import { IsInt, IsOptional, IsString } from 'class-validator'
 export class RoleBaseRespDto {
   @ApiProperty({ description: '角色id', type: Number })
   @IsInt()
+  @IsOptional()
   @Expose()
-  id: number
+  id?: number
 
   @ApiProperty({ description: '角色名称', type: String })
   @IsString()
+  @IsOptional()
   @Expose()
-  roleName: string
+  roleName?: string
 
   @ApiProperty({ description: '角色编码', type: String })
   @IsString()
+  @IsOptional()
   @Expose()
-  roleCode: string
+  roleCode?: string
 
   @ApiPropertyOptional({ description: '状态：0-禁用，1-启用', type: String })
   @IsString()

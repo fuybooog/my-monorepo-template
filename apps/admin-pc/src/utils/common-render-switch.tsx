@@ -1,6 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { StatusSwitch } from '@/components/status-switch/StatusSwitch'
+import { commonStatusRender } from '@/utils/common-render-status'
+import { useAuthStore } from '@/store/authStore'
 export type StatusOption<T = any> = { label?: string; value: T }
 export type StatusMapConfig<T = any> = [StatusOption<T> | T, StatusOption<T> | T]
 
@@ -8,6 +9,8 @@ export interface CreateStatusRenderOptions<RecordType = any, StatusType = any> {
   statusMap?: StatusMapConfig<StatusType>
   onStatusChange: (record: RecordType, newStatus: StatusType) => Promise<void | unknown>
   refreshList?: () => void
+  disabled?: (record: RecordType) => boolean
+  permission?: string | string[] | ((record: RecordType) => boolean)
 }
 
 /**
@@ -17,6 +20,8 @@ export function createStatusRender<RecordType extends object = any, StatusType =
   statusMap = ['1', '0'] as StatusMapConfig<StatusType>,
   onStatusChange,
   refreshList,
+  disabled,
+  permission,
 }: CreateStatusRenderOptions<RecordType, StatusType>) {
   // 解析状态的 active / inactive 值
   const activeVal =
@@ -31,6 +36,21 @@ export function createStatusRender<RecordType extends object = any, StatusType =
 
   // 返回符合 antd render 签名的普通函数 (value, record) => ReactNode
   return (value: StatusType, record: RecordType) => {
+    let isPermissionGranted = true
+    if (permission) {
+      const userPermissions = useAuthStore.getState().auth?.permissions || []
+      if (typeof permission === 'function') {
+        isPermissionGranted = permission(record)
+      } else {
+        const requiredCodes = Array.isArray(permission) ? permission : [permission]
+        isPermissionGranted = requiredCodes.some((code) => userPermissions.includes(code))
+      }
+    }
+
+    // 只要业务 disabled 满足，或者无权限，就禁用切换并降级为普通渲染
+    if (!isPermissionGranted || disabled?.(record)) {
+      return commonStatusRender(value as string | number)
+    }
     // 💡 关键：使用 React.createElement 挂载子组件，从而安全使用内部 Hooks
     return React.createElement(StatusSwitch<RecordType, StatusType>, {
       value,

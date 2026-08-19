@@ -87,10 +87,6 @@ export function ResourceListPage() {
         },
         handleDeleteMeta(record) {
           // console.log('handleDeleteMeta', record)
-          onEdit(record as ResourcePageRespDto)
-        },
-        handleEditMeta(record) {
-          // console.log('handleEditMeta', record)
           getModal().confirm({
             title: '提示',
             content: '确定要删除吗？',
@@ -101,6 +97,10 @@ export function ResourceListPage() {
               onDelete(record as ResourcePageRespDto)
             },
           })
+        },
+        handleEditMeta(record) {
+          onEdit(record as ResourcePageRespDto)
+          // console.log('handleEditMeta', record)
         },
         async refreshList() {
           await refreshTable()

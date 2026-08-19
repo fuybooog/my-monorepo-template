@@ -1014,7 +1014,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** 分页查询用户列表 */
+    /** 分页查询角色列表 */
     get: operations['RoleController_pageRole']
     put?: never
     post?: never
@@ -1051,7 +1051,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** 分页查询用户列表(可选字段) */
+    /** 分页查询角色列表(可选字段) */
     get: operations['RoleController_pageOptionRole']
     put?: never
     post?: never
@@ -1088,7 +1088,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** 按id查询用户 */
+    /** 按id查询角色 */
     get: operations['RoleController_findRoleById']
     put?: never
     post?: never
@@ -1105,7 +1105,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** 按ids查询用户 */
+    /** 按ids查询角色 */
     get: operations['RoleController_findRoleListByIds']
     put?: never
     post?: never
@@ -1124,7 +1124,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 创建用户 */
+    /** 创建角色 */
     post: operations['RoleController_createRole']
     delete?: never
     options?: never
@@ -1141,7 +1141,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 修改用户 */
+    /** 修改角色 */
     post: operations['RoleController_updateRole']
     delete?: never
     options?: never
@@ -1158,7 +1158,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 删除用户 */
+    /** 删除角色 */
     post: operations['RoleController_removeRole']
     delete?: never
     options?: never
@@ -1175,7 +1175,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 批量删除用户 */
+    /** 批量删除角色 */
     post: operations['RoleController_batchRemoveRole']
     delete?: never
     options?: never
@@ -1192,7 +1192,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 修改用户状态 */
+    /** 修改角色状态 */
     post: operations['RoleController_updateRoleStatus']
     delete?: never
     options?: never
@@ -1209,7 +1209,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 批量修改用户状态 */
+    /** 批量修改角色状态 */
     post: operations['RoleController_batchUpdateRoleStatus']
     delete?: never
     options?: never
@@ -1226,7 +1226,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 下载导入用户模板 */
+    /** 下载导入角色模板 */
     post: operations['RoleController_downloadRoleTemplate']
     delete?: never
     options?: never
@@ -1243,7 +1243,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 导入用户数据 */
+    /** 导入角色数据 */
     post: operations['RoleController_importRole']
     delete?: never
     options?: never
@@ -1260,7 +1260,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 导出用户数据 */
+    /** 导出角色数据 */
     post: operations['RoleController_exportRole']
     delete?: never
     options?: never
