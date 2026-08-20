@@ -9,6 +9,9 @@ const userApi = {
   findById(id: string | number): Promise<Backend.FindUserByIdRes> {
     return http.get('/user/find/' + id)
   },
+  findByIds(ids: string): Promise<Backend.FindUserListByIdsRes> {
+    return http.get('/user/batch/query', { ids })
+  },
   create(params: Backend.UserCreateDto): Promise<Backend.CreateUserRes> {
     return http.post('/user/create', params)
   },

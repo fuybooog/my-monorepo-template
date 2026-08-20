@@ -1,6 +1,3 @@
-/**
- * 树节点通用类型接口
- */
 export type TreeNode = Record<string, any>
 
 /**

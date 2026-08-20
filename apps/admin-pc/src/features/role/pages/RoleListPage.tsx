@@ -8,6 +8,7 @@ import { roleSearchSchema, getRoleColumns } from '../model'
 import { useDrawer } from '@/hooks/useDrawer'
 import { useRoleList } from '../hooks/useRoleList'
 import roleApi from '../api/role'
+import { PERMISSIONS } from '@repo/shared'
 
 const formTitleMap = { create: '新增角色', edit: '编辑角色', view: '角色详情' }
 export function RoleListPage() {
@@ -57,6 +58,20 @@ export function RoleListPage() {
     openDrawer(mode, record)
   }
 
+  const editButton = (record: Backend.RolePageRespDto) => ({
+    key: 'edit',
+    label: '编辑',
+    onClick: () => onEdit(record),
+    permission: [PERMISSIONS.SYS_ROLE_LIST_EDIT],
+  })
+
+  const deleteButton = (record: Backend.RolePageRespDto) => ({
+    key: 'delete',
+    label: '删除',
+    onClick: () => onDelete(record),
+    permission: [PERMISSIONS.SYS_ROLE_LIST_DELETE],
+  })
+
   return (
     <PageLayout>
       <SmartForm
@@ -78,9 +93,7 @@ export function RoleListPage() {
           onBatchDelete,
         }}
         actionColumn={{
-          buttons: ['edit', 'delete'],
-          onEdit,
-          onDelete,
+          buttons: (record) => [editButton(record), deleteButton(record)],
         }}
         scroll={{ x: 'max-content' }}
       />

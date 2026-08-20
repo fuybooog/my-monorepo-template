@@ -1519,7 +1519,7 @@ export interface components {
        */
       notFoundIds?: string[]
       /** @description 用户列表 */
-      list: string[]
+      list: components['schemas']['UserRespDto'][]
     }
     UserCreateDto: {
       /** @description 昵称 */
@@ -2066,6 +2066,10 @@ export interface components {
       updatedAt?: string
       /** @description 删除时间 */
       deletedAt?: string
+      /** @description 用户数量 */
+      userCount: number
+      /** @description 资源数量 */
+      resourceCount: number
     }
     RolePageDto: {
       /** @description 角色名称 */
@@ -2136,6 +2140,10 @@ export interface components {
       updatedAt?: string
       /** @description 删除时间 */
       deletedAt?: string
+      /** @description 用户id列表 */
+      userIds: string
+      /** @description 资源id列表 */
+      resourceIds: string
     }
     RoleListRespDto: {
       /**
@@ -2147,10 +2155,6 @@ export interface components {
       list: string[]
     }
     RoleCreateDto: {
-      /** @description 角色名称 */
-      roleName: string
-      /** @description 角色编码 */
-      roleCode: string
       /** @description 状态：0-禁用，1-启用 */
       status?: string
       /** @description 创建时间 */
@@ -2159,6 +2163,20 @@ export interface components {
       updatedAt?: string
       /** @description 删除时间 */
       deletedAt?: string
+      /** @description 角色名称 */
+      roleName: string
+      /** @description 角色编码 */
+      roleCode: string
+      /**
+       * @description 用“,”拼接的id
+       * @example
+       */
+      userIds: string
+      /**
+       * @description 用“,”拼接的id
+       * @example
+       */
+      resourceIds: string
     }
     RoleUpdateDto: {
       /** @description 角色名称 */
@@ -2173,6 +2191,16 @@ export interface components {
       updatedAt?: string
       /** @description 删除时间 */
       deletedAt?: string
+      /**
+       * @description 用“,”拼接的id
+       * @example
+       */
+      userIds: string
+      /**
+       * @description 用“,”拼接的id
+       * @example
+       */
+      resourceIds: string
     }
   }
   responses: never

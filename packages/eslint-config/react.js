@@ -36,6 +36,8 @@ export default [
           allow: ['error', 'warn'], // 允许这两个方法，其他（log, info, debug 等）会警告
         },
       ],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'eslint-comments/no-unused-disable': 'off',
     },
   },
 ]

@@ -4428,7 +4428,7 @@
             "description": "用户列表",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/UserRespDto"
             }
           }
         },
@@ -5471,9 +5471,17 @@
           "deletedAt": {
             "type": "string",
             "description": "删除时间"
+          },
+          "userCount": {
+            "type": "number",
+            "description": "用户数量"
+          },
+          "resourceCount": {
+            "type": "number",
+            "description": "资源数量"
           }
         },
-        "required": ["id", "roleName", "roleCode"]
+        "required": ["id", "roleName", "roleCode", "userCount", "resourceCount"]
       },
       "RolePageDto": {
         "type": "object",
@@ -5586,9 +5594,17 @@
           "deletedAt": {
             "type": "string",
             "description": "删除时间"
+          },
+          "userIds": {
+            "type": "string",
+            "description": "用户id列表"
+          },
+          "resourceIds": {
+            "type": "string",
+            "description": "资源id列表"
           }
         },
-        "required": ["id", "roleName", "roleCode"]
+        "required": ["id", "roleName", "roleCode", "userIds", "resourceIds"]
       },
       "RoleListRespDto": {
         "type": "object",
@@ -5614,14 +5630,6 @@
       "RoleCreateDto": {
         "type": "object",
         "properties": {
-          "roleName": {
-            "type": "string",
-            "description": "角色名称"
-          },
-          "roleCode": {
-            "type": "string",
-            "description": "角色编码"
-          },
           "status": {
             "type": "string",
             "description": "状态：0-禁用，1-启用"
@@ -5637,9 +5645,27 @@
           "deletedAt": {
             "type": "string",
             "description": "删除时间"
+          },
+          "roleName": {
+            "type": "string",
+            "description": "角色名称"
+          },
+          "roleCode": {
+            "type": "string",
+            "description": "角色编码"
+          },
+          "userIds": {
+            "type": "string",
+            "description": "用“,”拼接的id",
+            "example": ""
+          },
+          "resourceIds": {
+            "type": "string",
+            "description": "用“,”拼接的id",
+            "example": ""
           }
         },
-        "required": ["roleName", "roleCode"]
+        "required": ["roleName", "roleCode", "userIds", "resourceIds"]
       },
       "RoleUpdateDto": {
         "type": "object",
@@ -5667,9 +5693,19 @@
           "deletedAt": {
             "type": "string",
             "description": "删除时间"
+          },
+          "userIds": {
+            "type": "string",
+            "description": "用“,”拼接的id",
+            "example": ""
+          },
+          "resourceIds": {
+            "type": "string",
+            "description": "用“,”拼接的id",
+            "example": ""
           }
         },
-        "required": ["roleName", "roleCode"]
+        "required": ["roleName", "roleCode", "userIds", "resourceIds"]
       }
     }
   }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Form, Spin } from 'antd'
 import { SmartForm, SmartFormEditMode } from '@/components/common'
 import { serializeFormValues } from '@/components/common/smart-utils'
@@ -22,13 +22,52 @@ export const RoleFormContainer: React.FC<RoleFormContainerProps> = ({
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [dynamicSchema] = useState(getRoleFormSchema())
+  const [initialValues, setInitialValues] = useState<
+    Omit<Backend.RoleRespDto, 'userIds' | 'resourceIds'> & {
+      resourceIds: number[]
+      userIds: number[]
+    }
+  >()
+
+  const transformResData2Form = useCallback(
+    (data: Backend.RoleRespDto) => {
+      const formData = filterObjectKeys(data, Object.keys(dynamicSchema)) as Backend.RoleRespDto
+      return {
+        ...formData,
+        resourceIds: formData.resourceIds
+          ? formData.resourceIds.split(',').map((id) => Number(id))
+          : [],
+        userIds: formData.userIds ? formData.userIds.split(',').map((id) => Number(id)) : [],
+      }
+    },
+    [dynamicSchema],
+  )
 
   useEffect(() => {
-    if (drawerData) {
-      const result = filterObjectKeys(drawerData, Object.keys(dynamicSchema))
-      form.setFieldsValue(result)
+    let isMounted = true
+
+    const fetchData = async () => {
+      if ((mode === 'edit' || mode === 'view') && drawerData?.id) {
+        setLoading(true)
+        try {
+          const res = await roleApi.findById(drawerData.id)
+          if (isMounted) {
+            const tempInitialValues = transformResData2Form(res.data)
+            setInitialValues(tempInitialValues)
+            form.setFieldsValue(tempInitialValues)
+          }
+        } finally {
+          if (isMounted) setLoading(false)
+        }
+      }
     }
-  }, [drawerData, form, dynamicSchema])
+
+    fetchData()
+
+    return () => {
+      isMounted = false
+    }
+  }, [drawerData, mode, form, transformResData2Form])
 
   /**
    * 将表单数据转化为请求入参
@@ -39,8 +78,11 @@ export const RoleFormContainer: React.FC<RoleFormContainerProps> = ({
     // 转化日期格式
     const params = serializeFormValues(values, dynamicSchema)
     // 将 params中的地址进行格式化
-    if (params.address) {
-      params.address = JSON.stringify(params.address)
+    if (params.userIds) {
+      params.userIds = params.userIds.join()
+    }
+    if (params.resourceIds) {
+      params.resourceIds = params.resourceIds.join()
     }
     return params
   }
@@ -68,7 +110,7 @@ export const RoleFormContainer: React.FC<RoleFormContainerProps> = ({
     <Spin spinning={loading}>
       <SmartForm
         form={form}
-        initialValues={drawerData}
+        initialValues={initialValues}
         schema={dynamicSchema}
         mode={mode}
         onFinish={handleFinish}

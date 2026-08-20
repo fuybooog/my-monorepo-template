@@ -21,7 +21,6 @@ export default [
       'prefer-const': 'off',
     },
   },
-
   {
     files: ['apps/backend-api/**/*.ts'],
     rules: {

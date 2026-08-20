@@ -90,7 +90,7 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
   // 渲染单个按钮
   const renderButton = (action: CustomAction<RecordType>) => {
     // 1. 提取自定义字段，剩余作为原生按钮属性
-    const { key, label, icon, disabled, hidden, onClick, ...nativeProps } = action
+    const { key, label, icon, disabled, hidden: _hidden, onClick, ...nativeProps } = action
 
     // 2. 计算 disabled 值（可能是函数）
     const finalDisabled = typeof disabled === 'function' ? disabled(record) : disabled
@@ -113,7 +113,7 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
           type="link"
           icon={<EditOutlined />}
           {...buttonNativeProps}
-          onClick={() => onEdit?.(record)}
+          onClick={() => (onClick || onEdit)?.(record)}
         >
           {onlyIcon ? '' : label}
         </Button>
@@ -126,7 +126,7 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
         <Popconfirm
           title={action.popTitle || '确认删除'}
           description={action.popDescription || '确定要删除该条数据吗？此操作不可撤销。'}
-          onConfirm={() => onDelete?.(record)}
+          onConfirm={() => (onClick || onDelete)?.(record)}
           okText="确定"
           cancelText="取消"
         >
