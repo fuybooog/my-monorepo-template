@@ -3,7 +3,7 @@ import { Backend } from '@repo/types'
 import { useCallback, useRef, useState } from 'react'
 import resourceApi from '../api/resource'
 import { ERROR_MESSAGE, SUCCESS_MESSAGE } from '@/constants'
-import { arrayToTreeWithMeta, getMessage } from '@/utils'
+import { arrayToTree, arrayToTreeWithMeta, getMessage } from '@/utils'
 import { ResourcePageRespDto } from '../types'
 
 export function useResourceList() {
@@ -19,27 +19,53 @@ export function useResourceList() {
   const [resourceParentMap, setResourceParentMap] = useState<
     Map<string | number, ResourcePageRespDto>
   >(new Map())
+
+  const [resourceOriginTree, setResourceOriginTree] = useState<ResourcePageRespDto[]>([])
+  const [resourceOriginNodeMap, setResourceOriginNodeMap] = useState<
+    Map<string | number, ResourcePageRespDto>
+  >(new Map())
+  const [resourceOriginIdNodeMap, setResourceOriginIdNodeMap] = useState<
+    Map<string | number, ResourcePageRespDto>
+  >(new Map())
+  const [resourceOriginParentMap, setResourceOriginParentMap] = useState<
+    Map<string | number, ResourcePageRespDto>
+  >(new Map())
+
   const smartTable = useRef<SmartTableInstance>(null)
 
   const refreshTable = useCallback(() => {
     smartTable.current?.refresh(true)
   }, [])
 
-  const handleFetchData = useCallback(async (params: Backend.ResourcePageDto) => {
+  const handleFetchData = useCallback(async (params?: Backend.ResourcePageDto) => {
     const res = await resourceApi.list({
-      ...params,
+      ...(params || {}),
     })
-    setOriginList(res.data.list)
-    const { tree, parentMap, nodeMap, idNodeMap } = arrayToTreeWithMeta(res.data.list, {
+    const originData = res.data.list
+    setOriginList(originData)
+    const treeConfig = {
       idKey: 'uniqueProp',
       parentKey: 'parentUniqueProp',
-    })
+    } as const
+    const { tree, parentMap, nodeMap, idNodeMap } = arrayToTreeWithMeta(originData, treeConfig)
+    const {
+      tree: originTree,
+      parentMap: originParentMap,
+      nodeMap: originNodeMap,
+      idNodeMap: originIdNodeMap,
+    } = arrayToTree(originData, treeConfig)
     setResourceTree(tree)
     setResourceNodeMap(nodeMap)
     setResourceIdNodeMap(idNodeMap)
     setResourceParentMap(parentMap)
+
+    setResourceOriginTree(originTree)
+    setResourceOriginNodeMap(originNodeMap)
+    setResourceOriginIdNodeMap(originIdNodeMap)
+    setResourceOriginParentMap(originParentMap)
     return {
       data: tree,
+      originData,
       idNodeMap,
       parentMap,
       total: 99999,
@@ -76,6 +102,10 @@ export function useResourceList() {
     resourceIdNodeMap,
     resourceNodeMap,
     resourceParentMap,
+    resourceOriginTree,
+    resourceOriginIdNodeMap,
+    resourceOriginNodeMap,
+    resourceOriginParentMap,
     searchParams,
     setSearchParams,
     smartTable,

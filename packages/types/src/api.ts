@@ -1415,6 +1415,8 @@ export interface components {
       page?: number
       /** @description 每页条数 */
       pageSize?: number
+      /** @description 关键词 */
+      keyword?: string
       /** @description 用户名 */
       userName?: string
       /**
@@ -2380,6 +2382,8 @@ export interface operations {
         page?: number
         /** @description 每页条数 */
         pageSize?: number
+        /** @description 关键词 */
+        keyword?: string
         /** @description 用户名 */
         userName?: string
         /** @description 生日日期开始 */

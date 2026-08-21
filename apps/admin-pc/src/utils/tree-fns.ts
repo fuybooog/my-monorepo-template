@@ -478,3 +478,38 @@ function matchField(nodeValue: any, targetValue: any): boolean {
   }
   return nodeValue === targetValue
 }
+export function filterRealCheckedKeys(allKeys: React.Key[], treeData: any[]): React.Key[] {
+  const checkedKeySet = new Set(allKeys)
+  const realCheckedKeys: React.Key[] = []
+
+  function checkNode(node: any): boolean {
+    // 1. 改为获取 node.id (兼容 node.key)
+    const key = node.id ?? node.key
+
+    const children = node.children || []
+
+    // 2. 如果是叶子节点
+    if (children.length === 0) {
+      if (checkedKeySet.has(key)) {
+        realCheckedKeys.push(key)
+        return true
+      }
+      return false
+    }
+
+    // 3. 如果是父节点，递归检查子节点
+    const childrenStatus = children.map((child: any) => checkNode(child))
+    const isAllChildrenChecked = childrenStatus.every((status: boolean) => status === true)
+
+    // 只有当父节点本身在列表里，且“所有子节点也都全选”时，才视该父节点为全选
+    if (checkedKeySet.has(key) && isAllChildrenChecked) {
+      realCheckedKeys.push(key)
+      return true
+    }
+
+    return isAllChildrenChecked
+  }
+
+  treeData.forEach((node) => checkNode(node))
+  return realCheckedKeys
+}

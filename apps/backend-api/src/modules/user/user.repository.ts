@@ -1,4 +1,4 @@
-import { DataSource, EntityManager, getMetadataArgsStorage, Repository } from 'typeorm'
+import { Brackets, DataSource, EntityManager, getMetadataArgsStorage, Repository } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 import { User } from '@/modules/user/entities/user.entity'
 import { UserPageDto } from '@/modules/user/dto/user.page.dto'
@@ -13,11 +13,19 @@ export class UserRepository extends Repository<User> {
   }
 
   async searchUsersByPage(query: UserPageDto) {
-    const { page = 1, pageSize = 10, userName, sort, status, birthStart, birthEnd } = query
+    const { page = 1, pageSize = 10, userName, sort, status, birthStart, birthEnd, keyword } = query
 
     const qb = this.createQueryBuilder('user')
-
-    if (userName) {
+    if (keyword) {
+      qb.andWhere(
+        new Brackets((qb) => {
+          qb.where('user.userName LIKE :keyword', { keyword: `%${keyword}%` }).orWhere(
+            'user.email LIKE :keyword',
+            { keyword: `%${keyword}%` },
+          )
+        }),
+      )
+    } else if (userName) {
       qb.andWhere('user.userName LIKE :userName', { userName: `%${userName}%` })
     }
     if (status) {

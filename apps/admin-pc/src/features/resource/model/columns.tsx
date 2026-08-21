@@ -47,7 +47,7 @@ export const getResourceColumns = (callbacks: {
       title: '包含按钮',
       dataIndex: 'buttons',
       key: 'buttons',
-      width: 120,
+      width: 220,
       render: (buttons?: MetaTreeNode[]) => {
         if (!buttons || buttons.length === 0) return <span style={{ color: '#ccc' }}>-</span>
         return (

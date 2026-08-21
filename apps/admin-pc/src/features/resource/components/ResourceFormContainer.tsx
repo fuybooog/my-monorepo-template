@@ -125,6 +125,7 @@ export const ResourceFormContainer: React.FC<ResourceFormContainerProps> = ({
         await userApi.create({
           ...cleanParams,
           sortNumber: (sameLevelList?.length ?? 0) + 1,
+          status: '1',
         } as Backend.ResourceCreateDto)
         getMessage().success('创建资源成功')
       } else if (formType === 'edit') {

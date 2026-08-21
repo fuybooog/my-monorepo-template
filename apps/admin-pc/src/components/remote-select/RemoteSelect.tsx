@@ -5,10 +5,10 @@ import debounce from 'lodash-es/debounce'
 export interface RemoteSelectOption {
   label: React.ReactNode
   value: string | number
-  [key: string]: unknown
+  [key: string]: any
 }
 
-export interface RemoteSelectProps<T = Record<string, unknown>> extends Omit<
+export interface RemoteSelectProps<T = any> extends Omit<
   SelectProps,
   'options' | 'onSearch' | 'fieldNames'
 > {
@@ -16,28 +16,24 @@ export interface RemoteSelectProps<T = Record<string, unknown>> extends Omit<
     keyword: string
     page: number
     pageSize: number
-    signal?: AbortSignal
-    [key: string]: unknown
-  }) => Promise<{
-    list: T[]
-    total: number
-  }>
-  fetchByIdsApi?: (ids: number[]) => Promise<T[]>
+    [key: string]: any
+  }) => Promise<{ list: T[]; total: number }>
+  fetchByIdsApi?: (ids: (string | number)[]) => Promise<T[]>
   fieldNames?: {
-    label?: keyof T | ((item: T) => React.ReactNode)
-    value?: keyof T
+    label?: string | ((item: T) => React.ReactNode)
+    value?: string
   }
-  extraParams?: Record<string, unknown>
+  extraParams?: Record<string, any>
   pageSize?: number
   debounceTimeout?: number
 }
 
-export function RemoteSelect<T extends Record<string, unknown> = Record<string, unknown>>({
+export function RemoteSelect<T = any>({
   value,
   onChange,
   fetchApi,
   fetchByIdsApi,
-  fieldNames = { label: 'name' as keyof T, value: 'id' as keyof T },
+  fieldNames = { label: 'name', value: 'id' },
   extraParams = {},
   pageSize = 20,
   debounceTimeout = 300,
@@ -51,36 +47,30 @@ export function RemoteSelect<T extends Record<string, unknown> = Record<string, 
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
 
-  // 1. Refs 用于处理竞态、回显缓存和挂载状态
-  const abortControllerRef = useRef<AbortController | null>(null)
   const echoLoadedIdsRef = useRef<Set<string | number>>(new Set())
   const isMountedRef = useRef(true)
 
-  // 格式化 Option
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
   const formatOption = useCallback(
     (item: T): RemoteSelectOption => {
-      const valKey = (fieldNames.value || 'id') as keyof T
-      const val = item[valKey] as string | number
-
-      const labelKey = (fieldNames.label || 'name') as keyof T
+      const val = (item as any)[fieldNames.value || 'id']
       const label =
         typeof fieldNames.label === 'function'
           ? fieldNames.label(item)
-          : (item[labelKey] as React.ReactNode)
-
+          : (item as any)[fieldNames.label || 'name']
       return { ...item, label, value: val }
     },
     [fieldNames],
   )
 
-  // 2. 核心加载逻辑
   const loadData = useCallback(
     async (searchKey: string, pageNum: number, isAppend = false) => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
-      }
-      abortControllerRef.current = new AbortController()
-
       setLoading(true)
       setIsError(false)
 
@@ -90,7 +80,6 @@ export function RemoteSelect<T extends Record<string, unknown> = Record<string, 
           page: pageNum,
           pageSize,
           ...extraParams,
-          signal: abortControllerRef.current.signal,
         })
 
         if (!isMountedRef.current) return
@@ -105,11 +94,8 @@ export function RemoteSelect<T extends Record<string, unknown> = Record<string, 
         })
 
         setHasMore(pageNum * pageSize < (res?.total || 0))
-      } catch (error: unknown) {
-        if (
-          error instanceof Error &&
-          (error.name === 'CanceledError' || error.name === 'AbortError')
-        ) {
+      } catch (error: any) {
+        if (error?.name === 'CanceledError' || error?.name === 'AbortError') {
           return
         }
         if (isMountedRef.current) {
@@ -124,42 +110,38 @@ export function RemoteSelect<T extends Record<string, unknown> = Record<string, 
     [fetchApi, extraParams, pageSize, formatOption],
   )
 
-  // 3. 始终保存最新的 loadData 函数
+  // 同步最新 loadData 到 ref
   const loadDataRef = useRef(loadData)
   useEffect(() => {
     loadDataRef.current = loadData
   }, [loadData])
 
-  // 4. 防抖执行逻辑（将 `.current` 的读取完全延迟到事件触发执行时，不在渲染期读取）
-  const debouncedSearchRef = useRef<ReturnType<typeof debounce> | null>(null)
+  // 防抖函数修复
+  type DebouncedSearch = ((val: string) => void) & { cancel?: () => void }
+  const debouncedSearchRef = useRef<DebouncedSearch | null>(null)
 
   useEffect(() => {
     debouncedSearchRef.current = debounce((val: string) => {
+      setKeyword(val)
+      setPage(1)
       loadDataRef.current(val, 1, false)
     }, debounceTimeout)
 
     return () => {
-      debouncedSearchRef.current?.cancel()
+      debouncedSearchRef.current?.cancel?.()
     }
   }, [debounceTimeout])
 
   const handleSearch = useCallback((val: string) => {
-    setKeyword(val)
-    setPage(1)
     debouncedSearchRef.current?.(val)
   }, [])
 
-  // 5. 组件卸载清理
+  // 首次挂载触发一次空搜索
   useEffect(() => {
-    isMountedRef.current = true
-    return () => {
-      isMountedRef.current = false
-      abortControllerRef.current?.abort()
-      debouncedSearchRef.current?.cancel()
-    }
-  }, [])
+    handleSearch('')
+  }, [handleSearch])
 
-  // 6. 严谨的回显逻辑
+  // 回显逻辑保持不变
   useEffect(() => {
     if (!value || !fetchByIdsApi) return
     const valueArray = (Array.isArray(value) ? value : [value]).filter(
@@ -184,12 +166,11 @@ export function RemoteSelect<T extends Record<string, unknown> = Record<string, 
           return [...uniqueNew, ...prev]
         })
       })
-      .catch((err: unknown) => {
+      .catch((err) => {
         console.error('[RemoteSelect] Echo fetch failed:', err)
       })
   }, [value, fetchByIdsApi, options, formatOption])
 
-  // 7. 下拉展开与触底翻页处理
   const handleDropdownVisibleChange = (open: boolean) => {
     if (open && options.length === 0 && !loading && !isError) {
       loadData('', 1, false)
@@ -205,7 +186,6 @@ export function RemoteSelect<T extends Record<string, unknown> = Record<string, 
     }
   }
 
-  // 8. 异常与空状态渲染
   const renderNotFound = () => {
     if (loading) {
       return (
@@ -246,4 +226,5 @@ export function RemoteSelect<T extends Record<string, unknown> = Record<string, 
     />
   )
 }
+
 RemoteSelect.displayName = 'RemoteSelect'

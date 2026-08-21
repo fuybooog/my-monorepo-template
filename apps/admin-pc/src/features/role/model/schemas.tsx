@@ -2,6 +2,7 @@ import { SmartSchema } from '@/components/common'
 import { Select } from 'antd'
 import { defaultStatusList } from '@/constants'
 import { UserSelect } from '@/components/remote-select/UserSelect'
+import ResourceTree from '../components/ResourceTree'
 
 export const roleSearchSchema: SmartSchema = {
   roleName: {
@@ -42,6 +43,14 @@ export const getRoleFormSchema = (): SmartSchema => {
       },
       colProps: { span: 24 },
       widget: UserSelect,
+    },
+    resourceIds: {
+      title: '选择资源',
+      itemProps: {
+        rules: [{ required: true, message: '请选择资源' }],
+      },
+      colProps: { span: 24 },
+      widget: ResourceTree,
     },
   }
 }

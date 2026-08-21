@@ -8,6 +8,10 @@ export class UserPageDto extends IntersectionType(
   OmitType(UserBaseDto, ['id', 'userName'] as const),
   PaginationQueryDto,
 ) {
+  @ApiPropertyOptional({ description: '关键词', type: String })
+  @IsOptional()
+  @IsString()
+  keyword?: string
   @ApiPropertyOptional({ description: '用户名', type: String })
   @IsOptional()
   @IsString()

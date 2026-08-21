@@ -331,6 +331,15 @@
             }
           },
           {
+            "name": "keyword",
+            "required": false,
+            "in": "query",
+            "description": "关键词",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "userName",
             "required": false,
             "in": "query",
@@ -4264,6 +4273,10 @@
           "pageSize": {
             "type": "number",
             "description": "每页条数"
+          },
+          "keyword": {
+            "type": "string",
+            "description": "关键词"
           },
           "userName": {
             "type": "string",
