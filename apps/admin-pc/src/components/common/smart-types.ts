@@ -191,6 +191,8 @@ export interface CustomAction<RecordType> extends Omit<
   onClick?: (record: RecordType) => void // 自定义 onClick，带 record
   popTitle?: string
   popDescription?: string
+  permission?: string[]
+  permissionMode?: 'AND' | 'OR' | 'NOT'
 }
 
 export type ActionItem<RecordType> = PresetAction | CustomAction<RecordType>

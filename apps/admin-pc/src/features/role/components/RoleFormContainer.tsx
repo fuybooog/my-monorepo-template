@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Form, Spin } from 'antd'
 import { SmartForm, SmartFormEditMode } from '@/components/common'
 import { serializeFormValues } from '@/components/common/smart-utils'
@@ -21,13 +21,26 @@ export const RoleFormContainer: React.FC<RoleFormContainerProps> = ({
 }) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
-  const [dynamicSchema] = useState(getRoleFormSchema())
   const [initialValues, setInitialValues] = useState<
     Omit<Backend.RoleRespDto, 'userIds' | 'resourceIds'> & {
       resourceIds: number[]
       userIds: number[]
     }
   >()
+  const dynamicSchema = useMemo(() => {
+    const schema = getRoleFormSchema()
+    // 编辑时，角色编码禁止编辑
+    if (mode === 'edit') {
+      schema.roleCode = {
+        ...schema.roleCode,
+        props: {
+          ...schema.roleCode.props,
+          disabled: true,
+        },
+      }
+    }
+    return schema
+  }, [])
 
   const transformResData2Form = useCallback(
     (data: Backend.RoleRespDto) => {

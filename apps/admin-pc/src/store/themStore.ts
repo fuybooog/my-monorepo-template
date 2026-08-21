@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { create } from '@/store/store.util'
 
 export type ThemeMode = 'system' | 'light' | 'dark'
 
@@ -49,4 +49,4 @@ export const useThemeStore = create<ThemeState>((set, get) => {
       set({ mode: newMode, resolvedTheme: nextResolved })
     },
   }
-})
+}, 'ThemeStore')

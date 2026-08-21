@@ -3,6 +3,7 @@ import { Space, Button, Dropdown, Popconfirm } from 'antd'
 import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons'
 import type { ActionColumnConfig, CustomAction } from './smart-types'
 import type { ButtonProps } from 'antd'
+import { useAuthStore } from '@/store/authStore'
 
 export interface SmartTableButtonsProps<RecordType> {
   record: RecordType
@@ -76,6 +77,11 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
   const visibleActions = useMemo(() => {
     return allActions.filter((action) => {
       if (typeof action.hidden === 'function') return !action.hidden(record)
+      if (action.permission?.length) {
+        if (!useAuthStore().hasPermission(action.permission, action.permissionMode)) {
+          return false
+        }
+      }
       return !action.hidden
     })
   }, [allActions, record])

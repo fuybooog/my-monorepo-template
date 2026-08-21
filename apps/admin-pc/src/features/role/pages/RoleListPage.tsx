@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Drawer, Form } from 'antd'
 import { PageLayout } from '@/components/PageLayout'
-import { SmartTable, SmartForm, SmartFormEditMode } from '@/components/common'
+import { SmartTable, SmartForm, SmartFormEditMode, ActionItem } from '@/components/common'
 import { Backend } from '@repo/types'
 import { RoleFormContainer } from '../components/RoleFormContainer'
 import { roleSearchSchema, getRoleColumns } from '../model'
@@ -9,6 +9,7 @@ import { useDrawer } from '@/hooks/useDrawer'
 import { useRoleList } from '../hooks/useRoleList'
 import roleApi from '../api/role'
 import { PERMISSIONS } from '@repo/shared'
+import { isAdmin } from '@/utils'
 
 const formTitleMap = { create: '新增角色', edit: '编辑角色', view: '角色详情' }
 export function RoleListPage() {
@@ -58,18 +59,20 @@ export function RoleListPage() {
     openDrawer(mode, record)
   }
 
-  const editButton = (record: Backend.RolePageRespDto) => ({
+  const editButton = (record: Backend.RolePageRespDto): ActionItem<Backend.RolePageRespDto> => ({
     key: 'edit',
     label: '编辑',
     onClick: () => onEdit(record),
     permission: [PERMISSIONS.SYS_ROLE_LIST_EDIT],
+    hidden: (record) => isAdmin(record.roleCode),
   })
 
-  const deleteButton = (record: Backend.RolePageRespDto) => ({
+  const deleteButton = (record: Backend.RolePageRespDto): ActionItem<Backend.RolePageRespDto> => ({
     key: 'delete',
     label: '删除',
     onClick: () => onDelete(record),
     permission: [PERMISSIONS.SYS_ROLE_LIST_DELETE],
+    hidden: (record: Backend.RolePageRespDto) => isAdmin(record.roleCode),
   })
 
   return (

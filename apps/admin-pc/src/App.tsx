@@ -19,6 +19,8 @@ function App() {
   return (
     <ConfigProvider
       locale={zhCN}
+      drawer={{ mask: { closable: false } }}
+      modal={{ mask: { closable: false } }}
       theme={{
         algorithm: theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
       }}

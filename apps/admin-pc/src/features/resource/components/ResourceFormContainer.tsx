@@ -30,7 +30,7 @@ export const ResourceFormContainer: React.FC<ResourceFormContainerProps> = ({
   const [form] = Form.useForm()
 
   const dynamicSchema = useMemo(() => {
-    let filterdOptions = [...typeList]
+    let filteredOptions = [...typeList]
     const schema = getResourceFormSchema()
     if (formType === 'createSub' && drawerData) {
       const parentType = drawerData.type
@@ -42,15 +42,15 @@ export const ResourceFormContainer: React.FC<ResourceFormContainerProps> = ({
       } else {
         allowedTypes = []
       }
-      filterdOptions = typeList.filter((typeItem) => allowedTypes.includes(typeItem.id))
+      filteredOptions = typeList.filter((typeItem) => allowedTypes.includes(typeItem.id))
     } else if (formType === 'createLast' || formType === 'createPrev' || formType === 'copyPrev') {
-      filterdOptions = typeList.filter((typeItem) => ['0', '1'].includes(typeItem.id))
+      filteredOptions = typeList.filter((typeItem) => ['0', '1'].includes(typeItem.id))
     }
     schema.type = {
       ...schema.type,
       props: {
         ...schema.type.props,
-        options: filterdOptions,
+        options: filteredOptions,
         disabled: mode === 'edit',
       },
     }
