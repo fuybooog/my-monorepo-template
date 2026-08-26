@@ -165,11 +165,11 @@ export class AuthService {
       throw new UnauthorizedException('用户已被禁用')
     }
     let roleCodes: string[] = []
+    let maxLevel: number = 0
     if (user.roleIds && user.roleIds.length > 0) {
-      roleCodes =
-        (await this.roleService.findRoleListByIds(user.roleIds.join()))?.list?.map(
-          (role) => role.roleCode!,
-        ) || []
+      const roleListRel = await this.roleService.findRoleListByIds(user.roleIds.join())
+      roleCodes = roleListRel?.list?.map((role) => role.roleCode!) || []
+      maxLevel = Math.max(...(roleListRel?.list?.map((role) => role.level || 0) || [0]))
     }
     let permissions: string[] = []
     if (roleCodes.length > 0 && roleCodes.includes('admin')) {
@@ -184,6 +184,7 @@ export class AuthService {
       userName: user!.userName!,
       nickName: user!.nickName!,
       roleCodes: roleCodes.join(),
+      maxLevel,
       permissions: permissions.join(),
     }
     const jwtToken = this.jwtService.sign(payload)

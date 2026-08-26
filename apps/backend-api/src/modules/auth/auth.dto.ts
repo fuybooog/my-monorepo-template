@@ -48,6 +48,8 @@ export class CurrentLoginResponseDto {
   userName!: string
   @ApiProperty({ description: '昵称', example: 'testName' })
   nickName!: string
+  @ApiProperty({ description: '最高角色等级', example: '10' })
+  maxLevel!: number
   @ApiProperty({ description: '用户角色列表', example: '[1, 2]' })
   roleCodes?: string[]
   @ApiProperty({ description: '用户权限列表', example: '["sys:user:delete"]' })

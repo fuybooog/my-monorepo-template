@@ -17,6 +17,7 @@ export default [
       '**/remote-select/RemoteSelect.tsx',
       '**/components/ResourceTree.tsx',
       '**/store/store.util.ts',
+      '**/common/SmartForm.tsx',
     ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off', // 针对这些文件关闭 any 校验

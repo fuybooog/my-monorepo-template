@@ -16,6 +16,11 @@ export class RoleBaseDto {
   @IsOptional()
   roleCode?: string
 
+  @ApiProperty({ description: '角色等级', type: Number })
+  @IsInt()
+  @IsOptional()
+  level?: number
+
   @ApiPropertyOptional({ description: '状态：0-禁用，1-启用', type: String })
   @IsString()
   @IsOptional()

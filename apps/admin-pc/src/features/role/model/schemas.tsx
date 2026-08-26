@@ -1,5 +1,5 @@
 import { SmartSchema } from '@/components/common'
-import { Select } from 'antd'
+import { InputNumber, Select } from 'antd'
 import { defaultStatusList } from '@/constants'
 import { UserSelect } from '@/components/remote-select/UserSelect'
 import ResourceTree from '../components/ResourceTree'
@@ -33,6 +33,14 @@ export const getRoleFormSchema = (): SmartSchema => {
       title: '角色编码',
       itemProps: {
         rules: [{ required: true, message: '请输入角色编码' }],
+      },
+      colProps: { span: 12 },
+    },
+    level: {
+      title: '角色等级',
+      widget: InputNumber,
+      itemProps: {
+        rules: [{ required: true, message: '请输入角色等级' }],
       },
       colProps: { span: 12 },
     },

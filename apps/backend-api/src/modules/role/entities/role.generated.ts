@@ -40,6 +40,12 @@ export class RoleGenerated {
   })
   roleCode: string
 
+  @Column('int', {
+    name: 'level',
+    comment: '角色等级',
+  })
+  level: number
+
   @Column('varchar', {
     name: 'status',
     nullable: true,

@@ -212,6 +212,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/user/findRolesByUserId/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 按id查询角色 */
+    get: operations['UserController_findRolesByUserId']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/user/assignRolesToUser/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 按id查询角色 */
+    post: operations['UserController_assignRolesToUser']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/user/batch/query': {
     parameters: {
       query?: never
@@ -1432,6 +1466,11 @@ export interface components {
        */
       nickName: string
       /**
+       * @description 最高角色等级
+       * @example 10
+       */
+      maxLevel: number
+      /**
        * @description 用户角色列表
        * @example [1, 2]
        */
@@ -1643,6 +1682,14 @@ export interface components {
       /** @description 角色id */
       roleIds: number
     }
+    FindRolesByUserIdResp: {
+      /** @description 角色id列表 */
+      list: number[]
+    }
+    AssignRolesToUserDto: {
+      /** @description 角色id列表 */
+      roleIds: number[]
+    }
     UserListRespDto: {
       /**
        * @description 未找到的id数组
@@ -1790,6 +1837,8 @@ export interface components {
       roleName: string
       /** @description 角色编码 */
       roleCode: string
+      /** @description 角色等级 */
+      level: number
       /** @description 状态：0-禁用，1-启用 */
       status?: string
       /** @description 创建时间 */
@@ -1808,6 +1857,8 @@ export interface components {
       roleName: string
       /** @description 角色编码 */
       roleCode: string
+      /** @description 角色等级 */
+      level: number
       /** @description 状态：0-禁用，1-启用 */
       status?: string
       /** @description 创建时间 */
@@ -1852,6 +1903,11 @@ export interface components {
        */
       keyword?: string
       /**
+       * @description 用户ID
+       * @example
+       */
+      userId?: number
+      /**
        * @description 返回的列表字段
        * @example
        */
@@ -1864,6 +1920,8 @@ export interface components {
       roleName: string
       /** @description 角色编码 */
       roleCode: string
+      /** @description 角色等级 */
+      level: number
       /** @description 状态：0-禁用，1-启用 */
       status?: string
       /** @description 创建时间 */
@@ -1884,9 +1942,11 @@ export interface components {
        */
       notFoundIds?: string[]
       /** @description 列表 */
-      list: string[]
+      list: components['schemas']['RoleRespDto'][]
     }
     RoleCreateDto: {
+      /** @description 角色等级 */
+      level: number
       /** @description 状态：0-禁用，1-启用 */
       status?: string
       /** @description 创建时间 */
@@ -1915,6 +1975,8 @@ export interface components {
       roleName: string
       /** @description 角色编码 */
       roleCode: string
+      /** @description 角色等级 */
+      level: number
       /** @description 状态：0-禁用，1-启用 */
       status?: string
       /** @description 创建时间 */
@@ -2734,6 +2796,59 @@ export interface operations {
       }
     }
   }
+  UserController_findRolesByUserId: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['FindRolesByUserIdResp']
+          }
+        }
+      }
+    }
+  }
+  UserController_assignRolesToUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AssignRolesToUserDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
   UserController_findUserListByIds: {
     parameters: {
       query: {
@@ -3075,6 +3190,8 @@ export interface operations {
         roleName: string
         /** @description 角色编码 */
         roleCode: string
+        /** @description 角色等级 */
+        level: number
         /** @description 状态：0-禁用，1-启用 */
         status?: string
         /** @description 创建时间 */
@@ -3162,6 +3279,8 @@ export interface operations {
         pageSize?: number
         /** @description 关键字 */
         keyword?: string
+        /** @description 用户ID */
+        userId?: number
         /** @description 返回的列表字段 */
         fields?: string
       }

@@ -5,6 +5,7 @@ export interface JwtPayload {
   userName: string
   nickName: string
   roleCodes: string
+  maxLevel: number
   permissions: string
 }
 declare module 'express' {

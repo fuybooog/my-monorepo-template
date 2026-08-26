@@ -11,6 +11,7 @@ import { UserService } from '@/modules/user/user.service'
 import bcrypt from 'bcrypt'
 import { RoleService } from '@/modules/role/role.service'
 import { RoleRepository } from '@/modules/role/role.repository'
+import { MAX_ROLE_LEVEL } from '@/constants'
 
 @Injectable()
 export class AuthInitService implements OnModuleInit {
@@ -76,21 +77,27 @@ export class AuthInitService implements OnModuleInit {
       this.logger.log(`超级管理员账号已更新密码，用户名: admin, 新密码: ${plainPassword}`)
     }
     // 角色
-    const roleRes = await this.roleService.pageRole({
-      roleCode: '"admin"', // 按 admin 精确查询
-      page: 1,
-      pageSize: 1,
-    })
+    const roleRes = await this.roleService.pageRole(
+      {
+        roleCode: '"admin"', // 按 admin 精确查询
+        page: 1,
+        pageSize: 1,
+      },
+      MAX_ROLE_LEVEL,
+    )
     let roleEntity
     if (roleRes.list.length === 1) {
       roleEntity = roleRes.list[0]
       this.logger.log(`超级管理员角色已存在`)
     } else {
-      roleEntity = await this.roleService.createRole({
-        roleCode: 'admin',
-        roleName: '超级管理员',
-        status: '1',
-      })
+      roleEntity = await this.roleService.createRole(
+        {
+          roleCode: 'admin',
+          roleName: '超级管理员',
+          status: '1',
+        },
+        MAX_ROLE_LEVEL,
+      )
       this.logger.log(`超级管理员角色已创建，角色编码: admin`)
     }
     // 关系

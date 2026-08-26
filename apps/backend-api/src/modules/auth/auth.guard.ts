@@ -63,6 +63,7 @@ export class AuthGuard implements CanActivate {
         id: Number(payload.sub),
         userName: payload.userName,
         nickName: payload.nickName,
+        maxLevel: Number(payload.maxLevel),
         roleCodes: payload.roleCodes?.split(',') || [],
         permissions: payload.permissions?.split(',') || [],
       }

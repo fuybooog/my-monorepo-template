@@ -9,6 +9,15 @@ const userApi = {
   findById(id: string | number): Promise<Backend.FindUserByIdRes> {
     return http.get('/user/find/' + id)
   },
+  findRolesByUserId(id: string | number): Promise<Backend.FindRolesByUserIdRes> {
+    return http.get('/user/findRolesByUserId/' + id)
+  },
+  assignRolesToUser(
+    id: number,
+    params: Backend.AssignRolesToUserDto,
+  ): Promise<Backend.AssignRolesToUserRes> {
+    return http.get('/user/assignRolesToUser/' + id, params)
+  },
   findByIds(ids: string): Promise<Backend.FindUserListByIdsRes> {
     return http.get('/user/batch/query', { ids })
   },

@@ -20,6 +20,8 @@ export namespace Backend {
   export type UserPageDto = components['schemas']['UserPageDto']
   export type UserPageOptionDto = components['schemas']['UserPageOptionDto']
   export type UserRespDto = components['schemas']['UserRespDto']
+  export type FindRolesByUserIdResp = components['schemas']['FindRolesByUserIdResp']
+  export type AssignRolesToUserDto = components['schemas']['AssignRolesToUserDto']
   export type UserListRespDto = components['schemas']['UserListRespDto']
   export type UserCreateDto = components['schemas']['UserCreateDto']
   export type UserUpdateDto = components['schemas']['UserUpdateDto']
@@ -176,6 +178,28 @@ export namespace Backend {
         }
       ? R
       : unknown
+
+  export type FindRolesByUserIdRes =
+    operations['UserController_findRolesByUserId']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['UserController_findRolesByUserId']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type AssignRolesToUserRes =
+    operations['UserController_assignRolesToUser']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['UserController_assignRolesToUser']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
 
   export type FindUserListByIdsRes =
     operations['UserController_findUserListByIds']['responses'] extends {

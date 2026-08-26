@@ -11,6 +11,7 @@ import userApi from '../api/user'
 import { useAuthStore } from '@/store/authStore'
 import { PERMISSIONS } from '@repo/shared'
 import { ResetPasswordDrawer } from '@/features/user/components/ResetPasswordDrawer'
+import { AssignRolesDrawer } from '@/features/user/components/AssignRolesDrawer'
 
 const formTitleMap = { create: '新增用户', edit: '编辑用户', view: '用户详情' }
 export function UserListPage() {
@@ -34,6 +35,7 @@ export function UserListPage() {
 
   const [form] = Form.useForm()
   const [resetVisible, setResetVisible] = useState<boolean>(false)
+  const [assignRolesVisible, setAssignRolesVisible] = useState<boolean>(false)
   const [userId, setUserId] = useState<number | null>(null)
 
   const columns = useMemo(
@@ -80,6 +82,19 @@ export function UserListPage() {
       },
     }
   }
+  const assignRolesButton = (): ActionItem<Backend.UserPageRespDto> => {
+    return {
+      key: 'assignRoles',
+      label: '分配角色',
+      hidden() {
+        return !useAuthStore.getState().hasPermission([PERMISSIONS.SYS_USER_LIST_ASSIGN_ROLE])
+      },
+      async onClick(record) {
+        setUserId(record.id)
+        setAssignRolesVisible(true)
+      },
+    }
+  }
 
   return (
     <PageLayout>
@@ -102,7 +117,7 @@ export function UserListPage() {
           onBatchDelete,
         }}
         actionColumn={{
-          buttons: () => ['edit', resetPasswordButton(), 'delete'],
+          buttons: () => ['edit', resetPasswordButton(), assignRolesButton(), 'delete'],
           onEdit,
           onDelete,
         }}
@@ -131,6 +146,11 @@ export function UserListPage() {
         onCancel={() => setResetVisible(false)}
         userId={userId!}
       ></ResetPasswordDrawer>
+      <AssignRolesDrawer
+        visible={assignRolesVisible}
+        onCancel={() => setAssignRolesVisible(false)}
+        userId={userId!}
+      ></AssignRolesDrawer>
     </PageLayout>
   )
 }

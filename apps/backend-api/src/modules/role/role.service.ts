@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
 
 import { RolePageRespDto } from '@/modules/role/dto/role.page.resp.dto'
 import { RolePageDto } from '@/modules/role/dto/role.page.dto'
@@ -15,16 +15,24 @@ import { DataSource, FindManyOptions, In, Not } from 'typeorm'
 import { Role } from '@/modules/role/entities/role.entity'
 import { BusinessException } from '@/exceptions/business-exception'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
+import { CurrentLoginResponseDto } from '@/modules/auth/auth.dto'
+import { MAX_ROLE_LEVEL } from '@/constants'
 
 @Injectable()
 export class RoleService {
-  static readonly SEARCHABLE_FIELDS = ['roleName']
+  static readonly SEARCHABLE_FIELDS = ['roleName, roleCode']
   constructor(
     private readonly roleRepository: RoleRepository,
     private readonly dataSource: DataSource,
   ) {}
-  async pageRole(rolePageDto: RolePageDto): Promise<PaginatedResult<RolePageRespDto>> {
-    const { list: entities, total } = await this.roleRepository.searchRolesByPage(rolePageDto)
+  async pageRole(
+    rolePageDto: RolePageDto,
+    maxLevel?: number,
+  ): Promise<PaginatedResult<RolePageRespDto>> {
+    const { list: entities, total } = await this.roleRepository.searchRolesByPage(
+      rolePageDto,
+      maxLevel,
+    )
     const list = plainToInstance(RolePageRespDto, entities, {
       excludeExtraneousValues: true,
     })
@@ -37,8 +45,9 @@ export class RoleService {
   }
   async pageOptionRole(
     rolePageOptionDto: RolePageOptionDto,
+    user: CurrentLoginResponseDto,
   ): Promise<PaginatedResult<RolePageRespDto>> {
-    const { keyword, fields, page, pageSize } = rolePageOptionDto
+    const { keyword, fields, page, pageSize, userId } = rolePageOptionDto
     const queryBuilder = this.roleRepository.createQueryBuilder('role')
     if (fields && fields.length) {
       const selectFields = fields.split(',').map((field) => `role.${field}`)
@@ -50,8 +59,20 @@ export class RoleService {
       )
       queryBuilder.andWhere(`(${where})`, { keyword: `%${keyword}%` })
     }
+    if (userId) {
+      queryBuilder.andWhere(
+        `EXISTS (SELECT 1 FROM system_user_role userRole WHERE userRole.role_id = role.id AND userRole.user_id = :userId)`,
+        { userId },
+      )
+    }
+    queryBuilder.andWhere('role.deletedAt IS NULL')
+    if (user.maxLevel !== MAX_ROLE_LEVEL) {
+      queryBuilder.andWhere('role.level < :maxLevel', {
+        maxLevel: user.maxLevel,
+      })
+    }
     const skip = (page - 1) * pageSize
-    queryBuilder.skip(skip).take(pageSize)
+    queryBuilder.skip(skip).take(pageSize).orderBy('role.id', 'ASC')
     const [resultList, total] = await queryBuilder.getManyAndCount()
     const list = plainToInstance(RolePageRespDto, resultList, {
       excludeExtraneousValues: true,
@@ -102,7 +123,11 @@ export class RoleService {
       notFoundIds,
     }
   }
-  async createRole(roleCreateDto: RoleCreateDto): Promise<RoleRespDto | null> {
+  async createRole(roleCreateDto: RoleCreateDto, maxLevel: number): Promise<RoleRespDto | null> {
+    // 角色的等级无法超过当前操作人的角色等级
+    if (roleCreateDto.level && roleCreateDto.level >= maxLevel) {
+      throw new UnauthorizedException('权限不足，无法创建角色等级过高的角色')
+    }
     return await this.dataSource.transaction(async (manager) => {
       try {
         const roleEntity = await this.roleRepository.createRole(roleCreateDto, manager)
@@ -125,13 +150,23 @@ export class RoleService {
       }
     })
   }
-  async updateRole(id: number, roleUpdateDto: RoleUpdateDto): Promise<RoleRespDto | null> {
+  async updateRole(
+    id: number,
+    roleUpdateDto: RoleUpdateDto,
+    user: CurrentLoginResponseDto,
+  ): Promise<RoleRespDto | null> {
+    if (roleUpdateDto.level && roleUpdateDto.level >= user.maxLevel) {
+      throw new UnauthorizedException('权限不足，无法修改角色等级过高的角色')
+    }
     return await this.dataSource.transaction(async (manager) => {
       const roleEntity = await this.roleRepository.findOne({
         where: { id },
       })
       if (!roleEntity) {
         throw new BusinessException(`未找到id为${id}的角色`)
+      }
+      if (roleEntity.level && roleEntity.level >= user.maxLevel) {
+        throw new UnauthorizedException('权限不足，无法修改角色等级过高的角色')
       }
       const updatedRoleEntity = await this.roleRepository.updateRole(
         roleEntity,
@@ -192,21 +227,28 @@ export class RoleService {
       return updatedRoleEntity
     })
   }
-  async removeRole(id: number): Promise<null> {
+  async removeRole(id: number, user: CurrentLoginResponseDto): Promise<null> {
     const roleEntity = await this.roleRepository.findOne({
       where: { id },
     })
     if (!roleEntity) {
       throw new BusinessException(`未找到id为${id}的角色`)
     }
+    if (roleEntity.level && roleEntity.level >= user.maxLevel) {
+      throw new UnauthorizedException('权限不足，无法删除角色等级过高的角色')
+    }
     return await this.dataSource.transaction(async (manager) => {
       await this.roleRepository.removeRole(roleEntity, manager)
       return null
     })
   }
-  async batchRemoveRole(ids: string): Promise<BatchRespDto | null> {
+  async batchRemoveRole(ids: string, user: CurrentLoginResponseDto): Promise<BatchRespDto | null> {
     const idList = ids.split(',').map((id) => Number.parseInt(id))
     const roles = await this.roleRepository.find({ where: { id: In(idList) } })
+    const maxLevel = Math.max(...roles.map((role) => role.level))
+    if (maxLevel >= user.maxLevel) {
+      throw new UnauthorizedException('权限不足，无法删除角色等级过高的角色')
+    }
     let missingIds: number[] = []
     if (roles.length !== ids.length) {
       missingIds = idList.filter((id) => !roles.some((role) => role.id === id))
@@ -218,12 +260,19 @@ export class RoleService {
       }
     })
   }
-  async updateRoleStatus(id: number, roleUpdateDto: UpdateStatusDto): Promise<null> {
+  async updateRoleStatus(
+    id: number,
+    roleUpdateDto: UpdateStatusDto,
+    user: CurrentLoginResponseDto,
+  ): Promise<null> {
     const roleEntity = await this.roleRepository.findOne({
       where: { id },
     })
     if (!roleEntity) {
       throw new BusinessException(`未找到id为${id}的角色`)
+    }
+    if (roleEntity.level >= user.maxLevel) {
+      throw new UnauthorizedException('权限不足，无法修改角色等级过高的角色')
     }
     return await this.dataSource.transaction(async (manager) => {
       await this.roleRepository.updateRoleStatus(roleEntity, roleUpdateDto.status, manager)
@@ -232,9 +281,14 @@ export class RoleService {
   }
   async batchUpdateRoleStatus(
     batchUpdateStatusDto: BatchUpdateStatusDto,
+    user: CurrentLoginResponseDto,
   ): Promise<BatchRespDto | null> {
     const idList = batchUpdateStatusDto.ids.split(',').map((id) => Number.parseInt(id))
     const roles = await this.roleRepository.find({ where: { id: In(idList) } })
+    const maxLevel = Math.max(...roles.map((role) => role.level))
+    if (maxLevel >= user.maxLevel) {
+      throw new UnauthorizedException('权限不足，无法修改角色等级过高的角色')
+    }
     let missingIds: number[] = []
     if (roles.length !== batchUpdateStatusDto.ids.length) {
       missingIds = idList.filter((id) => !roles.some((role) => role.id === id))

@@ -12,6 +12,8 @@ import { ApiOperation } from '@nestjs/swagger'
 import { ApiSuccessPageResponse, ApiSuccessResponse } from '@/decorators/api-response.decorator'
 import { BatchDto, BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
+import { CurrentUser } from '@/decorators/current-user.decorator'
+import { CurrentLoginResponseDto } from '@/modules/auth/auth.dto'
 
 @Controller('role')
 export class RoleController {
@@ -20,8 +22,11 @@ export class RoleController {
   @Get('page')
   @ApiOperation({ summary: '分页查询角色列表' })
   @ApiSuccessPageResponse(RolePageRespDto)
-  async pageRole(@Query() query: RolePageDto): Promise<PaginatedResult<RolePageRespDto>> {
-    return await this.roleService.pageRole(query)
+  async pageRole(
+    @Query() query: RolePageDto,
+    @CurrentUser() user: CurrentLoginResponseDto,
+  ): Promise<PaginatedResult<RolePageRespDto>> {
+    return await this.roleService.pageRole(query, user.maxLevel)
   }
 
   @Post('schema-generator-holder-page-role')
@@ -36,8 +41,9 @@ export class RoleController {
   @ApiSuccessPageResponse(RolePageRespDto)
   async pageOptionRole(
     @Query() query: RolePageOptionDto,
+    @CurrentUser() user: CurrentLoginResponseDto,
   ): Promise<PaginatedResult<Partial<RolePageRespDto>>> {
-    return await this.roleService.pageOptionRole(query)
+    return await this.roleService.pageOptionRole(query, user)
   }
 
   @Post('schema-generator-holder-page-option-role')
@@ -65,8 +71,11 @@ export class RoleController {
   @Post('create')
   @ApiOperation({ summary: '创建角色' })
   @ApiSuccessResponse(RoleRespDto)
-  async createRole(@Body() body: RoleCreateDto): Promise<RoleRespDto | null> {
-    return await this.roleService.createRole(body)
+  async createRole(
+    @Body() body: RoleCreateDto,
+    @CurrentUser() user: CurrentLoginResponseDto,
+  ): Promise<RoleRespDto | null> {
+    return await this.roleService.createRole(body, user.maxLevel)
   }
 
   @Post('update/:id')
@@ -75,36 +84,47 @@ export class RoleController {
   async updateRole(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: RoleUpdateDto,
+    @CurrentUser() user: CurrentLoginResponseDto,
   ): Promise<RoleRespDto | null> {
-    return await this.roleService.updateRole(id, body)
+    return await this.roleService.updateRole(id, body, user)
   }
 
   @Post('delete/:id')
   @ApiOperation({ summary: '删除角色' })
   @ApiSuccessResponse()
-  async removeRole(@Param('id') id: number) {
-    return await this.roleService.removeRole(id)
+  async removeRole(@Param('id') id: number, @CurrentUser() user: CurrentLoginResponseDto) {
+    return await this.roleService.removeRole(id, user)
   }
 
   @Post('batch/delete')
   @ApiOperation({ summary: '批量删除角色' })
   @ApiSuccessResponse(BatchRespDto)
-  async batchRemoveRole(@Body() body: BatchDto): Promise<BatchRespDto | null> {
-    return await this.roleService.batchRemoveRole(body.ids)
+  async batchRemoveRole(
+    @Body() body: BatchDto,
+    @CurrentUser() user: CurrentLoginResponseDto,
+  ): Promise<BatchRespDto | null> {
+    return await this.roleService.batchRemoveRole(body.ids, user)
   }
 
   @Post('updateStatus/:id')
   @ApiOperation({ summary: '修改角色状态' })
   @ApiSuccessResponse()
-  async updateRoleStatus(@Param('id') id: number, @Body() body: UpdateStatusDto) {
-    return await this.roleService.updateRoleStatus(id, body)
+  async updateRoleStatus(
+    @Param('id') id: number,
+    @Body() body: UpdateStatusDto,
+    @CurrentUser() user: CurrentLoginResponseDto,
+  ) {
+    return await this.roleService.updateRoleStatus(id, body, user)
   }
 
   @Post('batch/status')
   @ApiOperation({ summary: '批量修改角色状态' })
   @ApiSuccessResponse(BatchRespDto)
-  async batchUpdateRoleStatus(@Body() body: BatchUpdateStatusDto): Promise<BatchRespDto | null> {
-    return await this.roleService.batchUpdateRoleStatus(body)
+  async batchUpdateRoleStatus(
+    @Body() body: BatchUpdateStatusDto,
+    @CurrentUser() user: CurrentLoginResponseDto,
+  ): Promise<BatchRespDto | null> {
+    return await this.roleService.batchUpdateRoleStatus(body, user)
   }
 
   @Post('template')

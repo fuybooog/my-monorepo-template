@@ -19,6 +19,7 @@ import { UpdateStatusDto } from '@/dto/update-status.dto'
 import { AdminResetPasswordDto, ResetPasswordDto } from '@/modules/user/dto/user.dto'
 import { HelperService } from '@/modules/shared/helper.service'
 import bcrypt from 'bcrypt'
+import { MAX_ROLE_LEVEL } from '@/constants'
 
 @Injectable()
 export class UserService {
@@ -28,8 +29,11 @@ export class UserService {
     private readonly dataSource: DataSource,
     private readonly helperService: HelperService,
   ) {}
-  async pageUser(userPageDto: UserPageDto): Promise<PaginatedResult<UserPageRespDto>> {
-    const [entities, total] = await this.userRepository.searchUsersByPage(userPageDto)
+  async pageUser(
+    userPageDto: UserPageDto,
+    maxLevel: number,
+  ): Promise<PaginatedResult<UserPageRespDto>> {
+    const [entities, total] = await this.userRepository.searchUsersByPage(userPageDto, maxLevel)
     const list = plainToInstance(UserPageRespDto, entities, {
       excludeExtraneousValues: true,
     })
@@ -42,6 +46,7 @@ export class UserService {
   }
   async pageOptionUser(
     userPageOptionDto: UserPageOptionDto,
+    maxLevel: number,
   ): Promise<PaginatedResult<UserPageRespDto>> {
     const { keyword, fields, page, pageSize } = userPageOptionDto
     const queryBuilder = this.userRepository.createQueryBuilder('user')
@@ -54,6 +59,12 @@ export class UserService {
         ' OR ',
       )
       queryBuilder.andWhere(`(${where})`, { keyword: `%${keyword}%` })
+    }
+    if (maxLevel !== MAX_ROLE_LEVEL) {
+      queryBuilder.leftJoin('user.roles', 'role').groupBy('user.id')
+
+      const havingClause = 'MAX(role.level) < :maxLevel'
+      queryBuilder.having(`${havingClause} OR MAX(role.level) IS NULL`, { maxLevel })
     }
     const skip = (page - 1) * pageSize
     queryBuilder.skip(skip).take(pageSize)
@@ -89,6 +100,13 @@ export class UserService {
       ...result,
       roleIds: roles,
     }
+  }
+  async findRolesByUserId(id: number) {
+    const list = await this.userRepository.getRoleIdsByUserId(id)
+    return { list }
+  }
+  async assignRolesToUser(roleIds: number[], userId: number) {
+    await this.userRepository.assignRolesToUser(roleIds, userId)
   }
   // 这个方法包返回结果含密码字段，使用时要谨慎
   async findUserWithPasswordByUserName(

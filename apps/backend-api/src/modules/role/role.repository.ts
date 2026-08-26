@@ -5,6 +5,7 @@ import { RolePageDto } from '@/modules/role/dto/role.page.dto'
 import { isTargetOrParent } from '@/utils/fns'
 import { RoleCreateDto } from './dto/role.create.dto'
 import { RoleUpdateDto } from './dto/role.update.dto'
+import { ADMIN_ROLE_CODE, MAX_ROLE_LEVEL } from '@/constants'
 
 @Injectable()
 export class RoleRepository extends Repository<Role> {
@@ -12,7 +13,7 @@ export class RoleRepository extends Repository<Role> {
     super(Role, dataSource.createEntityManager())
   }
 
-  async searchRolesByPage(query: RolePageDto) {
+  async searchRolesByPage(query: RolePageDto, maxLevel?: number) {
     const { page = 1, pageSize = 10, roleCode } = query
 
     const qb = this.createQueryBuilder('role')
@@ -30,7 +31,10 @@ export class RoleRepository extends Repository<Role> {
           .from('system_role_resource', 'rr')
           .where('rr.role_id = role.id')
       }, 'resourceCount')
-      .andWhere('role.deletedAt IS NULL') // 过滤已删除的角色
+      .andWhere('role.deletedAt IS NULL')
+    if (maxLevel !== MAX_ROLE_LEVEL) {
+      qb.andWhere('role.level < :maxLevel', { maxLevel })
+    }
 
     // 查询条件由传入的 roleCode 决定，支持精确匹配和模糊匹配
     if (roleCode) {

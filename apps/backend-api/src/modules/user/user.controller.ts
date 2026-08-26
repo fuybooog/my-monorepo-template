@@ -17,7 +17,14 @@ import {
 import { BatchDto, BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { UserCheckUniqueDto } from './dto/user.check.unique.dto'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
-import { AdminResetPasswordDto, ResetPasswordDto } from '@/modules/user/dto/user.dto'
+import {
+  AdminResetPasswordDto,
+  AssignRolesToUserDto,
+  FindRolesByUserIdResp,
+  ResetPasswordDto,
+} from '@/modules/user/dto/user.dto'
+import { CurrentUser } from '@/decorators/current-user.decorator'
+import { CurrentLoginResponseDto } from '@/modules/auth/auth.dto'
 
 @ApiTags('用户模块')
 @Controller('user')
@@ -27,8 +34,11 @@ export class UserController {
   @Get('page')
   @ApiOperation({ summary: '分页查询用户列表' })
   @ApiSuccessPageResponse(UserPageRespDto)
-  async pageUser(@Query() query: UserPageDto): Promise<PaginatedResult<UserPageRespDto>> {
-    return await this.userService.pageUser(query)
+  async pageUser(
+    @Query() query: UserPageDto,
+    @CurrentUser() user: CurrentLoginResponseDto,
+  ): Promise<PaginatedResult<UserPageRespDto>> {
+    return await this.userService.pageUser(query, user.maxLevel)
   }
 
   @Post('schema-generator-holder-page-user')
@@ -43,8 +53,9 @@ export class UserController {
   @ApiSuccessPageResponse(UserPageRespDto)
   async pageOptionUser(
     @Query() query: UserPageOptionDto,
+    @CurrentUser() user: CurrentLoginResponseDto,
   ): Promise<PaginatedResult<Partial<UserPageRespDto>>> {
-    return await this.userService.pageOptionUser(query)
+    return await this.userService.pageOptionUser(query, user.maxLevel)
   }
 
   @Post('schema-generator-holder-page-option-user')
@@ -60,6 +71,25 @@ export class UserController {
   async findUserById(@Param('id', ParseIntPipe) id: number): Promise<UserRespDto | null> {
     const user = await this.userService.findUserById(id)
     return user
+  }
+
+  @Get('findRolesByUserId/:id')
+  @ApiOperation({ summary: '按id查询角色' })
+  @ApiSuccessResponse(FindRolesByUserIdResp)
+  async findRolesByUserId(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<FindRolesByUserIdResp | null> {
+    return await this.userService.findRolesByUserId(id)
+  }
+
+  @Post('assignRolesToUser/:id')
+  @ApiOperation({ summary: '按id查询角色' })
+  @ApiSuccessResponse()
+  async assignRolesToUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: AssignRolesToUserDto,
+  ) {
+    return await this.userService.assignRolesToUser(body.roleIds, id)
   }
 
   @Get('batch/query')

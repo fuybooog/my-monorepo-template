@@ -5,10 +5,13 @@ export class RolePageOptionDto extends PaginationQueryDto {
   @ApiPropertyOptional({ description: '关键字', example: '' })
   @IsOptional()
   keyword?: string
+  @ApiPropertyOptional({ description: '用户ID', example: '' })
+  @IsOptional()
+  userId?: number
   @ApiPropertyOptional({
     description: '返回的列表字段',
     example: '',
   })
   @IsOptional()
-  fields?: string = 'id'
+  fields?: string = 'id,roleName,roleCode'
 }

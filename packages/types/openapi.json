@@ -737,6 +737,100 @@
         "tags": ["用户模块"]
       }
     },
+    "/user/findRolesByUserId/{id}": {
+      "get": {
+        "operationId": "UserController_findRolesByUserId",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/FindRolesByUserIdResp"
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "按id查询角色",
+        "tags": ["用户模块"]
+      }
+    },
+    "/user/assignRolesToUser/{id}": {
+      "post": {
+        "operationId": "UserController_assignRolesToUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRolesToUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "按id查询角色",
+        "tags": ["用户模块"]
+      }
+    },
     "/user/batch/query": {
       "get": {
         "operationId": "UserController_findUserListByIds",
@@ -1300,6 +1394,15 @@
             }
           },
           {
+            "name": "level",
+            "required": true,
+            "in": "query",
+            "description": "角色等级",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
             "name": "status",
             "required": false,
             "in": "query",
@@ -1506,6 +1609,16 @@
             "schema": {
               "example": "",
               "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "description": "用户ID",
+            "schema": {
+              "example": "",
+              "type": "number"
             }
           },
           {
@@ -4303,6 +4416,11 @@
             "description": "昵称",
             "example": "testName"
           },
+          "maxLevel": {
+            "type": "number",
+            "description": "最高角色等级",
+            "example": "10"
+          },
           "roleCodes": {
             "description": "用户角色列表",
             "example": "[1, 2]",
@@ -4320,7 +4438,7 @@
             }
           }
         },
-        "required": ["id", "userName", "nickName", "roleCodes", "permissions"]
+        "required": ["id", "userName", "nickName", "maxLevel", "roleCodes", "permissions"]
       },
       "PublicKeyRespDto": {
         "type": "object",
@@ -4667,6 +4785,32 @@
         },
         "required": ["id", "userName", "roleIds"]
       },
+      "FindRolesByUserIdResp": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "description": "角色id列表",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": ["list"]
+      },
+      "AssignRolesToUserDto": {
+        "type": "object",
+        "properties": {
+          "roleIds": {
+            "description": "角色id列表",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": ["roleIds"]
+      },
       "UserListRespDto": {
         "type": "object",
         "properties": {
@@ -4966,6 +5110,10 @@
             "type": "string",
             "description": "角色编码"
           },
+          "level": {
+            "type": "number",
+            "description": "角色等级"
+          },
           "status": {
             "type": "string",
             "description": "状态：0-禁用，1-启用"
@@ -4991,7 +5139,7 @@
             "description": "资源数量"
           }
         },
-        "required": ["id", "roleName", "roleCode", "userCount", "resourceCount"]
+        "required": ["id", "roleName", "roleCode", "level", "userCount", "resourceCount"]
       },
       "RolePageDto": {
         "type": "object",
@@ -5003,6 +5151,10 @@
           "roleCode": {
             "type": "string",
             "description": "角色编码"
+          },
+          "level": {
+            "type": "number",
+            "description": "角色等级"
           },
           "status": {
             "type": "string",
@@ -5049,7 +5201,7 @@
             "example": "2000-10-10 23:59:59"
           }
         },
-        "required": ["roleName", "roleCode"]
+        "required": ["roleName", "roleCode", "level"]
       },
       "RolePageOptionDto": {
         "type": "object",
@@ -5065,6 +5217,11 @@
           "keyword": {
             "type": "string",
             "description": "关键字",
+            "example": ""
+          },
+          "userId": {
+            "type": "number",
+            "description": "用户ID",
             "example": ""
           },
           "fields": {
@@ -5088,6 +5245,10 @@
           "roleCode": {
             "type": "string",
             "description": "角色编码"
+          },
+          "level": {
+            "type": "number",
+            "description": "角色等级"
           },
           "status": {
             "type": "string",
@@ -5114,7 +5275,7 @@
             "description": "资源id列表"
           }
         },
-        "required": ["id", "roleName", "roleCode", "userIds", "resourceIds"]
+        "required": ["id", "roleName", "roleCode", "level", "userIds", "resourceIds"]
       },
       "RoleListRespDto": {
         "type": "object",
@@ -5131,7 +5292,7 @@
             "description": "列表",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/RoleRespDto"
             }
           }
         },
@@ -5140,6 +5301,10 @@
       "RoleCreateDto": {
         "type": "object",
         "properties": {
+          "level": {
+            "type": "number",
+            "description": "角色等级"
+          },
           "status": {
             "type": "string",
             "description": "状态：0-禁用，1-启用"
@@ -5175,7 +5340,7 @@
             "example": ""
           }
         },
-        "required": ["roleName", "roleCode", "userIds", "resourceIds"]
+        "required": ["level", "roleName", "roleCode", "userIds", "resourceIds"]
       },
       "RoleUpdateDto": {
         "type": "object",
@@ -5188,6 +5353,10 @@
             "type": "string",
             "description": "角色编码"
           },
+          "level": {
+            "type": "number",
+            "description": "角色等级"
+          },
           "status": {
             "type": "string",
             "description": "状态：0-禁用，1-启用"
@@ -5215,7 +5384,7 @@
             "example": ""
           }
         },
-        "required": ["roleName", "roleCode", "userIds", "resourceIds"]
+        "required": ["roleName", "roleCode", "level", "userIds", "resourceIds"]
       },
       "ResourcePageRespDto": {
         "type": "object",
