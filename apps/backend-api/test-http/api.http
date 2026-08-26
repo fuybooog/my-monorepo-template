@@ -1,12 +1,22 @@
+## 初始化admin
+POST http://localhost:3000/api/auth/init
+Content-Type: application/json
+x-init-token: cc3cb074-7b53-4ba2-8f96-4d9785c3e5a4
+
+{
+  "plainPassword": "Aa111111!"
+}
+
 
 ### 登录请求
 # @name login
 POST http://localhost:3000/api/auth/passwordLogin
 Content-Type: application/json
+x-req-method: httpClient
 
 {
-    "userName": "123",
-    "password": "111111"
+    "userName": "傅小一",
+    "password": "Aa111111!"
 }
 
 ### 将登录响应头中的 Set-Cookie 保存到变量
@@ -129,3 +139,18 @@ Content-Type: application/json
 Cookie: {{authCookie}}
 
 {"label":"用户管理","uniqueProp":"user","parentUniqueProp":"","type":"0","notInMenu":"0"}
+
+
+### 重置密码
+
+POST http://localhost:3000/api/user/resetPassword
+Content-Type: application/json
+Cookie: {{authCookie}}
+
+{
+    "oldPassword": "Owj9l/sEoRZSVPLljiot3B2B2OpG/MSiKFNgKuwcI8MLE2Um+UibObSbYFnWswJoOoUgEqc15/g6xyxF/xaMr2MShBrYNk0SrmIJhKJuRoB7EQs/yWY49bEbdcj+5FHYSbAVcWx/QCa4J/LGdcYTu/0Pgkt8Z9lG5k3LKwgXKhG2QUi7hp7DuAm308B9qOJsVGyrByyFldxOxX8exA+mU9+Lkn+MYl7NCL8BhUgOsSuZyY3GDliGPoFWKgYjqdPoT9nySsbWw7Eg6efsVtPYHEXuDDSy7BxEPsu6tImeUtIzSBiZM1x6dT+HFwkOMzoHJH844pDSUiSnVP9Hg+2FJw==",
+    "newPassword": "bCdTukyexH1XNoWT5+jbcN88xfyCa4IJsY4CyzBiWuPu9Xdp/c3KdeNDcAFYcT8FfiVTh0X/X4wA3A1Btp7IanSQSB4o8g3NFFJWv3Ligi+srJ6//FQkioDhWoA4ibvt6Opmm4y10tJdKCC5dIKUHkArwsOYVVbTZsyC4oVLcgAjRciZnf5n6n5NicipIYuismwRucVzTWKPE6qSfCMGDplzi7Cd5B1AqlBZZtQHm0Pjk4mem77ui9FlCvWW0DF8wEYx1mrikByPpbvMUOVxlv2c7wTgIMQmDByONjYt5XQyXe/GJL1JuEea7lGa/aXY+x+ln+6+V2z7u5HP2JyP0Q==",
+    "oldPasswordKeyId": "a7a465ea-edad-4f97-becb-288776cc12b0",
+    "newPasswordKeyId": "9b9309ef-e021-4357-ac38-d85c6bc5f731",
+    "userId": 358
+}

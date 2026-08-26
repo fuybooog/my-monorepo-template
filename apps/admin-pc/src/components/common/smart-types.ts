@@ -14,6 +14,12 @@ import type { TreeConfig } from '@/utils'
 
 // form属
 
+export type RenderParams = {
+  value?: any
+  onChange?: (...args: any[]) => void
+  form: FormInstance
+}
+
 export type SmartFormItem<T extends React.ComponentType<any> = any> = {
   title: string
   itemProps?: Omit<FormItemProps, 'label' | 'name'>
@@ -31,7 +37,7 @@ export type SmartFormItem<T extends React.ComponentType<any> = any> = {
   colProps?: ColProps
 } & (
   | { widget?: T; props?: React.ComponentProps<T>; render?: never }
-  | { widget?: never; props?: never; render: (form: FormInstance) => React.ReactNode }
+  | { widget?: never; props?: never; render: (props: RenderParams) => React.ReactNode }
 )
 
 export type SmartSchema = Record<string, SmartFormItem<any>>
@@ -62,6 +68,8 @@ export interface SmartFormExtraProps {
   labelWidth?: string | number
   // 取消按钮事件
   handleCancel?: () => void
+  // 不显示任何按钮
+  noSubmit?: boolean
 }
 
 export type SmartFormProps = Omit<FormProps, 'children'> & SmartFormExtraProps

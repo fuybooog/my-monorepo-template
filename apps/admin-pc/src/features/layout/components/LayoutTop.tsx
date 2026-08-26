@@ -12,10 +12,13 @@ import authApi from '@/features/auth/api/auth'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themStore'
 import reactSvg from '@/assets/react.svg'
+import { useState } from 'react'
+import { UserInfoDrawer } from '@/features/layout/components/UserInfoDrawer'
 
 export function LayoutTop() {
   const navigate = useNavigate()
   const { mode, setMode } = useThemeStore()
+  const [infoVisible, setInfoVisible] = useState<boolean>(false)
 
   // 假设 useAuthStore 保存了 userInfo
   const auth = useAuthStore((state) => state.auth)
@@ -59,7 +62,9 @@ export function LayoutTop() {
           {/* 后续扩展字段 */}
         </div>
       ),
-      disabled: true,
+      onClick: () => {
+        setInfoVisible(true)
+      },
     },
     {
       key: 'logout',
@@ -102,6 +107,7 @@ export function LayoutTop() {
           </div>
         </Dropdown>
       </div>
+      <UserInfoDrawer visible={infoVisible} onCancel={() => setInfoVisible(false)}></UserInfoDrawer>
     </header>
   )
 }

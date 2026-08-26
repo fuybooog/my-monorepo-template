@@ -18,4 +18,8 @@ export class UserCreateDto extends IntersectionType(
   @IsArray()
   @IsOptional()
   roles?: Role[]
+  @ApiPropertyOptional({ description: '密码', type: Array })
+  @IsString()
+  @IsOptional()
+  password?: string
 }

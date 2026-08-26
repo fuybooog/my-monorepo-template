@@ -9,7 +9,6 @@ import { useDrawer } from '@/hooks/useDrawer'
 import { useRoleList } from '../hooks/useRoleList'
 import roleApi from '../api/role'
 import { PERMISSIONS } from '@repo/shared'
-import { isAdmin } from '@/utils'
 
 const formTitleMap = { create: '新增角色', edit: '编辑角色', view: '角色详情' }
 export function RoleListPage() {
@@ -64,7 +63,7 @@ export function RoleListPage() {
     label: '编辑',
     onClick: () => onEdit(record),
     permission: [PERMISSIONS.SYS_ROLE_LIST_EDIT],
-    hidden: (record) => isAdmin(record.roleCode),
+    hidden: (record) => record.roleCode === 'admin',
   })
 
   const deleteButton = (record: Backend.RolePageRespDto): ActionItem<Backend.RolePageRespDto> => ({
@@ -72,7 +71,7 @@ export function RoleListPage() {
     label: '删除',
     onClick: () => onDelete(record),
     permission: [PERMISSIONS.SYS_ROLE_LIST_DELETE],
-    hidden: (record: Backend.RolePageRespDto) => isAdmin(record.roleCode),
+    hidden: (record: Backend.RolePageRespDto) => record.roleCode === 'admin',
   })
 
   return (

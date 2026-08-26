@@ -1,6 +1,6 @@
 import { IsOptional, Matches, Length, IsNotEmpty, IsArray } from 'class-validator'
 
-export class GetCommonDto {
+export class GetFileDto {
   @IsOptional()
   @Length(2, 32, { message: 'code 长度必须在 2 到 32 个字符之间' })
   @Matches(/^[a-zA-Z0-9_-]+$/, {
@@ -9,7 +9,7 @@ export class GetCommonDto {
   code?: string
 }
 
-export class UpdateCommonDto {
+export class UpdateFileDto {
   @IsNotEmpty({ message: 'json 字段不能为空' })
   @IsArray({ message: 'json 必须是一个数组格式' })
   json!: any[]

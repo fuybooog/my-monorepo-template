@@ -11,6 +11,7 @@ export interface SmartTableButtonsProps<RecordType> {
 }
 
 export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<RecordType>) {
+  const hasPermission = useAuthStore((state) => state.hasPermission)
   const { record, actionColumn } = props
   const {
     buttons,
@@ -78,13 +79,13 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
     return allActions.filter((action) => {
       if (typeof action.hidden === 'function') return !action.hidden(record)
       if (action.permission?.length) {
-        if (!useAuthStore().hasPermission(action.permission, action.permissionMode)) {
+        if (!hasPermission(action.permission, action.permissionMode)) {
           return false
         }
       }
       return !action.hidden
     })
-  }, [allActions, record])
+  }, [allActions, record, hasPermission])
 
   if (visibleActions.length === 0) return null
 

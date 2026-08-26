@@ -1,13 +1,16 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Drawer, Form } from 'antd'
 import { PageLayout } from '@/components/PageLayout'
-import { SmartTable, SmartForm, SmartFormEditMode } from '@/components/common'
+import { SmartTable, SmartForm, SmartFormEditMode, ActionItem } from '@/components/common'
 import { Backend } from '@repo/types'
 import { UserFormContainer } from '../components/UserFormContainer'
 import { userSearchSchema, getUserColumns } from '../model'
 import { useDrawer } from '@/hooks/useDrawer'
 import { useUserList } from '../hooks/useUserList'
 import userApi from '../api/user'
+import { useAuthStore } from '@/store/authStore'
+import { PERMISSIONS } from '@repo/shared'
+import { ResetPasswordDrawer } from '@/features/user/components/ResetPasswordDrawer'
 
 const formTitleMap = { create: '新增用户', edit: '编辑用户', view: '用户详情' }
 export function UserListPage() {
@@ -30,6 +33,8 @@ export function UserListPage() {
   } = useDrawer<Backend.UserPageRespDto>()
 
   const [form] = Form.useForm()
+  const [resetVisible, setResetVisible] = useState<boolean>(false)
+  const [userId, setUserId] = useState<number | null>(null)
 
   const columns = useMemo(
     () =>
@@ -62,6 +67,20 @@ export function UserListPage() {
     openDrawer(mode, id)
   }
 
+  const resetPasswordButton = (): ActionItem<Backend.UserPageRespDto> => {
+    return {
+      key: 'resetPassword',
+      label: '重置密码',
+      hidden() {
+        return !useAuthStore.getState().hasPermission([PERMISSIONS.SYS_USER_LIST_RESET_PWD])
+      },
+      async onClick(record) {
+        setUserId(record.id)
+        setResetVisible(true)
+      },
+    }
+  }
+
   return (
     <PageLayout>
       <SmartForm
@@ -83,7 +102,7 @@ export function UserListPage() {
           onBatchDelete,
         }}
         actionColumn={{
-          buttons: ['edit', 'delete'],
+          buttons: () => ['edit', resetPasswordButton(), 'delete'],
           onEdit,
           onDelete,
         }}
@@ -107,6 +126,11 @@ export function UserListPage() {
           }}
         />
       </Drawer>
+      <ResetPasswordDrawer
+        visible={resetVisible}
+        onCancel={() => setResetVisible(false)}
+        userId={userId!}
+      ></ResetPasswordDrawer>
     </PageLayout>
   )
 }

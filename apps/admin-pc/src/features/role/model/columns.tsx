@@ -1,6 +1,6 @@
 import { SmartColumnType } from '@/components/common'
 import { Backend } from '@repo/types'
-import { commonTimeRender, createStatusRender, isAdmin } from '@/utils'
+import { commonTimeRender, createStatusRender } from '@/utils'
 import { PERMISSIONS } from '@repo/shared'
 
 /**
@@ -35,13 +35,23 @@ export const getRoleColumns = (callbacks: {
       ellipsis: true,
     },
     {
+      title: '资源数',
+      dataIndex: 'resourceCount',
+      width: 120,
+    },
+    {
+      title: '人员数',
+      dataIndex: 'userCount',
+      width: 120,
+    },
+    {
       title: '状态',
       dataIndex: 'status',
       width: 90,
       render: createStatusRender({
         onStatusChange,
         refreshList,
-        disabled: (record) => isAdmin(record.roleCode),
+        disabled: (record) => record.roleCode === 'admin',
         permission: [PERMISSIONS.SYS_ROLE_LIST_EDIT],
       }),
     },

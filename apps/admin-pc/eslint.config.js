@@ -16,6 +16,7 @@ export default [
       '**/address-select/AddressSelect.tsx',
       '**/remote-select/RemoteSelect.tsx',
       '**/components/ResourceTree.tsx',
+      '**/store/store.util.ts',
     ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off', // 针对这些文件关闭 any 校验

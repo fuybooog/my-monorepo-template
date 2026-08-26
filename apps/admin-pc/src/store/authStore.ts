@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthState>(
       }),
 
     isAdmin: () => {
-      const roles = get().auth?.roles || []
+      const roles = get().auth?.roleCodes || []
       return roles.includes('admin')
     },
 

@@ -3,9 +3,19 @@ import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { AuthController } from '@/modules/auth/auth.controller'
 import { AuthService } from '@/modules/auth/auth.service'
+import { AuthInitGuard } from '@/modules/auth/auth-init.guard'
+import { AuthInitService } from '@/modules/auth/auth-init.service'
+import { UserModule } from '@/modules/user/user.module'
+import { RoleModule } from '@/modules/role/role.module'
+import { ResourceModule } from '@/modules/resource/resource.module'
+import { SharedModule } from '@/modules/shared/shared.module'
 
 @Module({
   imports: [
+    UserModule,
+    RoleModule,
+    ResourceModule,
+    SharedModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -16,7 +26,7 @@ import { AuthService } from '@/modules/auth/auth.service'
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, AuthInitService, AuthInitGuard],
   exports: [JwtModule],
 })
 export class AuthModule {}

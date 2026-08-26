@@ -1,4 +1,3 @@
-// apps/backend-api/src/common/redis/redis.service.ts
 import { Injectable } from '@nestjs/common'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import Redis from 'ioredis'

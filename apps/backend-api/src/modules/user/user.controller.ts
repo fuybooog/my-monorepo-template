@@ -17,6 +17,7 @@ import {
 import { BatchDto, BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { UserCheckUniqueDto } from './dto/user.check.unique.dto'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
+import { AdminResetPasswordDto, ResetPasswordDto } from '@/modules/user/dto/user.dto'
 
 @ApiTags('用户模块')
 @Controller('user')
@@ -138,5 +139,17 @@ export class UserController {
   @ApiSuccessBooleanResponse()
   async checkUnique(userCheckUniqueDto: UserCheckUniqueDto): Promise<boolean> {
     return await this.userService.checkUserFieldUnique(userCheckUniqueDto)
+  }
+  @Post('adminResetPassword')
+  @ApiOperation({ summary: '重置密码' })
+  @ApiSuccessResponse()
+  async adminResetPassword(@Body() body: AdminResetPasswordDto) {
+    return await this.userService.adminResetPassword(body)
+  }
+  @Post('resetPassword')
+  @ApiOperation({ summary: '修改密码' })
+  @ApiSuccessResponse()
+  async resetPassword(@Body() body: ResetPasswordDto) {
+    return await this.userService.resetPassword(body)
   }
 }

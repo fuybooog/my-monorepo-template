@@ -89,7 +89,11 @@ export class UserRepository extends Repository<User> {
     return savedUser
   }
 
-  async updateUser(user: User, userUpdateDto: UserUpdateDto, manager: EntityManager) {
+  async updateUser(
+    user: User,
+    userUpdateDto: UserUpdateDto & { password?: string },
+    manager: EntityManager,
+  ) {
     const updatedUser = Object.assign(user, userUpdateDto)
     return await manager.save(User, updatedUser)
   }
@@ -112,5 +116,22 @@ export class UserRepository extends Repository<User> {
       user.status = status
     })
     return await manager.save(users)
+  }
+  async searchRoleIdsByUserId(userId: number) {
+    const result = await this.manager
+      .createQueryBuilder()
+      .select('user_role.role_id', 'roleId')
+      .from('system_user_role', 'user_role')
+      .where('user_role.user_id = :userId', { userId })
+      .getRawMany()
+    return result.map((row) => Number(row.roleId)).filter((id) => !isNaN(id))
+  }
+  async updateUserPassword(userId: number, passwordHash: string, manager: EntityManager) {
+    const user = await manager.findOne(User, { where: { id: userId } })
+    if (!user) {
+      throw new Error(`User with ID ${userId} not found`)
+    }
+    user.password = passwordHash
+    return await manager.save(User, user)
   }
 }

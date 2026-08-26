@@ -13,7 +13,7 @@ export class RoleRepository extends Repository<Role> {
   }
 
   async searchRolesByPage(query: RolePageDto) {
-    const { page = 1, pageSize = 10 } = query
+    const { page = 1, pageSize = 10, roleCode } = query
 
     const qb = this.createQueryBuilder('role')
       // 1. 统计关联的用户数量
@@ -30,6 +30,19 @@ export class RoleRepository extends Repository<Role> {
           .from('system_role_resource', 'rr')
           .where('rr.role_id = role.id')
       }, 'resourceCount')
+      .andWhere('role.deletedAt IS NULL') // 过滤已删除的角色
+
+    // 查询条件由传入的 roleCode 决定，支持精确匹配和模糊匹配
+    if (roleCode) {
+      const codeExact = roleCode.startsWith('"') && roleCode.endsWith('"')
+      const roleCodeValue = codeExact ? roleCode.slice(1, -1) : roleCode
+      if (codeExact) {
+        qb.andWhere('role.roleCode = :roleCode', { roleCode: roleCodeValue })
+      } else {
+        qb.andWhere('role.roleCode LIKE :roleCode', { roleCode: `%${roleCode}%` })
+      }
+    }
+    qb
       // 3. 排序与分页
       .orderBy('role.createdAt', 'DESC')
       .skip((page - 1) * pageSize)
@@ -76,48 +89,49 @@ export class RoleRepository extends Repository<Role> {
     return await queryBuilder.where('role.id = :id', { id }).getOne()
   }
 
-  async createRole(roleCreateDto: RoleCreateDto, manager: EntityManager) {
-    const roleInstance = manager.create(Role, roleCreateDto)
-    const savedRole = await manager.save(Role, roleInstance)
+  async createRole(roleCreateDto: RoleCreateDto, manager?: EntityManager) {
+    const em = manager || this.manager
+    const roleInstance = em.create(Role, roleCreateDto)
+    const savedRole = await em.save(Role, roleInstance)
     return savedRole
   }
 
-  async updateRole(role: Role, roleUpdateDto: RoleUpdateDto, manager: EntityManager) {
+  async updateRole(role: Role, roleUpdateDto: RoleUpdateDto, manager?: EntityManager) {
     const updatedRole = Object.assign(role, roleUpdateDto)
-    return await manager.save(Role, updatedRole)
+    return await (manager || this.manager).save(Role, updatedRole)
   }
-  async removeRole(role: Role, manager: EntityManager) {
+  async removeRole(role: Role, manager?: EntityManager) {
     role.deletedAt = new Date()
-    return await manager.save(Role, role)
+    return await (manager || this.manager).save(Role, role)
   }
-  async batchRemoveRole(roles: Role[], manager: EntityManager) {
+  async batchRemoveRole(roles: Role[], manager?: EntityManager) {
     roles.forEach((role) => {
       role.deletedAt = new Date()
     })
-    return await manager.save(roles)
+    return await (manager || this.manager).save(roles)
   }
-  async updateRoleStatus(role: Role, status: string, manager: EntityManager) {
+  async updateRoleStatus(role: Role, status: string, manager?: EntityManager) {
     role.status = status
-    return await manager.save(Role, role)
+    return await (manager || this.manager).save(Role, role)
   }
-  async batchUpdateRoleStatus(roles: Role[], status: string, manager: EntityManager) {
+  async batchUpdateRoleStatus(roles: Role[], status: string, manager?: EntityManager) {
     roles.forEach((role) => {
       role.status = status
     })
-    return await manager.save(roles)
+    return await (manager || this.manager).save(roles)
   }
-  async assignUsersToRole(role: Role, userIds: number[], manager: EntityManager) {
+  async assignUsersToRole(roleId: number, userIds: number[], manager?: EntityManager) {
     if (!userIds || userIds.length === 0) return
 
     // 1. 拼装批量插入的对象数组
     const userRoleEntities = userIds.map((userId) => ({
       user_id: userId,
-      role_id: role.id,
+      role_id: roleId,
     }))
 
     // 2. 直接对中间表执行批量插入
     // 注意：如果表存在联合主键 (user_id, role_id)，可以使用 orIgnore() 过滤已存在的重复绑定
-    await manager
+    await (manager || this.manager)
       .createQueryBuilder()
       .insert()
       .into('system_user_role') // 中间表表名
@@ -125,7 +139,7 @@ export class RoleRepository extends Repository<Role> {
       .orIgnore() // 可选：MySQL 下相当于 INSERT IGNORE，防止重复插入报错
       .execute()
   }
-  async assignResourcesToRole(role: Role, resourceIds: number[], manager: EntityManager) {
+  async assignResourcesToRole(role: Role, resourceIds: number[], manager?: EntityManager) {
     if (!resourceIds || resourceIds.length === 0) return
 
     // 1. 拼装批量插入的对象数组
@@ -135,7 +149,7 @@ export class RoleRepository extends Repository<Role> {
     }))
 
     // 2. 直接对中间表执行批量插入
-    await manager
+    await (manager || this.manager)
       .createQueryBuilder()
       .insert()
       .into('system_role_resource') // 中间表表名
@@ -143,8 +157,8 @@ export class RoleRepository extends Repository<Role> {
       .orIgnore() // 可选：MySQL 下相当于 INSERT IGNORE，防止重复插入报错
       .execute()
   }
-  async getUserIdsByRoleId(roleId: number, manager: EntityManager): Promise<number[]> {
-    const result = await manager
+  async getUserIdsByRoleId(roleId: number, manager?: EntityManager): Promise<number[]> {
+    const result = await (manager || this.manager)
       .createQueryBuilder()
       .select('user_role.user_id', 'userId')
       .from('system_user_role', 'user_role') // 直接查中间表
@@ -154,14 +168,14 @@ export class RoleRepository extends Repository<Role> {
     // 确保转为 number 类型（防止数据库驱动返回字符串）
     return result.map((row) => Number(row.userId)).filter((id) => !isNaN(id))
   }
-  async removeUsersFromRole(roleId: number, userIds: number[], manager: EntityManager) {
+  async removeUsersFromRole(roleId: number, userIds: number[], manager?: EntityManager) {
     // 1. 过滤掉无效值并去重
     const validUserIds = Array.from(new Set(userIds?.filter(Boolean)))
 
     if (validUserIds.length === 0) return
 
     // 2. 执行批量删除
-    await manager
+    await (manager || this.manager)
       .createQueryBuilder()
       .delete()
       .from('system_user_role')
@@ -171,8 +185,8 @@ export class RoleRepository extends Repository<Role> {
       })
       .execute()
   }
-  async getResourceIdsByRoleId(roleId: number, manager: EntityManager): Promise<number[]> {
-    const result = await manager
+  async getResourceIdsByRoleId(roleId: number, manager?: EntityManager): Promise<number[]> {
+    const result = await (manager || this.manager)
       .createQueryBuilder()
       .select('role_resource.resource_id', 'resourceId')
       .from('system_role_resource', 'role_resource') // 直接查中间表
@@ -182,14 +196,40 @@ export class RoleRepository extends Repository<Role> {
     // 确保转为 number 类型（防止数据库驱动返回字符串）
     return result.map((row) => Number(row.resourceId)).filter((id) => !isNaN(id))
   }
-  async removeResourcesFromRole(roleId: number, resourceIds: number[], manager: EntityManager) {
+  async getResourceIdsByRoleIds(roleIds: number[], manager?: EntityManager): Promise<string[]> {
+    const validRoleIds = Array.from(new Set(roleIds?.filter((id) => id && id > 0) || []))
+    if (validRoleIds.length === 0) {
+      return []
+    }
+
+    // 2. 获取 EntityManager（优先使用传入的，否则使用当前 Repository 的）
+    const em = manager || this.manager
+
+    // 3. 构建查询：从中间表关联资源表，只查 unique_prop
+    const result = await em
+      .createQueryBuilder()
+      .select('DISTINCT resource.unique_prop', 'uniqueProp')
+      .from('system_role_resource', 'roleResource')
+      .innerJoin('system_resource', 'resource', 'resource.id = roleResource.resource_id')
+      .where('roleResource.role_id IN (:...roleIds)', { roleIds: validRoleIds })
+      .andWhere('resource.deleted_at IS NULL') // 只查未被删除的资源
+      // 可选：如果也需过滤角色是否删除，可加下面这行，但既然传入了 roleIds，一般调用方已确认角色有效，可省略
+      // .andWhere('EXISTS (SELECT 1 FROM system_role r WHERE r.id = roleResource.role_id AND r.deleted_at IS NULL)')
+      .getRawMany()
+
+    // 4. 提取并过滤掉可能的 null 值
+    return result
+      .map((row) => row.uniqueProp)
+      .filter((prop) => prop !== null && prop !== undefined) as string[]
+  }
+  async removeResourcesFromRole(roleId: number, resourceIds: number[], manager?: EntityManager) {
     // 1. 过滤掉无效值并去重
     const validResourceIds = Array.from(new Set(resourceIds?.filter(Boolean)))
 
     if (validResourceIds.length === 0) return
 
     // 2. 执行批量删除
-    await manager
+    await (manager || this.manager)
       .createQueryBuilder()
       .delete()
       .from('system_role_resource')

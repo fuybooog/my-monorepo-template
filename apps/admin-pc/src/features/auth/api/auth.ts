@@ -14,5 +14,19 @@ const authApi = {
   logout(): Promise<Backend.LogoutRes> {
     return http.post('/auth/logout')
   },
+  getCaptcha(): Promise<Backend.CreateCaptchaRes> {
+    return http.get('/auth/captcha')
+  },
+  getPublicKey(): Promise<Backend.GetPublicKeyRes> {
+    return http.get(
+      '/auth/publicKey',
+      {},
+      {
+        cacheOptions: {
+          enable: false,
+        },
+      },
+    )
+  },
 }
 export default authApi

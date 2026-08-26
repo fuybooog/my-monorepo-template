@@ -13,7 +13,8 @@ export namespace Backend {
   export type PasswordLoginDto = components['schemas']['PasswordLoginDto']
   export type PhoneLoginDto = components['schemas']['PhoneLoginDto']
   export type CurrentLoginResponseDto = components['schemas']['CurrentLoginResponseDto']
-  export type UpdateCommonDto = components['schemas']['UpdateCommonDto']
+  export type PublicKeyRespDto = components['schemas']['PublicKeyRespDto']
+  export type CaptchaResponseDto = components['schemas']['CaptchaResponseDto']
   export type PaginatedResult = components['schemas']['PaginatedResult']
   export type UserPageRespDto = components['schemas']['UserPageRespDto']
   export type UserPageDto = components['schemas']['UserPageDto']
@@ -26,14 +27,15 @@ export namespace Backend {
   export type BatchDto = components['schemas']['BatchDto']
   export type UpdateStatusDto = components['schemas']['UpdateStatusDto']
   export type BatchUpdateStatusDto = components['schemas']['BatchUpdateStatusDto']
-  export type ValueSetPageRespDto = components['schemas']['ValueSetPageRespDto']
-  export type ValueSetPageDto = components['schemas']['ValueSetPageDto']
-  export type ValueSetPageOptionDto = components['schemas']['ValueSetPageOptionDto']
-  export type ValueSetRespDto = components['schemas']['ValueSetRespDto']
-  export type ValueSetListRespDto = components['schemas']['ValueSetListRespDto']
-  export type ValueSetListDto = components['schemas']['ValueSetListDto']
-  export type ValueSetCreateDto = components['schemas']['ValueSetCreateDto']
-  export type ValueSetUpdateDto = components['schemas']['ValueSetUpdateDto']
+  export type AdminResetPasswordDto = components['schemas']['AdminResetPasswordDto']
+  export type ResetPasswordDto = components['schemas']['ResetPasswordDto']
+  export type RolePageRespDto = components['schemas']['RolePageRespDto']
+  export type RolePageDto = components['schemas']['RolePageDto']
+  export type RolePageOptionDto = components['schemas']['RolePageOptionDto']
+  export type RoleRespDto = components['schemas']['RoleRespDto']
+  export type RoleListRespDto = components['schemas']['RoleListRespDto']
+  export type RoleCreateDto = components['schemas']['RoleCreateDto']
+  export type RoleUpdateDto = components['schemas']['RoleUpdateDto']
   export type ResourcePageRespDto = components['schemas']['ResourcePageRespDto']
   export type ResourcePageDto = components['schemas']['ResourcePageDto']
   export type ResourcePageOptionDto = components['schemas']['ResourcePageOptionDto']
@@ -43,13 +45,15 @@ export namespace Backend {
   export type ResourceUpdateDto = components['schemas']['ResourceUpdateDto']
   export type ResourcePartialDto = components['schemas']['ResourcePartialDto']
   export type ResourceBatchUpdateDto = components['schemas']['ResourceBatchUpdateDto']
-  export type RolePageRespDto = components['schemas']['RolePageRespDto']
-  export type RolePageDto = components['schemas']['RolePageDto']
-  export type RolePageOptionDto = components['schemas']['RolePageOptionDto']
-  export type RoleRespDto = components['schemas']['RoleRespDto']
-  export type RoleListRespDto = components['schemas']['RoleListRespDto']
-  export type RoleCreateDto = components['schemas']['RoleCreateDto']
-  export type RoleUpdateDto = components['schemas']['RoleUpdateDto']
+  export type UpdateFileDto = components['schemas']['UpdateFileDto']
+  export type ValueSetPageRespDto = components['schemas']['ValueSetPageRespDto']
+  export type ValueSetPageDto = components['schemas']['ValueSetPageDto']
+  export type ValueSetPageOptionDto = components['schemas']['ValueSetPageOptionDto']
+  export type ValueSetRespDto = components['schemas']['ValueSetRespDto']
+  export type ValueSetListRespDto = components['schemas']['ValueSetListRespDto']
+  export type ValueSetListDto = components['schemas']['ValueSetListDto']
+  export type ValueSetCreateDto = components['schemas']['ValueSetCreateDto']
+  export type ValueSetUpdateDto = components['schemas']['ValueSetUpdateDto']
 
   /* ====== 动态 AST 自动桥接的 Response 类型 ====== */
   export type PasswordLoginRes = operations['AuthController_passwordLogin']['responses'] extends {
@@ -92,21 +96,31 @@ export namespace Backend {
       ? R
       : unknown
 
-  export type ReadDataRes = operations['CommonController_readData']['responses'] extends {
+  export type GetPublicKeyRes = operations['AuthController_getPublicKey']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
     ? R
-    : operations['CommonController_readData']['responses'] extends {
+    : operations['AuthController_getPublicKey']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R
       : unknown
 
-  export type WriteDataRes = operations['CommonController_writeData']['responses'] extends {
+  export type CreateCaptchaRes = operations['AuthController_createCaptcha']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
     ? R
-    : operations['CommonController_writeData']['responses'] extends {
+    : operations['AuthController_createCaptcha']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type InitAdminRes = operations['AuthController_initAdmin']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['AuthController_initAdmin']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R
@@ -278,191 +292,182 @@ export namespace Backend {
       ? R
       : unknown
 
-  export type PageValueSetRes = operations['ValueSetController_pageValueSet']['responses'] extends {
+  export type AdminResetPasswordRes =
+    operations['UserController_adminResetPassword']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['UserController_adminResetPassword']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type ResetPasswordRes = operations['UserController_resetPassword']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
     ? R
-    : operations['ValueSetController_pageValueSet']['responses'] extends {
+    : operations['UserController_resetPassword']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R
       : unknown
 
-  export type _pageValueSetRes =
-    operations['ValueSetController__pageValueSet']['responses'] extends {
+  export type PageRoleRes = operations['RoleController_pageRole']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['RoleController_pageRole']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type _pageRoleRes = operations['RoleController__pageRole']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['RoleController__pageRole']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type PageOptionRoleRes = operations['RoleController_pageOptionRole']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['RoleController_pageOptionRole']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type _pageOptionRoleRes =
+    operations['RoleController__pageOptionRole']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['ValueSetController__pageValueSet']['responses'] extends {
+      : operations['RoleController__pageOptionRole']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type PageOptionValueSetRes =
-    operations['ValueSetController_pageOptionValueSet']['responses'] extends {
+  export type FindRoleByIdRes = operations['RoleController_findRoleById']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['RoleController_findRoleById']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type FindRoleListByIdsRes =
+    operations['RoleController_findRoleListByIds']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['ValueSetController_pageOptionValueSet']['responses'] extends {
+      : operations['RoleController_findRoleListByIds']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type _pageOptionValueSetRes =
-    operations['ValueSetController__pageOptionValueSet']['responses'] extends {
+  export type CreateRoleRes = operations['RoleController_createRole']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['RoleController_createRole']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type UpdateRoleRes = operations['RoleController_updateRole']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['RoleController_updateRole']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type RemoveRoleRes = operations['RoleController_removeRole']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['RoleController_removeRole']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type BatchRemoveRoleRes =
+    operations['RoleController_batchRemoveRole']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['ValueSetController__pageOptionValueSet']['responses'] extends {
+      : operations['RoleController_batchRemoveRole']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type FindValueSetBySetCodesRes =
-    operations['ValueSetController_findValueSetBySetCodes']['responses'] extends {
+  export type UpdateRoleStatusRes =
+    operations['RoleController_updateRoleStatus']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['ValueSetController_findValueSetBySetCodes']['responses'] extends {
+      : operations['RoleController_updateRoleStatus']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type _findValueSetBySetCodesRes =
-    operations['ValueSetController__findValueSetBySetCodes']['responses'] extends {
+  export type BatchUpdateRoleStatusRes =
+    operations['RoleController_batchUpdateRoleStatus']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['ValueSetController__findValueSetBySetCodes']['responses'] extends {
+      : operations['RoleController_batchUpdateRoleStatus']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type FindValueSetByIdRes =
-    operations['ValueSetController_findValueSetById']['responses'] extends {
+  export type DownloadRoleTemplateRes =
+    operations['RoleController_downloadRoleTemplate']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['ValueSetController_findValueSetById']['responses'] extends {
+      : operations['RoleController_downloadRoleTemplate']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type FindValueSetListByIdsRes =
-    operations['ValueSetController_findValueSetListByIds']['responses'] extends {
-      '200': { content: { 'application/json': infer R } }
-    }
+  export type ImportRoleRes = operations['RoleController_importRole']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['RoleController_importRole']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
       ? R
-      : operations['ValueSetController_findValueSetListByIds']['responses'] extends {
-            '201': { content: { 'application/json': infer R } }
-          }
-        ? R
-        : unknown
+      : unknown
 
-  export type CreateValueSetRes =
-    operations['ValueSetController_createValueSet']['responses'] extends {
-      '200': { content: { 'application/json': infer R } }
-    }
+  export type ExportRoleRes = operations['RoleController_exportRole']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['RoleController_exportRole']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
       ? R
-      : operations['ValueSetController_createValueSet']['responses'] extends {
-            '201': { content: { 'application/json': infer R } }
-          }
-        ? R
-        : unknown
-
-  export type UpdateValueSetRes =
-    operations['ValueSetController_updateValueSet']['responses'] extends {
-      '200': { content: { 'application/json': infer R } }
-    }
-      ? R
-      : operations['ValueSetController_updateValueSet']['responses'] extends {
-            '201': { content: { 'application/json': infer R } }
-          }
-        ? R
-        : unknown
-
-  export type RemoveValueSetRes =
-    operations['ValueSetController_removeValueSet']['responses'] extends {
-      '200': { content: { 'application/json': infer R } }
-    }
-      ? R
-      : operations['ValueSetController_removeValueSet']['responses'] extends {
-            '201': { content: { 'application/json': infer R } }
-          }
-        ? R
-        : unknown
-
-  export type BatchRemoveValueSetRes =
-    operations['ValueSetController_batchRemoveValueSet']['responses'] extends {
-      '200': { content: { 'application/json': infer R } }
-    }
-      ? R
-      : operations['ValueSetController_batchRemoveValueSet']['responses'] extends {
-            '201': { content: { 'application/json': infer R } }
-          }
-        ? R
-        : unknown
-
-  export type UpdateValueSetStatusRes =
-    operations['ValueSetController_updateValueSetStatus']['responses'] extends {
-      '200': { content: { 'application/json': infer R } }
-    }
-      ? R
-      : operations['ValueSetController_updateValueSetStatus']['responses'] extends {
-            '201': { content: { 'application/json': infer R } }
-          }
-        ? R
-        : unknown
-
-  export type BatchUpdateValueSetStatusRes =
-    operations['ValueSetController_batchUpdateValueSetStatus']['responses'] extends {
-      '200': { content: { 'application/json': infer R } }
-    }
-      ? R
-      : operations['ValueSetController_batchUpdateValueSetStatus']['responses'] extends {
-            '201': { content: { 'application/json': infer R } }
-          }
-        ? R
-        : unknown
-
-  export type DownloadValueSetTemplateRes =
-    operations['ValueSetController_downloadValueSetTemplate']['responses'] extends {
-      '200': { content: { 'application/json': infer R } }
-    }
-      ? R
-      : operations['ValueSetController_downloadValueSetTemplate']['responses'] extends {
-            '201': { content: { 'application/json': infer R } }
-          }
-        ? R
-        : unknown
-
-  export type ImportValueSetRes =
-    operations['ValueSetController_importValueSet']['responses'] extends {
-      '200': { content: { 'application/json': infer R } }
-    }
-      ? R
-      : operations['ValueSetController_importValueSet']['responses'] extends {
-            '201': { content: { 'application/json': infer R } }
-          }
-        ? R
-        : unknown
-
-  export type ExportValueSetRes =
-    operations['ValueSetController_exportValueSet']['responses'] extends {
-      '200': { content: { 'application/json': infer R } }
-    }
-      ? R
-      : operations['ValueSetController_exportValueSet']['responses'] extends {
-            '201': { content: { 'application/json': infer R } }
-          }
-        ? R
-        : unknown
+      : unknown
 
   export type PageResourceRes = operations['ResourceController_pageResource']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
@@ -672,159 +677,209 @@ export namespace Backend {
         ? R
         : unknown
 
-  export type PageRoleRes = operations['RoleController_pageRole']['responses'] extends {
+  export type ReadDataRes = operations['FileController_readData']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
     ? R
-    : operations['RoleController_pageRole']['responses'] extends {
+    : operations['FileController_readData']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R
       : unknown
 
-  export type _pageRoleRes = operations['RoleController__pageRole']['responses'] extends {
+  export type WriteDataRes = operations['FileController_writeData']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
     ? R
-    : operations['RoleController__pageRole']['responses'] extends {
+    : operations['FileController_writeData']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R
       : unknown
 
-  export type PageOptionRoleRes = operations['RoleController_pageOptionRole']['responses'] extends {
+  export type PageValueSetRes = operations['ValueSetController_pageValueSet']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
     ? R
-    : operations['RoleController_pageOptionRole']['responses'] extends {
+    : operations['ValueSetController_pageValueSet']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R
       : unknown
 
-  export type _pageOptionRoleRes =
-    operations['RoleController__pageOptionRole']['responses'] extends {
+  export type _pageValueSetRes =
+    operations['ValueSetController__pageValueSet']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['RoleController__pageOptionRole']['responses'] extends {
+      : operations['ValueSetController__pageValueSet']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type FindRoleByIdRes = operations['RoleController_findRoleById']['responses'] extends {
-    '200': { content: { 'application/json': infer R } }
-  }
-    ? R
-    : operations['RoleController_findRoleById']['responses'] extends {
-          '201': { content: { 'application/json': infer R } }
-        }
-      ? R
-      : unknown
-
-  export type FindRoleListByIdsRes =
-    operations['RoleController_findRoleListByIds']['responses'] extends {
+  export type PageOptionValueSetRes =
+    operations['ValueSetController_pageOptionValueSet']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['RoleController_findRoleListByIds']['responses'] extends {
+      : operations['ValueSetController_pageOptionValueSet']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type CreateRoleRes = operations['RoleController_createRole']['responses'] extends {
-    '200': { content: { 'application/json': infer R } }
-  }
-    ? R
-    : operations['RoleController_createRole']['responses'] extends {
-          '201': { content: { 'application/json': infer R } }
-        }
-      ? R
-      : unknown
-
-  export type UpdateRoleRes = operations['RoleController_updateRole']['responses'] extends {
-    '200': { content: { 'application/json': infer R } }
-  }
-    ? R
-    : operations['RoleController_updateRole']['responses'] extends {
-          '201': { content: { 'application/json': infer R } }
-        }
-      ? R
-      : unknown
-
-  export type RemoveRoleRes = operations['RoleController_removeRole']['responses'] extends {
-    '200': { content: { 'application/json': infer R } }
-  }
-    ? R
-    : operations['RoleController_removeRole']['responses'] extends {
-          '201': { content: { 'application/json': infer R } }
-        }
-      ? R
-      : unknown
-
-  export type BatchRemoveRoleRes =
-    operations['RoleController_batchRemoveRole']['responses'] extends {
+  export type _pageOptionValueSetRes =
+    operations['ValueSetController__pageOptionValueSet']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['RoleController_batchRemoveRole']['responses'] extends {
+      : operations['ValueSetController__pageOptionValueSet']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type UpdateRoleStatusRes =
-    operations['RoleController_updateRoleStatus']['responses'] extends {
+  export type FindValueSetBySetCodesRes =
+    operations['ValueSetController_findValueSetBySetCodes']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['RoleController_updateRoleStatus']['responses'] extends {
+      : operations['ValueSetController_findValueSetBySetCodes']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type BatchUpdateRoleStatusRes =
-    operations['RoleController_batchUpdateRoleStatus']['responses'] extends {
+  export type _findValueSetBySetCodesRes =
+    operations['ValueSetController__findValueSetBySetCodes']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['RoleController_batchUpdateRoleStatus']['responses'] extends {
+      : operations['ValueSetController__findValueSetBySetCodes']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type DownloadRoleTemplateRes =
-    operations['RoleController_downloadRoleTemplate']['responses'] extends {
+  export type FindValueSetByIdRes =
+    operations['ValueSetController_findValueSetById']['responses'] extends {
       '200': { content: { 'application/json': infer R } }
     }
       ? R
-      : operations['RoleController_downloadRoleTemplate']['responses'] extends {
+      : operations['ValueSetController_findValueSetById']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R
         : unknown
 
-  export type ImportRoleRes = operations['RoleController_importRole']['responses'] extends {
-    '200': { content: { 'application/json': infer R } }
-  }
-    ? R
-    : operations['RoleController_importRole']['responses'] extends {
-          '201': { content: { 'application/json': infer R } }
-        }
+  export type FindValueSetListByIdsRes =
+    operations['ValueSetController_findValueSetListByIds']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
       ? R
-      : unknown
+      : operations['ValueSetController_findValueSetListByIds']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
 
-  export type ExportRoleRes = operations['RoleController_exportRole']['responses'] extends {
-    '200': { content: { 'application/json': infer R } }
-  }
-    ? R
-    : operations['RoleController_exportRole']['responses'] extends {
-          '201': { content: { 'application/json': infer R } }
-        }
+  export type CreateValueSetRes =
+    operations['ValueSetController_createValueSet']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
       ? R
-      : unknown
+      : operations['ValueSetController_createValueSet']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type UpdateValueSetRes =
+    operations['ValueSetController_updateValueSet']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ValueSetController_updateValueSet']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type RemoveValueSetRes =
+    operations['ValueSetController_removeValueSet']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ValueSetController_removeValueSet']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type BatchRemoveValueSetRes =
+    operations['ValueSetController_batchRemoveValueSet']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ValueSetController_batchRemoveValueSet']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type UpdateValueSetStatusRes =
+    operations['ValueSetController_updateValueSetStatus']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ValueSetController_updateValueSetStatus']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type BatchUpdateValueSetStatusRes =
+    operations['ValueSetController_batchUpdateValueSetStatus']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ValueSetController_batchUpdateValueSetStatus']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type DownloadValueSetTemplateRes =
+    operations['ValueSetController_downloadValueSetTemplate']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ValueSetController_downloadValueSetTemplate']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type ImportValueSetRes =
+    operations['ValueSetController_importValueSet']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ValueSetController_importValueSet']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type ExportValueSetRes =
+    operations['ValueSetController_exportValueSet']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ValueSetController_exportValueSet']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
 }

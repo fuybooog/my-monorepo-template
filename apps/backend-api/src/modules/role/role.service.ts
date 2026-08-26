@@ -109,7 +109,7 @@ export class RoleService {
 
         if (roleCreateDto.userIds) {
           const userIdList = roleCreateDto.userIds.split(',').map((id) => Number.parseInt(id))
-          await this.roleRepository.assignUsersToRole(roleEntity, userIdList, manager)
+          await this.roleRepository.assignUsersToRole(roleEntity.id, userIdList, manager)
         }
 
         if (roleCreateDto.resourceIds) {
@@ -155,7 +155,7 @@ export class RoleService {
           )
         }
         if (userIdsToAdd.length > 0) {
-          await this.roleRepository.assignUsersToRole(updatedRoleEntity, userIdsToAdd, manager)
+          await this.roleRepository.assignUsersToRole(updatedRoleEntity.id, userIdsToAdd, manager)
         }
       }
       // 当 roleUpdateDto.resourceIds 为 空字符串时，表示清空当前角色下的所有资源，不传 resourceIds 表示不修改当前角色下的资源
@@ -255,5 +255,10 @@ export class RoleService {
   }
   async exportRole() {
     return null
+  }
+  async getResourceIdsByRoleIds(roleIds: number[]) {
+    if (!roleIds || roleIds.length === 0) return []
+    const resourceIds = await this.roleRepository.getResourceIdsByRoleIds(roleIds)
+    return resourceIds
   }
 }

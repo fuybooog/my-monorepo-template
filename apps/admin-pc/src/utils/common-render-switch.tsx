@@ -38,12 +38,12 @@ export function createStatusRender<RecordType extends object = any, StatusType =
   return (value: StatusType, record: RecordType) => {
     let isPermissionGranted = true
     if (permission) {
-      const userPermissions = useAuthStore.getState().auth?.permissions || []
       if (typeof permission === 'function') {
         isPermissionGranted = permission(record)
       } else {
-        const requiredCodes = Array.isArray(permission) ? permission : [permission]
-        isPermissionGranted = requiredCodes.some((code) => userPermissions.includes(code))
+        isPermissionGranted = useAuthStore
+          .getState()
+          .hasPermission(Array.isArray(permission) ? permission : [permission])
       }
     }
 

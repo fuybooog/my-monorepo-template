@@ -40,7 +40,7 @@ export const RoleFormContainer: React.FC<RoleFormContainerProps> = ({
       }
     }
     return schema
-  }, [])
+  }, [mode])
 
   const transformResData2Form = useCallback(
     (data: Backend.RoleRespDto) => {
@@ -116,6 +116,8 @@ export const RoleFormContainer: React.FC<RoleFormContainerProps> = ({
       onSuccess()
     } catch (err) {
       console.error(err)
+    } finally {
+      setLoading(false)
     }
   }
 

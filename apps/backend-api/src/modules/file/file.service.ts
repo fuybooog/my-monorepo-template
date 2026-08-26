@@ -3,7 +3,7 @@ import * as path from 'path'
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 
 @Injectable()
-export class CommonService {
+export class FileService {
   private readonly DATA_DIR = path.join(process.cwd(), 'data')
   private readonly DEFAULT_PATH = path.join(this.DATA_DIR, 'common.json')
 

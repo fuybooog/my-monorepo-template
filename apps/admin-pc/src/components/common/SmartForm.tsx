@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo, useEffect, useState } from 'react'
 import { Button, Col, ColProps, Form, FormInstance, Input, Row, RowProps, Space } from 'antd'
 import dayjs from 'dayjs'
 import {
+  RenderParams,
   SmartFormExtraProps,
   SmartFormItem,
   SmartFormMode,
@@ -256,6 +256,14 @@ const formatViewValue = (
   return String(val)
 }
 
+const RenderCustomField: React.FC<
+  {
+    renderFn: (props: RenderParams) => React.ReactNode
+  } & RenderParams
+> = ({ renderFn, form, value, onChange }) => {
+  return <>{renderFn({ value, onChange, form })}</>
+}
+
 const SmartFormItemField: React.FC<{
   itemKey: string
   item: SmartFormItem
@@ -331,7 +339,7 @@ const SmartFormItemField: React.FC<{
         rules={mergeRules}
       >
         {item.render ? (
-          item.render(form)
+          <RenderCustomField renderFn={item.render} form={form} />
         ) : WidgetComponent ? (
           <WidgetComponent {...mergedProps} />
         ) : null}
@@ -348,9 +356,21 @@ const FormActions: React.FC<{
   actionRender?: SmartFormExtraProps['actionRender']
   children?: React.ReactNode
   loading?: boolean
+  noSubmit?: boolean
   buttonDisabled?: boolean
   handleCancel?: () => void
-}> = ({ mode, form, actionRender, children, grid, loading, buttonDisabled, handleCancel }) => {
+}> = ({
+  mode,
+  form,
+  actionRender,
+  children,
+  grid,
+  loading,
+  noSubmit,
+  buttonDisabled,
+  handleCancel,
+}) => {
+  if (noSubmit) return null
   if (children) return <>{children}</>
   if (actionRender) return <>{actionRender(form, mode)}</>
 
@@ -411,6 +431,7 @@ const SmartFormContent: React.FC<{
   colProps: ColProps
   loading?: boolean
   buttonDisabled?: boolean
+  noSubmit?: boolean
   handleCancel?: () => void
 }> = ({
   schema,
@@ -421,6 +442,7 @@ const SmartFormContent: React.FC<{
   grid = false,
   colProps,
   loading,
+  noSubmit,
   buttonDisabled,
   handleCancel,
 }) => {
@@ -508,6 +530,7 @@ const SmartFormContent: React.FC<{
         actionRender={actionRender}
         grid={grid}
         loading={loading}
+        noSubmit={noSubmit}
         buttonDisabled={buttonDisabled}
         handleCancel={handleCancel}
       >
@@ -533,6 +556,7 @@ export const SmartForm: React.FC<SmartFormProps> = ({
   labelWidth = 100,
   colProps = { span: 12 },
   handleCancel,
+  noSubmit = false,
   ...restFormProps
 }) => {
   const [internalForm] = Form.useForm()
@@ -580,6 +604,7 @@ export const SmartForm: React.FC<SmartFormProps> = ({
       loading={submitting}
       buttonDisabled={disabled}
       handleCancel={handleCancel}
+      noSubmit={noSubmit}
     >
       {children}
     </SmartFormContent>

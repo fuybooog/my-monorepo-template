@@ -1,16 +1,22 @@
 import { Module } from '@nestjs/common'
-import { AuthModule, CommonModule, UserModule } from '@/modules'
-import { ValueSetModule } from './value-set/value-set.module'
-import { ResourceModule } from './resource/resource.module'
-import { RoleModule } from './role/role.module'
-
-const SHARED_MODULES = [
+import {
   AuthModule,
-  CommonModule,
+  FileModule,
   UserModule,
   ValueSetModule,
   ResourceModule,
   RoleModule,
+  SharedModule,
+} from '@/modules'
+
+const SHARED_MODULES = [
+  AuthModule,
+  FileModule,
+  UserModule,
+  ValueSetModule,
+  ResourceModule,
+  RoleModule,
+  SharedModule,
 ] as const
 
 @Module({

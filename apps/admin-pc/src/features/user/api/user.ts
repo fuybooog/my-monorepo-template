@@ -27,5 +27,13 @@ const userApi = {
   updateStatus(id: string | number, status: string): Promise<Backend.UpdateUserStatusRes> {
     return http.post('/user/updateStatus/' + id, { status })
   },
+  adminResetPassword(
+    params: Backend.AdminResetPasswordDto,
+  ): Promise<Backend.AdminResetPasswordRes> {
+    return http.post('/user/adminResetPassword', params)
+  },
+  resetPassword(params: Backend.ResetPasswordDto): Promise<Backend.ResetPasswordRes> {
+    return http.post('/user/resetPassword', params)
+  },
 }
 export default userApi

@@ -59,13 +59,12 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException('登录状态无效！')
       }
 
-      const permissions = ['sys:user-list:delete', 'sys:user-list:edit', 'sys:role-list:edit']
-
       request.user = {
         id: Number(payload.sub),
         userName: payload.userName,
-        roles: payload.roles,
-        permissions,
+        nickName: payload.nickName,
+        roleCodes: payload.roleCodes?.split(',') || [],
+        permissions: payload.permissions?.split(',') || [],
       }
 
       return true

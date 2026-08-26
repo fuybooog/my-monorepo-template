@@ -144,3 +144,39 @@ export const filterObjectKeys = <T extends Record<string, any>>(
 
   return result as Partial<T>
 }
+
+export function generateStrongPassword(length: number = 12): string {
+  // 定义字符集
+  const lower = 'abcdefghijklmnopqrstuvwxyz'
+  const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const digits = '0123456789'
+  const special = '@$!%*?&#'
+  const all = lower + upper + digits + special
+
+  // 确保长度至少 8
+  const finalLength = Math.max(length, 8)
+
+  // 辅助：从指定字符串中随机取一个字符
+  const randomChar = (chars: string) => chars[Math.floor(Math.random() * chars.length)]
+
+  // 1. 先保证至少包含每一类字符各一个
+  const passwordChars = [
+    randomChar(lower),
+    randomChar(upper),
+    randomChar(digits),
+    randomChar(special),
+  ]
+
+  // 2. 填充剩余长度（从全部字符集中随机取）
+  for (let i = passwordChars.length; i < finalLength; i++) {
+    passwordChars.push(randomChar(all))
+  }
+
+  // 3. 打乱顺序（Fisher-Yates 洗牌算法），避免生成的密码有明显模式
+  for (let i = passwordChars.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[passwordChars[i], passwordChars[j]] = [passwordChars[j], passwordChars[i]]
+  }
+
+  return passwordChars.join('')
+}

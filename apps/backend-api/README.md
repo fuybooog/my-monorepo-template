@@ -40,3 +40,17 @@
 7. 增加新表/新模块
 
 - 先同步数据库 pnpm run db:sync 再执行 generate:module
+
+### 2026-08-24
+
+初始化系统管理员（人员和角色以及关系）
+
+```
+POST http://localhost:3000/api/auth/init
+Content-Type: application/json
+x-init-token: cc3cb074-7b53-4ba2-8f96-4d9785c3e5a4
+
+{
+  "plainPassword": "Aa111111!"
+}
+```

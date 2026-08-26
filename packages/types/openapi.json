@@ -130,38 +130,102 @@
         "tags": ["鉴权模块"]
       }
     },
-    "/common/get": {
+    "/auth/publicKey": {
       "get": {
-        "operationId": "CommonController_readData",
+        "operationId": "AuthController_getPublicKey",
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
-          }
-        },
-        "tags": ["Common"]
-      }
-    },
-    "/common/update": {
-      "post": {
-        "operationId": "CommonController_writeData",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateCommonDto"
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PublicKeyRespDto"
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
               }
             }
           }
         },
+        "summary": "获取公钥",
+        "tags": ["鉴权模块"]
+      }
+    },
+    "/auth/captcha": {
+      "get": {
+        "operationId": "AuthController_createCaptcha",
+        "parameters": [],
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CaptchaResponseDto"
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
           }
         },
-        "tags": ["Common"]
+        "summary": "获取图形验证码",
+        "tags": ["鉴权模块"]
+      }
+    },
+    "/auth/init": {
+      "post": {
+        "operationId": "AuthController_initAdmin",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "初始化管理员",
+        "tags": ["鉴权模块"]
       }
     },
     "/user/page": {
@@ -1125,24 +1189,112 @@
         "tags": ["用户模块"]
       }
     },
-    "/value-set/page": {
+    "/user/adminResetPassword": {
+      "post": {
+        "operationId": "UserController_adminResetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "重置密码",
+        "tags": ["用户模块"]
+      }
+    },
+    "/user/resetPassword": {
+      "post": {
+        "operationId": "UserController_resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "修改密码",
+        "tags": ["用户模块"]
+      }
+    },
+    "/role/page": {
       "get": {
-        "operationId": "ValueSetController_pageValueSet",
+        "operationId": "RoleController_pageRole",
         "parameters": [
           {
-            "name": "parentSetCode",
-            "required": false,
+            "name": "roleName",
+            "required": true,
             "in": "query",
-            "description": "父编码",
+            "description": "角色名称",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "parentSetName",
-            "required": false,
+            "name": "roleCode",
+            "required": true,
             "in": "query",
-            "description": "父名称",
+            "description": "角色编码",
             "schema": {
               "type": "string"
             }
@@ -1151,7 +1303,7 @@
             "name": "status",
             "required": false,
             "in": "query",
-            "description": "状态  0-禁用 1-启用",
+            "description": "状态：0-禁用，1-启用",
             "schema": {
               "type": "string"
             }
@@ -1170,42 +1322,6 @@
             "required": false,
             "in": "query",
             "description": "修改时间",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "createdUserId",
-            "required": false,
-            "in": "query",
-            "description": "创建人id",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "createdUserName",
-            "required": false,
-            "in": "query",
-            "description": "创建人名称",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "updatedUserId",
-            "required": false,
-            "in": "query",
-            "description": "修改人id",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "updatedUserName",
-            "required": false,
-            "in": "query",
-            "description": "修改人姓名",
             "schema": {
               "type": "string"
             }
@@ -1235,46 +1351,6 @@
             "description": "每页条数",
             "schema": {
               "type": "number"
-            }
-          },
-          {
-            "name": "setCode",
-            "required": false,
-            "in": "query",
-            "description": "集CODE",
-            "schema": {
-              "example": "SYS_GENDER",
-              "type": "string"
-            }
-          },
-          {
-            "name": "setName",
-            "required": false,
-            "in": "query",
-            "description": "集NAME",
-            "schema": {
-              "example": "性别",
-              "type": "string"
-            }
-          },
-          {
-            "name": "code",
-            "required": false,
-            "in": "query",
-            "description": "值CODE",
-            "schema": {
-              "example": "1",
-              "type": "string"
-            }
-          },
-          {
-            "name": "name",
-            "required": false,
-            "in": "query",
-            "description": "值NAME",
-            "schema": {
-              "example": "男",
-              "type": "string"
             }
           },
           {
@@ -1356,7 +1432,7 @@
                                 "list": {
                                   "type": "array",
                                   "items": {
-                                    "$ref": "#/components/schemas/ValueSetPageRespDto"
+                                    "$ref": "#/components/schemas/RolePageRespDto"
                                   }
                                 }
                               }
@@ -1372,21 +1448,21 @@
             }
           }
         },
-        "summary": "分页查询值集列表",
-        "tags": ["值集模块"]
+        "summary": "分页查询角色列表",
+        "tags": ["Role"]
       }
     },
-    "/value-set/schema-generator-holder-page-value-set": {
+    "/role/schema-generator-holder-page-role": {
       "post": {
         "deprecated": true,
-        "operationId": "ValueSetController__pageValueSet",
+        "operationId": "RoleController__pageRole",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ValueSetPageDto"
+                "$ref": "#/components/schemas/RolePageDto"
               }
             }
           }
@@ -1397,12 +1473,12 @@
           }
         },
         "summary": "请勿调用，用于生成前端DTO",
-        "tags": ["值集模块"]
+        "tags": ["Role"]
       }
     },
-    "/value-set/option": {
+    "/role/option": {
       "get": {
-        "operationId": "ValueSetController_pageOptionValueSet",
+        "operationId": "RoleController_pageOptionRole",
         "parameters": [
           {
             "name": "page",
@@ -1481,7 +1557,7 @@
                                 "list": {
                                   "type": "array",
                                   "items": {
-                                    "$ref": "#/components/schemas/ValueSetPageRespDto"
+                                    "$ref": "#/components/schemas/RolePageRespDto"
                                   }
                                 }
                               }
@@ -1497,21 +1573,21 @@
             }
           }
         },
-        "summary": "分页查询值集列表(可选字段)",
-        "tags": ["值集模块"]
+        "summary": "分页查询角色列表(可选字段)",
+        "tags": ["Role"]
       }
     },
-    "/value-set/schema-generator-holder-page-option-value-set": {
+    "/role/schema-generator-holder-page-option-role": {
       "post": {
         "deprecated": true,
-        "operationId": "ValueSetController__pageOptionValueSet",
+        "operationId": "RoleController__pageOptionRole",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ValueSetPageOptionDto"
+                "$ref": "#/components/schemas/RolePageOptionDto"
               }
             }
           }
@@ -1522,78 +1598,12 @@
           }
         },
         "summary": "请勿调用，用于生成前端DTO",
-        "tags": ["值集模块"]
+        "tags": ["Role"]
       }
     },
-    "/value-set/by-set-codes": {
+    "/role/find/{id}": {
       "get": {
-        "operationId": "ValueSetController_findValueSetBySetCodes",
-        "parameters": [
-          {
-            "name": "setCodes",
-            "required": true,
-            "in": "query",
-            "description": ",分隔的集CODE",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功响应",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/ValueSetListRespDto"
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "summary": "按集code查询值集",
-        "tags": ["值集模块"]
-      }
-    },
-    "/value-set/schema-generator-holder-by-set-codes": {
-      "post": {
-        "deprecated": true,
-        "operationId": "ValueSetController__findValueSetBySetCodes",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ValueSetListDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "请勿调用，用于生成前端DTO",
-        "tags": ["值集模块"]
-      }
-    },
-    "/value-set/find/{id}": {
-      "get": {
-        "operationId": "ValueSetController_findValueSetById",
+        "operationId": "RoleController_findRoleById",
         "parameters": [
           {
             "name": "id",
@@ -1617,7 +1627,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/ValueSetRespDto"
+                          "$ref": "#/components/schemas/RoleRespDto"
                         }
                       },
                       "required": ["data"]
@@ -1628,13 +1638,13 @@
             }
           }
         },
-        "summary": "按id查询值集",
-        "tags": ["值集模块"]
+        "summary": "按id查询角色",
+        "tags": ["Role"]
       }
     },
-    "/value-set/batch/query": {
+    "/role/batch/query": {
       "get": {
-        "operationId": "ValueSetController_findValueSetListByIds",
+        "operationId": "RoleController_findRoleListByIds",
         "parameters": [
           {
             "name": "ids",
@@ -1660,7 +1670,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/ValueSetListRespDto"
+                          "$ref": "#/components/schemas/RoleListRespDto"
                         }
                       },
                       "required": ["data"]
@@ -1671,20 +1681,20 @@
             }
           }
         },
-        "summary": "按ids查询值集",
-        "tags": ["值集模块"]
+        "summary": "按ids查询角色",
+        "tags": ["Role"]
       }
     },
-    "/value-set/create": {
+    "/role/create": {
       "post": {
-        "operationId": "ValueSetController_createValueSet",
+        "operationId": "RoleController_createRole",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ValueSetCreateDto"
+                "$ref": "#/components/schemas/RoleCreateDto"
               }
             }
           }
@@ -1702,7 +1712,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/ValueSetRespDto"
+                          "$ref": "#/components/schemas/RoleRespDto"
                         }
                       },
                       "required": ["data"]
@@ -1713,13 +1723,13 @@
             }
           }
         },
-        "summary": "创建值集",
-        "tags": ["值集模块"]
+        "summary": "创建角色",
+        "tags": ["Role"]
       }
     },
-    "/value-set/update/{id}": {
+    "/role/update/{id}": {
       "post": {
-        "operationId": "ValueSetController_updateValueSet",
+        "operationId": "RoleController_updateRole",
         "parameters": [
           {
             "name": "id",
@@ -1735,7 +1745,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ValueSetUpdateDto"
+                "$ref": "#/components/schemas/RoleUpdateDto"
               }
             }
           }
@@ -1753,7 +1763,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/ValueSetRespDto"
+                          "$ref": "#/components/schemas/RoleRespDto"
                         }
                       },
                       "required": ["data"]
@@ -1764,13 +1774,13 @@
             }
           }
         },
-        "summary": "修改值集",
-        "tags": ["值集模块"]
+        "summary": "修改角色",
+        "tags": ["Role"]
       }
     },
-    "/value-set/delete/{id}": {
+    "/role/delete/{id}": {
       "post": {
-        "operationId": "ValueSetController_removeValueSet",
+        "operationId": "RoleController_removeRole",
         "parameters": [
           {
             "name": "id",
@@ -1807,13 +1817,13 @@
             }
           }
         },
-        "summary": "删除值集",
-        "tags": ["值集模块"]
+        "summary": "删除角色",
+        "tags": ["Role"]
       }
     },
-    "/value-set/batch/delete": {
+    "/role/batch/delete": {
       "post": {
-        "operationId": "ValueSetController_batchRemoveValueSet",
+        "operationId": "RoleController_batchRemoveRole",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1849,13 +1859,13 @@
             }
           }
         },
-        "summary": "批量删除值集",
-        "tags": ["值集模块"]
+        "summary": "批量删除角色",
+        "tags": ["Role"]
       }
     },
-    "/value-set/updateStatus/{id}": {
+    "/role/updateStatus/{id}": {
       "post": {
-        "operationId": "ValueSetController_updateValueSetStatus",
+        "operationId": "RoleController_updateRoleStatus",
         "parameters": [
           {
             "name": "id",
@@ -1902,13 +1912,13 @@
             }
           }
         },
-        "summary": "修改值集状态",
-        "tags": ["值集模块"]
+        "summary": "修改角色状态",
+        "tags": ["Role"]
       }
     },
-    "/value-set/batch/status": {
+    "/role/batch/status": {
       "post": {
-        "operationId": "ValueSetController_batchUpdateValueSetStatus",
+        "operationId": "RoleController_batchUpdateRoleStatus",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1944,13 +1954,13 @@
             }
           }
         },
-        "summary": "批量修改值集状态",
-        "tags": ["值集模块"]
+        "summary": "批量修改角色状态",
+        "tags": ["Role"]
       }
     },
-    "/value-set/template": {
+    "/role/template": {
       "post": {
-        "operationId": "ValueSetController_downloadValueSetTemplate",
+        "operationId": "RoleController_downloadRoleTemplate",
         "parameters": [],
         "responses": {
           "200": {
@@ -1978,13 +1988,13 @@
             }
           }
         },
-        "summary": "下载导入值集模板",
-        "tags": ["值集模块"]
+        "summary": "下载导入角色模板",
+        "tags": ["Role"]
       }
     },
-    "/value-set/import": {
+    "/role/import": {
       "post": {
-        "operationId": "ValueSetController_importValueSet",
+        "operationId": "RoleController_importRole",
         "parameters": [],
         "responses": {
           "200": {
@@ -2012,13 +2022,13 @@
             }
           }
         },
-        "summary": "导入值集数据",
-        "tags": ["值集模块"]
+        "summary": "导入角色数据",
+        "tags": ["Role"]
       }
     },
-    "/value-set/export": {
+    "/role/export": {
       "post": {
-        "operationId": "ValueSetController_exportValueSet",
+        "operationId": "RoleController_exportRole",
         "parameters": [],
         "responses": {
           "200": {
@@ -2046,8 +2056,8 @@
             }
           }
         },
-        "summary": "导出值集数据",
-        "tags": ["值集模块"]
+        "summary": "导出角色数据",
+        "tags": ["Role"]
       }
     },
     "/resource/page": {
@@ -3210,24 +3220,58 @@
         "tags": ["Resource"]
       }
     },
-    "/role/page": {
+    "/file/get": {
       "get": {
-        "operationId": "RoleController_pageRole",
+        "operationId": "FileController_readData",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["File"]
+      }
+    },
+    "/file/update": {
+      "post": {
+        "operationId": "FileController_writeData",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["File"]
+      }
+    },
+    "/value-set/page": {
+      "get": {
+        "operationId": "ValueSetController_pageValueSet",
         "parameters": [
           {
-            "name": "roleName",
-            "required": true,
+            "name": "parentSetCode",
+            "required": false,
             "in": "query",
-            "description": "角色名称",
+            "description": "父编码",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "roleCode",
-            "required": true,
+            "name": "parentSetName",
+            "required": false,
             "in": "query",
-            "description": "角色编码",
+            "description": "父名称",
             "schema": {
               "type": "string"
             }
@@ -3236,7 +3280,7 @@
             "name": "status",
             "required": false,
             "in": "query",
-            "description": "状态：0-禁用，1-启用",
+            "description": "状态  0-禁用 1-启用",
             "schema": {
               "type": "string"
             }
@@ -3255,6 +3299,42 @@
             "required": false,
             "in": "query",
             "description": "修改时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdUserId",
+            "required": false,
+            "in": "query",
+            "description": "创建人id",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "createdUserName",
+            "required": false,
+            "in": "query",
+            "description": "创建人名称",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedUserId",
+            "required": false,
+            "in": "query",
+            "description": "修改人id",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "updatedUserName",
+            "required": false,
+            "in": "query",
+            "description": "修改人姓名",
             "schema": {
               "type": "string"
             }
@@ -3284,6 +3364,46 @@
             "description": "每页条数",
             "schema": {
               "type": "number"
+            }
+          },
+          {
+            "name": "setCode",
+            "required": false,
+            "in": "query",
+            "description": "集CODE",
+            "schema": {
+              "example": "SYS_GENDER",
+              "type": "string"
+            }
+          },
+          {
+            "name": "setName",
+            "required": false,
+            "in": "query",
+            "description": "集NAME",
+            "schema": {
+              "example": "性别",
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "required": false,
+            "in": "query",
+            "description": "值CODE",
+            "schema": {
+              "example": "1",
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "description": "值NAME",
+            "schema": {
+              "example": "男",
+              "type": "string"
             }
           },
           {
@@ -3365,7 +3485,7 @@
                                 "list": {
                                   "type": "array",
                                   "items": {
-                                    "$ref": "#/components/schemas/RolePageRespDto"
+                                    "$ref": "#/components/schemas/ValueSetPageRespDto"
                                   }
                                 }
                               }
@@ -3381,21 +3501,21 @@
             }
           }
         },
-        "summary": "分页查询角色列表",
-        "tags": ["Role"]
+        "summary": "分页查询值集列表",
+        "tags": ["值集模块"]
       }
     },
-    "/role/schema-generator-holder-page-role": {
+    "/value-set/schema-generator-holder-page-value-set": {
       "post": {
         "deprecated": true,
-        "operationId": "RoleController__pageRole",
+        "operationId": "ValueSetController__pageValueSet",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RolePageDto"
+                "$ref": "#/components/schemas/ValueSetPageDto"
               }
             }
           }
@@ -3406,12 +3526,12 @@
           }
         },
         "summary": "请勿调用，用于生成前端DTO",
-        "tags": ["Role"]
+        "tags": ["值集模块"]
       }
     },
-    "/role/option": {
+    "/value-set/option": {
       "get": {
-        "operationId": "RoleController_pageOptionRole",
+        "operationId": "ValueSetController_pageOptionValueSet",
         "parameters": [
           {
             "name": "page",
@@ -3490,7 +3610,7 @@
                                 "list": {
                                   "type": "array",
                                   "items": {
-                                    "$ref": "#/components/schemas/RolePageRespDto"
+                                    "$ref": "#/components/schemas/ValueSetPageRespDto"
                                   }
                                 }
                               }
@@ -3506,21 +3626,21 @@
             }
           }
         },
-        "summary": "分页查询角色列表(可选字段)",
-        "tags": ["Role"]
+        "summary": "分页查询值集列表(可选字段)",
+        "tags": ["值集模块"]
       }
     },
-    "/role/schema-generator-holder-page-option-role": {
+    "/value-set/schema-generator-holder-page-option-value-set": {
       "post": {
         "deprecated": true,
-        "operationId": "RoleController__pageOptionRole",
+        "operationId": "ValueSetController__pageOptionValueSet",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RolePageOptionDto"
+                "$ref": "#/components/schemas/ValueSetPageOptionDto"
               }
             }
           }
@@ -3531,12 +3651,78 @@
           }
         },
         "summary": "请勿调用，用于生成前端DTO",
-        "tags": ["Role"]
+        "tags": ["值集模块"]
       }
     },
-    "/role/find/{id}": {
+    "/value-set/by-set-codes": {
       "get": {
-        "operationId": "RoleController_findRoleById",
+        "operationId": "ValueSetController_findValueSetBySetCodes",
+        "parameters": [
+          {
+            "name": "setCodes",
+            "required": true,
+            "in": "query",
+            "description": ",分隔的集CODE",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ValueSetListRespDto"
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "按集code查询值集",
+        "tags": ["值集模块"]
+      }
+    },
+    "/value-set/schema-generator-holder-by-set-codes": {
+      "post": {
+        "deprecated": true,
+        "operationId": "ValueSetController__findValueSetBySetCodes",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValueSetListDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "请勿调用，用于生成前端DTO",
+        "tags": ["值集模块"]
+      }
+    },
+    "/value-set/find/{id}": {
+      "get": {
+        "operationId": "ValueSetController_findValueSetById",
         "parameters": [
           {
             "name": "id",
@@ -3560,7 +3746,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/RoleRespDto"
+                          "$ref": "#/components/schemas/ValueSetRespDto"
                         }
                       },
                       "required": ["data"]
@@ -3571,13 +3757,13 @@
             }
           }
         },
-        "summary": "按id查询角色",
-        "tags": ["Role"]
+        "summary": "按id查询值集",
+        "tags": ["值集模块"]
       }
     },
-    "/role/batch/query": {
+    "/value-set/batch/query": {
       "get": {
-        "operationId": "RoleController_findRoleListByIds",
+        "operationId": "ValueSetController_findValueSetListByIds",
         "parameters": [
           {
             "name": "ids",
@@ -3603,7 +3789,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/RoleListRespDto"
+                          "$ref": "#/components/schemas/ValueSetListRespDto"
                         }
                       },
                       "required": ["data"]
@@ -3614,20 +3800,20 @@
             }
           }
         },
-        "summary": "按ids查询角色",
-        "tags": ["Role"]
+        "summary": "按ids查询值集",
+        "tags": ["值集模块"]
       }
     },
-    "/role/create": {
+    "/value-set/create": {
       "post": {
-        "operationId": "RoleController_createRole",
+        "operationId": "ValueSetController_createValueSet",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RoleCreateDto"
+                "$ref": "#/components/schemas/ValueSetCreateDto"
               }
             }
           }
@@ -3645,7 +3831,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/RoleRespDto"
+                          "$ref": "#/components/schemas/ValueSetRespDto"
                         }
                       },
                       "required": ["data"]
@@ -3656,13 +3842,13 @@
             }
           }
         },
-        "summary": "创建角色",
-        "tags": ["Role"]
+        "summary": "创建值集",
+        "tags": ["值集模块"]
       }
     },
-    "/role/update/{id}": {
+    "/value-set/update/{id}": {
       "post": {
-        "operationId": "RoleController_updateRole",
+        "operationId": "ValueSetController_updateValueSet",
         "parameters": [
           {
             "name": "id",
@@ -3678,7 +3864,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RoleUpdateDto"
+                "$ref": "#/components/schemas/ValueSetUpdateDto"
               }
             }
           }
@@ -3696,7 +3882,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/RoleRespDto"
+                          "$ref": "#/components/schemas/ValueSetRespDto"
                         }
                       },
                       "required": ["data"]
@@ -3707,13 +3893,13 @@
             }
           }
         },
-        "summary": "修改角色",
-        "tags": ["Role"]
+        "summary": "修改值集",
+        "tags": ["值集模块"]
       }
     },
-    "/role/delete/{id}": {
+    "/value-set/delete/{id}": {
       "post": {
-        "operationId": "RoleController_removeRole",
+        "operationId": "ValueSetController_removeValueSet",
         "parameters": [
           {
             "name": "id",
@@ -3750,13 +3936,13 @@
             }
           }
         },
-        "summary": "删除角色",
-        "tags": ["Role"]
+        "summary": "删除值集",
+        "tags": ["值集模块"]
       }
     },
-    "/role/batch/delete": {
+    "/value-set/batch/delete": {
       "post": {
-        "operationId": "RoleController_batchRemoveRole",
+        "operationId": "ValueSetController_batchRemoveValueSet",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3792,13 +3978,13 @@
             }
           }
         },
-        "summary": "批量删除角色",
-        "tags": ["Role"]
+        "summary": "批量删除值集",
+        "tags": ["值集模块"]
       }
     },
-    "/role/updateStatus/{id}": {
+    "/value-set/updateStatus/{id}": {
       "post": {
-        "operationId": "RoleController_updateRoleStatus",
+        "operationId": "ValueSetController_updateValueSetStatus",
         "parameters": [
           {
             "name": "id",
@@ -3845,13 +4031,13 @@
             }
           }
         },
-        "summary": "修改角色状态",
-        "tags": ["Role"]
+        "summary": "修改值集状态",
+        "tags": ["值集模块"]
       }
     },
-    "/role/batch/status": {
+    "/value-set/batch/status": {
       "post": {
-        "operationId": "RoleController_batchUpdateRoleStatus",
+        "operationId": "ValueSetController_batchUpdateValueSetStatus",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3887,13 +4073,13 @@
             }
           }
         },
-        "summary": "批量修改角色状态",
-        "tags": ["Role"]
+        "summary": "批量修改值集状态",
+        "tags": ["值集模块"]
       }
     },
-    "/role/template": {
+    "/value-set/template": {
       "post": {
-        "operationId": "RoleController_downloadRoleTemplate",
+        "operationId": "ValueSetController_downloadValueSetTemplate",
         "parameters": [],
         "responses": {
           "200": {
@@ -3921,13 +4107,13 @@
             }
           }
         },
-        "summary": "下载导入角色模板",
-        "tags": ["Role"]
+        "summary": "下载导入值集模板",
+        "tags": ["值集模块"]
       }
     },
-    "/role/import": {
+    "/value-set/import": {
       "post": {
-        "operationId": "RoleController_importRole",
+        "operationId": "ValueSetController_importValueSet",
         "parameters": [],
         "responses": {
           "200": {
@@ -3955,13 +4141,13 @@
             }
           }
         },
-        "summary": "导入角色数据",
-        "tags": ["Role"]
+        "summary": "导入值集数据",
+        "tags": ["值集模块"]
       }
     },
-    "/role/export": {
+    "/value-set/export": {
       "post": {
-        "operationId": "RoleController_exportRole",
+        "operationId": "ValueSetController_exportValueSet",
         "parameters": [],
         "responses": {
           "200": {
@@ -3989,8 +4175,8 @@
             }
           }
         },
-        "summary": "导出角色数据",
-        "tags": ["Role"]
+        "summary": "导出值集数据",
+        "tags": ["值集模块"]
       }
     }
   },
@@ -4033,7 +4219,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
+            "type": "number",
             "description": "用户ID",
             "example": "testId"
           },
@@ -4042,16 +4228,21 @@
             "description": "用户名",
             "example": "testName"
           },
-          "roles": {
+          "roleCodes": {
             "description": "角色列表",
-            "example": "[\"admin\"]",
+            "example": "",
             "type": "array",
             "items": {
               "type": "string"
             }
+          },
+          "nickName": {
+            "type": "string",
+            "description": "昵称",
+            "example": ""
           }
         },
-        "required": ["id", "userName", "roles"]
+        "required": ["id", "userName", "roleCodes", "nickName"]
       },
       "PasswordLoginDto": {
         "type": "object",
@@ -4063,9 +4254,22 @@
           "password": {
             "type": "string",
             "description": "密码"
+          },
+          "captchaKey": {
+            "type": "string",
+            "description": "验证码Key"
+          },
+          "captchaCode": {
+            "type": "string",
+            "description": "验证码"
+          },
+          "keyId": {
+            "type": "string",
+            "description": "公钥Key",
+            "example": ""
           }
         },
-        "required": ["userName", "password"]
+        "required": ["userName", "password", "captchaKey", "captchaCode", "keyId"]
       },
       "PhoneLoginDto": {
         "type": "object",
@@ -4094,9 +4298,14 @@
             "description": "用户名",
             "example": "testName"
           },
-          "roles": {
+          "nickName": {
+            "type": "string",
+            "description": "昵称",
+            "example": "testName"
+          },
+          "roleCodes": {
             "description": "用户角色列表",
-            "example": "[\"admin\"]",
+            "example": "[1, 2]",
             "type": "array",
             "items": {
               "type": "string"
@@ -4111,11 +4320,39 @@
             }
           }
         },
-        "required": ["id", "userName", "roles", "permissions"]
+        "required": ["id", "userName", "nickName", "roleCodes", "permissions"]
       },
-      "UpdateCommonDto": {
+      "PublicKeyRespDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "publicKey": {
+            "type": "string",
+            "description": "公钥",
+            "example": ""
+          },
+          "keyId": {
+            "type": "string",
+            "description": "公钥Key",
+            "example": ""
+          }
+        },
+        "required": ["publicKey", "keyId"]
+      },
+      "CaptchaResponseDto": {
+        "type": "object",
+        "properties": {
+          "captchaImg": {
+            "type": "string",
+            "description": "图形验证码",
+            "example": ""
+          },
+          "captchaKey": {
+            "type": "string",
+            "description": "图形验证码Key",
+            "example": ""
+          }
+        },
+        "required": ["captchaImg", "captchaKey"]
       },
       "PaginatedResult": {
         "type": "object",
@@ -4422,9 +4659,13 @@
           "py": {
             "type": "string",
             "description": "拼音首字母"
+          },
+          "roleIds": {
+            "type": "number",
+            "description": "角色id"
           }
         },
-        "required": ["id", "userName"]
+        "required": ["id", "userName", "roleIds"]
       },
       "UserListRespDto": {
         "type": "object",
@@ -4520,6 +4761,13 @@
           },
           "roles": {
             "description": "用户角色",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "password": {
+            "description": "密码",
             "type": "array",
             "items": {
               "type": "string"
@@ -4658,6 +4906,712 @@
           }
         },
         "required": ["ids", "status"]
+      },
+      "AdminResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "keyId": {
+            "type": "string",
+            "description": "解密id"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "新密码"
+          },
+          "userId": {
+            "type": "number",
+            "description": "用户id"
+          }
+        },
+        "required": ["keyId", "newPassword", "userId"]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "oldPasswordKeyId": {
+            "type": "string",
+            "description": "old解密id"
+          },
+          "newPasswordKeyId": {
+            "type": "string",
+            "description": "new解密id"
+          },
+          "oldPassword": {
+            "type": "string",
+            "description": "旧密码"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "新密码"
+          },
+          "userId": {
+            "type": "number",
+            "description": "用户id"
+          }
+        },
+        "required": ["oldPasswordKeyId", "newPasswordKeyId", "oldPassword", "newPassword", "userId"]
+      },
+      "RolePageRespDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "角色id"
+          },
+          "roleName": {
+            "type": "string",
+            "description": "角色名称"
+          },
+          "roleCode": {
+            "type": "string",
+            "description": "角色编码"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          },
+          "userCount": {
+            "type": "number",
+            "description": "用户数量"
+          },
+          "resourceCount": {
+            "type": "number",
+            "description": "资源数量"
+          }
+        },
+        "required": ["id", "roleName", "roleCode", "userCount", "resourceCount"]
+      },
+      "RolePageDto": {
+        "type": "object",
+        "properties": {
+          "roleName": {
+            "type": "string",
+            "description": "角色名称"
+          },
+          "roleCode": {
+            "type": "string",
+            "description": "角色编码"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          },
+          "page": {
+            "type": "number",
+            "description": "页码"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "每页条数"
+          },
+          "createdAtStart": {
+            "type": "string",
+            "description": "创建时间开始",
+            "example": "2000-10-10 00:00:00"
+          },
+          "createdAtEnd": {
+            "type": "string",
+            "description": "创建时间结束",
+            "example": "2000-10-10 23:59:59"
+          },
+          "updatedAtStart": {
+            "type": "string",
+            "description": "修改时间开始",
+            "example": "2000-10-10 00:00:00"
+          },
+          "updatedAtEnd": {
+            "type": "string",
+            "description": "修改时间结束",
+            "example": "2000-10-10 23:59:59"
+          }
+        },
+        "required": ["roleName", "roleCode"]
+      },
+      "RolePageOptionDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "description": "页码"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "每页条数"
+          },
+          "keyword": {
+            "type": "string",
+            "description": "关键字",
+            "example": ""
+          },
+          "fields": {
+            "type": "string",
+            "description": "返回的列表字段",
+            "example": ""
+          }
+        }
+      },
+      "RoleRespDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "角色id"
+          },
+          "roleName": {
+            "type": "string",
+            "description": "角色名称"
+          },
+          "roleCode": {
+            "type": "string",
+            "description": "角色编码"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          },
+          "userIds": {
+            "type": "string",
+            "description": "用户id列表"
+          },
+          "resourceIds": {
+            "type": "string",
+            "description": "资源id列表"
+          }
+        },
+        "required": ["id", "roleName", "roleCode", "userIds", "resourceIds"]
+      },
+      "RoleListRespDto": {
+        "type": "object",
+        "properties": {
+          "notFoundIds": {
+            "description": "未找到的id数组",
+            "example": "",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "list": {
+            "description": "列表",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["list"]
+      },
+      "RoleCreateDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          },
+          "roleName": {
+            "type": "string",
+            "description": "角色名称"
+          },
+          "roleCode": {
+            "type": "string",
+            "description": "角色编码"
+          },
+          "userIds": {
+            "type": "string",
+            "description": "用“,”拼接的id",
+            "example": ""
+          },
+          "resourceIds": {
+            "type": "string",
+            "description": "用“,”拼接的id",
+            "example": ""
+          }
+        },
+        "required": ["roleName", "roleCode", "userIds", "resourceIds"]
+      },
+      "RoleUpdateDto": {
+        "type": "object",
+        "properties": {
+          "roleName": {
+            "type": "string",
+            "description": "角色名称"
+          },
+          "roleCode": {
+            "type": "string",
+            "description": "角色编码"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          },
+          "userIds": {
+            "type": "string",
+            "description": "用“,”拼接的id",
+            "example": ""
+          },
+          "resourceIds": {
+            "type": "string",
+            "description": "用“,”拼接的id",
+            "example": ""
+          }
+        },
+        "required": ["roleName", "roleCode", "userIds", "resourceIds"]
+      },
+      "ResourcePageRespDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "资源id"
+          },
+          "label": {
+            "type": "string",
+            "description": "资源名称"
+          },
+          "uniqueProp": {
+            "type": "string",
+            "description": "唯一编码"
+          },
+          "parentUniqueProp": {
+            "type": "string",
+            "description": "唯一父编码"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "type": {
+            "type": "string",
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          }
+        },
+        "required": ["id"]
+      },
+      "ResourcePageDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "资源名称"
+          },
+          "uniqueProp": {
+            "type": "string",
+            "description": "唯一编码"
+          },
+          "parentUniqueProp": {
+            "type": "string",
+            "description": "唯一父编码"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "type": {
+            "type": "string",
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          },
+          "page": {
+            "type": "number",
+            "description": "页码"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "每页条数"
+          },
+          "createdAtStart": {
+            "type": "string",
+            "description": "创建时间开始",
+            "example": "2000-10-10 00:00:00"
+          },
+          "createdAtEnd": {
+            "type": "string",
+            "description": "创建时间结束",
+            "example": "2000-10-10 23:59:59"
+          },
+          "updatedAtStart": {
+            "type": "string",
+            "description": "修改时间开始",
+            "example": "2000-10-10 00:00:00"
+          },
+          "updatedAtEnd": {
+            "type": "string",
+            "description": "修改时间结束",
+            "example": "2000-10-10 23:59:59"
+          }
+        }
+      },
+      "ResourcePageOptionDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "description": "页码"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "每页条数"
+          },
+          "keyword": {
+            "type": "string",
+            "description": "关键字",
+            "example": ""
+          },
+          "fields": {
+            "type": "string",
+            "description": "返回的列表字段",
+            "example": ""
+          }
+        }
+      },
+      "ResourceRespDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "资源id"
+          },
+          "label": {
+            "type": "string",
+            "description": "资源名称"
+          },
+          "uniqueProp": {
+            "type": "string",
+            "description": "唯一编码"
+          },
+          "parentUniqueProp": {
+            "type": "string",
+            "description": "唯一父编码"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "type": {
+            "type": "string",
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          }
+        },
+        "required": ["id"]
+      },
+      "ResourceListRespDto": {
+        "type": "object",
+        "properties": {
+          "notFoundIds": {
+            "description": "未找到的id数组",
+            "example": "",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "list": {
+            "description": "列表",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["list"]
+      },
+      "ResourceCreateDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "资源名称"
+          },
+          "uniqueProp": {
+            "type": "string",
+            "description": "唯一编码"
+          },
+          "parentUniqueProp": {
+            "type": "string",
+            "description": "唯一父编码"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "type": {
+            "type": "string",
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          }
+        }
+      },
+      "ResourceUpdateDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "资源名称"
+          },
+          "uniqueProp": {
+            "type": "string",
+            "description": "唯一编码"
+          },
+          "parentUniqueProp": {
+            "type": "string",
+            "description": "唯一父编码"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "type": {
+            "type": "string",
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          }
+        }
+      },
+      "ResourcePartialDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "资源id"
+          },
+          "label": {
+            "type": "string",
+            "description": "资源名称"
+          },
+          "uniqueProp": {
+            "type": "string",
+            "description": "唯一编码"
+          },
+          "parentUniqueProp": {
+            "type": "string",
+            "description": "唯一父编码"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "type": {
+            "type": "string",
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
+          },
+          "notInMenu": {
+            "type": "string",
+            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
+          },
+          "menuPath": {
+            "type": "string",
+            "description": "菜单路径"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "修改时间"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "删除时间"
+          }
+        }
+      },
+      "ResourceBatchUpdateDto": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResourcePartialDto"
+            }
+          }
+        },
+        "required": ["list"]
+      },
+      "UpdateFileDto": {
+        "type": "object",
+        "properties": {}
       },
       "ValueSetPageRespDto": {
         "type": "object",
@@ -5061,664 +6015,6 @@
           }
         },
         "required": ["setCode", "setName", "code", "name"]
-      },
-      "ResourcePageRespDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "资源id"
-          },
-          "label": {
-            "type": "string",
-            "description": "资源名称"
-          },
-          "uniqueProp": {
-            "type": "string",
-            "description": "唯一编码"
-          },
-          "parentUniqueProp": {
-            "type": "string",
-            "description": "唯一父编码"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态：0-禁用，1-启用"
-          },
-          "type": {
-            "type": "string",
-            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
-          },
-          "menuPath": {
-            "type": "string",
-            "description": "菜单路径"
-          },
-          "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
-          },
-          "sortNumber": {
-            "type": "number",
-            "description": "排序号"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "修改时间"
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "删除时间"
-          }
-        },
-        "required": ["id"]
-      },
-      "ResourcePageDto": {
-        "type": "object",
-        "properties": {
-          "label": {
-            "type": "string",
-            "description": "资源名称"
-          },
-          "uniqueProp": {
-            "type": "string",
-            "description": "唯一编码"
-          },
-          "parentUniqueProp": {
-            "type": "string",
-            "description": "唯一父编码"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态：0-禁用，1-启用"
-          },
-          "type": {
-            "type": "string",
-            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
-          },
-          "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
-          },
-          "sortNumber": {
-            "type": "number",
-            "description": "排序号"
-          },
-          "menuPath": {
-            "type": "string",
-            "description": "菜单路径"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "修改时间"
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "删除时间"
-          },
-          "page": {
-            "type": "number",
-            "description": "页码"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "每页条数"
-          },
-          "createdAtStart": {
-            "type": "string",
-            "description": "创建时间开始",
-            "example": "2000-10-10 00:00:00"
-          },
-          "createdAtEnd": {
-            "type": "string",
-            "description": "创建时间结束",
-            "example": "2000-10-10 23:59:59"
-          },
-          "updatedAtStart": {
-            "type": "string",
-            "description": "修改时间开始",
-            "example": "2000-10-10 00:00:00"
-          },
-          "updatedAtEnd": {
-            "type": "string",
-            "description": "修改时间结束",
-            "example": "2000-10-10 23:59:59"
-          }
-        }
-      },
-      "ResourcePageOptionDto": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "number",
-            "description": "页码"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "每页条数"
-          },
-          "keyword": {
-            "type": "string",
-            "description": "关键字",
-            "example": ""
-          },
-          "fields": {
-            "type": "string",
-            "description": "返回的列表字段",
-            "example": ""
-          }
-        }
-      },
-      "ResourceRespDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "资源id"
-          },
-          "label": {
-            "type": "string",
-            "description": "资源名称"
-          },
-          "uniqueProp": {
-            "type": "string",
-            "description": "唯一编码"
-          },
-          "parentUniqueProp": {
-            "type": "string",
-            "description": "唯一父编码"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态：0-禁用，1-启用"
-          },
-          "type": {
-            "type": "string",
-            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
-          },
-          "menuPath": {
-            "type": "string",
-            "description": "菜单路径"
-          },
-          "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
-          },
-          "sortNumber": {
-            "type": "number",
-            "description": "排序号"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "修改时间"
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "删除时间"
-          }
-        },
-        "required": ["id"]
-      },
-      "ResourceListRespDto": {
-        "type": "object",
-        "properties": {
-          "notFoundIds": {
-            "description": "未找到的id数组",
-            "example": "",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "list": {
-            "description": "列表",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": ["list"]
-      },
-      "ResourceCreateDto": {
-        "type": "object",
-        "properties": {
-          "label": {
-            "type": "string",
-            "description": "资源名称"
-          },
-          "uniqueProp": {
-            "type": "string",
-            "description": "唯一编码"
-          },
-          "parentUniqueProp": {
-            "type": "string",
-            "description": "唯一父编码"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态：0-禁用，1-启用"
-          },
-          "type": {
-            "type": "string",
-            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
-          },
-          "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
-          },
-          "sortNumber": {
-            "type": "number",
-            "description": "排序号"
-          },
-          "menuPath": {
-            "type": "string",
-            "description": "菜单路径"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "修改时间"
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "删除时间"
-          }
-        }
-      },
-      "ResourceUpdateDto": {
-        "type": "object",
-        "properties": {
-          "label": {
-            "type": "string",
-            "description": "资源名称"
-          },
-          "uniqueProp": {
-            "type": "string",
-            "description": "唯一编码"
-          },
-          "parentUniqueProp": {
-            "type": "string",
-            "description": "唯一父编码"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态：0-禁用，1-启用"
-          },
-          "type": {
-            "type": "string",
-            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
-          },
-          "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
-          },
-          "sortNumber": {
-            "type": "number",
-            "description": "排序号"
-          },
-          "menuPath": {
-            "type": "string",
-            "description": "菜单路径"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "修改时间"
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "删除时间"
-          }
-        }
-      },
-      "ResourcePartialDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "资源id"
-          },
-          "label": {
-            "type": "string",
-            "description": "资源名称"
-          },
-          "uniqueProp": {
-            "type": "string",
-            "description": "唯一编码"
-          },
-          "parentUniqueProp": {
-            "type": "string",
-            "description": "唯一父编码"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态：0-禁用，1-启用"
-          },
-          "type": {
-            "type": "string",
-            "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
-          },
-          "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
-          },
-          "sortNumber": {
-            "type": "number",
-            "description": "排序号"
-          },
-          "menuPath": {
-            "type": "string",
-            "description": "菜单路径"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "修改时间"
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "删除时间"
-          }
-        }
-      },
-      "ResourceBatchUpdateDto": {
-        "type": "object",
-        "properties": {
-          "list": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ResourcePartialDto"
-            }
-          }
-        },
-        "required": ["list"]
-      },
-      "RolePageRespDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "角色id"
-          },
-          "roleName": {
-            "type": "string",
-            "description": "角色名称"
-          },
-          "roleCode": {
-            "type": "string",
-            "description": "角色编码"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态：0-禁用，1-启用"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "修改时间"
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "删除时间"
-          },
-          "userCount": {
-            "type": "number",
-            "description": "用户数量"
-          },
-          "resourceCount": {
-            "type": "number",
-            "description": "资源数量"
-          }
-        },
-        "required": ["id", "roleName", "roleCode", "userCount", "resourceCount"]
-      },
-      "RolePageDto": {
-        "type": "object",
-        "properties": {
-          "roleName": {
-            "type": "string",
-            "description": "角色名称"
-          },
-          "roleCode": {
-            "type": "string",
-            "description": "角色编码"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态：0-禁用，1-启用"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "修改时间"
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "删除时间"
-          },
-          "page": {
-            "type": "number",
-            "description": "页码"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "每页条数"
-          },
-          "createdAtStart": {
-            "type": "string",
-            "description": "创建时间开始",
-            "example": "2000-10-10 00:00:00"
-          },
-          "createdAtEnd": {
-            "type": "string",
-            "description": "创建时间结束",
-            "example": "2000-10-10 23:59:59"
-          },
-          "updatedAtStart": {
-            "type": "string",
-            "description": "修改时间开始",
-            "example": "2000-10-10 00:00:00"
-          },
-          "updatedAtEnd": {
-            "type": "string",
-            "description": "修改时间结束",
-            "example": "2000-10-10 23:59:59"
-          }
-        },
-        "required": ["roleName", "roleCode"]
-      },
-      "RolePageOptionDto": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "number",
-            "description": "页码"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "每页条数"
-          },
-          "keyword": {
-            "type": "string",
-            "description": "关键字",
-            "example": ""
-          },
-          "fields": {
-            "type": "string",
-            "description": "返回的列表字段",
-            "example": ""
-          }
-        }
-      },
-      "RoleRespDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "角色id"
-          },
-          "roleName": {
-            "type": "string",
-            "description": "角色名称"
-          },
-          "roleCode": {
-            "type": "string",
-            "description": "角色编码"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态：0-禁用，1-启用"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "修改时间"
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "删除时间"
-          },
-          "userIds": {
-            "type": "string",
-            "description": "用户id列表"
-          },
-          "resourceIds": {
-            "type": "string",
-            "description": "资源id列表"
-          }
-        },
-        "required": ["id", "roleName", "roleCode", "userIds", "resourceIds"]
-      },
-      "RoleListRespDto": {
-        "type": "object",
-        "properties": {
-          "notFoundIds": {
-            "description": "未找到的id数组",
-            "example": "",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "list": {
-            "description": "列表",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": ["list"]
-      },
-      "RoleCreateDto": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "description": "状态：0-禁用，1-启用"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "修改时间"
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "删除时间"
-          },
-          "roleName": {
-            "type": "string",
-            "description": "角色名称"
-          },
-          "roleCode": {
-            "type": "string",
-            "description": "角色编码"
-          },
-          "userIds": {
-            "type": "string",
-            "description": "用“,”拼接的id",
-            "example": ""
-          },
-          "resourceIds": {
-            "type": "string",
-            "description": "用“,”拼接的id",
-            "example": ""
-          }
-        },
-        "required": ["roleName", "roleCode", "userIds", "resourceIds"]
-      },
-      "RoleUpdateDto": {
-        "type": "object",
-        "properties": {
-          "roleName": {
-            "type": "string",
-            "description": "角色名称"
-          },
-          "roleCode": {
-            "type": "string",
-            "description": "角色编码"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态：0-禁用，1-启用"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "修改时间"
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "删除时间"
-          },
-          "userIds": {
-            "type": "string",
-            "description": "用“,”拼接的id",
-            "example": ""
-          },
-          "resourceIds": {
-            "type": "string",
-            "description": "用“,”拼接的id",
-            "example": ""
-          }
-        },
-        "required": ["roleName", "roleCode", "userIds", "resourceIds"]
       }
     }
   }
