@@ -11,7 +11,7 @@ import { PaginatedResult } from '@/dto/pagination-response.dto'
 import { BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { ResourceRepository } from '@/modules/resource/resource.repository'
 import { plainToInstance } from 'class-transformer'
-import { DataSource, EntityManager, FindManyOptions, In, Not } from 'typeorm'
+import { DataSource, FindManyOptions, In } from 'typeorm'
 import { Resource } from '@/modules/resource/entities/resource.entity'
 import { BusinessException } from '@/exceptions/business-exception'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
@@ -48,9 +48,19 @@ export class ResourceService {
       list,
     }
   }
-  async listByUser(userId: number): Promise<ListResp<ResourcePageRespDto>> {
+  async listByUser(
+    userId: number,
+    roleCodes: string[] = [],
+    types?: string,
+    notInMenu?: string,
+  ): Promise<ListResp<ResourcePageRespDto>> {
     // todo 判断userId 若非本人，则必须为管理员
-    const [entities] = await this.resourceRepository.searchResourcesByUser(userId)
+    const [entities] = await this.resourceRepository.searchResourcesByUser(
+      userId,
+      roleCodes,
+      types,
+      notInMenu,
+    )
     const list = plainToInstance(ResourcePageRespDto, entities, {
       excludeExtraneousValues: true,
     })

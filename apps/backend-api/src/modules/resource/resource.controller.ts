@@ -12,12 +12,18 @@ import {
 } from '@/modules/resource/dto/resource.update.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
 import { ApiOperation } from '@nestjs/swagger'
-import { ApiSuccessPageResponse, ApiSuccessResponse } from '@/decorators/api-response.decorator'
+import {
+  ApiSuccessListResponse,
+  ApiSuccessPageResponse,
+  ApiSuccessResponse,
+} from '@/decorators/api-response.decorator'
 import { BatchDto, BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
 import { CurrentUser } from '@/decorators/current-user.decorator'
 import { CurrentLoginResponseDto } from '../auth/auth.dto'
 import { ListResp } from '@/dto/base.dto'
+import { RequirePermissions } from '@/decorators/require-permissions.decorator'
+import { PERMISSIONS } from '@repo/shared'
 
 @Controller('resource')
 export class ResourceController {
@@ -40,13 +46,16 @@ export class ResourceController {
   }
 
   @Get('listByUser')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_PAGE)
   @ApiOperation({ summary: '查询用户的菜单资源' })
-  @ApiSuccessResponse()
+  @ApiSuccessListResponse(ResourcePageRespDto)
   async listResourceByUser(
     @Query('id', new ParseIntPipe({ optional: true })) id: number | undefined,
+    @Query('types') types: string | undefined,
+    @Query('notInMenu') notInMenu: string | undefined,
     @CurrentUser() user: CurrentLoginResponseDto,
   ): Promise<ListResp<ResourcePageRespDto>> {
-    return await this.resourceService.listByUser(id || user.id)
+    return await this.resourceService.listByUser(id || user.id, user.roleCodes, types, notInMenu)
   }
 
   @Post('schema-generator-holder-page-resource')
@@ -88,6 +97,7 @@ export class ResourceController {
   }
 
   @Post('create')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_CREATE)
   @ApiOperation({ summary: '创建资源' })
   @ApiSuccessResponse(ResourceRespDto)
   async createResource(@Body() body: ResourceCreateDto): Promise<ResourceRespDto | null> {

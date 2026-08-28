@@ -2619,7 +2619,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "成功响应",
+            "description": "list成功响应",
             "content": {
               "application/json": {
                 "schema": {
@@ -2630,9 +2630,22 @@
                     {
                       "properties": {
                         "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/ListResp"
+                            },
+                            {
+                              "required": ["list"],
+                              "properties": {
+                                "list": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/components/schemas/ResourcePageRespDto"
+                                  }
+                                }
+                              }
+                            }
+                          ]
                         }
                       },
                       "required": ["data"]
@@ -5439,6 +5452,20 @@
           }
         },
         "required": ["id"]
+      },
+      "ListResp": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "description": "列表",
+            "example": "",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["list"]
       },
       "ResourcePageDto": {
         "type": "object",

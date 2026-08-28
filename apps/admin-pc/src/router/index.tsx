@@ -8,8 +8,10 @@ import { ResetPasswordPage } from '@/features/auth/pages/ResetPassword'
 import { UserListPage } from '@/features/user/pages/UserListPage'
 import { ResourceListPage } from '@/features/resource/pages/ResourceListPage'
 import { RoleListPage } from '@/features/role/pages/RoleListPage'
+import { PERMISSIONS } from '@repo/shared'
+import { createRoutesFromConfig } from '@/router/createRoutesFromConfig'
 
-export const router = createBrowserRouter([
+const routeConfig = [
   {
     id: 'root',
     path: '/',
@@ -20,14 +22,14 @@ export const router = createBrowserRouter([
         element: <LoginGard />,
       },
       {
+        path: 'resetPassword',
+        element: <ResetPasswordPage />,
+      },
+      {
         path: '',
         element: <ProtectedLayout />,
         loader: protectedLoader,
         children: [
-          {
-            path: 'resetPassword',
-            element: <ResetPasswordPage />,
-          },
           {
             path: 'dashboard',
             element: <DashboardPage />,
@@ -35,14 +37,17 @@ export const router = createBrowserRouter([
           {
             path: 'user/list',
             element: <UserListPage />,
+            permission: [PERMISSIONS.SYS_USER_LIST_PAGE],
           },
           {
             path: 'resource/list',
             element: <ResourceListPage />,
+            permission: [PERMISSIONS.SYS_RESOURCE_LIST_PAGE],
           },
           {
             path: 'role/list',
             element: <RoleListPage />,
+            permission: [PERMISSIONS.SYS_ROLE_LIST_PAGE],
           },
           {
             path: '*',
@@ -56,4 +61,6 @@ export const router = createBrowserRouter([
       },
     ],
   },
-])
+]
+const routeList = createRoutesFromConfig(routeConfig)
+export const router = createBrowserRouter(routeList)

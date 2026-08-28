@@ -39,6 +39,7 @@ export namespace Backend {
   export type RoleCreateDto = components['schemas']['RoleCreateDto']
   export type RoleUpdateDto = components['schemas']['RoleUpdateDto']
   export type ResourcePageRespDto = components['schemas']['ResourcePageRespDto']
+  export type ListResp = components['schemas']['ListResp']
   export type ResourcePageDto = components['schemas']['ResourcePageDto']
   export type ResourcePageOptionDto = components['schemas']['ResourcePageOptionDto']
   export type ResourceRespDto = components['schemas']['ResourceRespDto']

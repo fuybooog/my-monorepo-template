@@ -23,7 +23,7 @@
     "delete:module": "pnpm exec tsx ./scripts/delete-module.ts",
     "start:redis": "redis-server",
     "build:openapi": "ts-node -r tsconfig-paths/register -P tsconfig.build.json scripts/generate-openapi.ts",
-    "dev": "cross-env NODE_ENV=development concurrently \"nest start --watch\" \"pnpm run watch:openapi\" ",
+    "dev": "cross-env NODE_ENV=development concurrently \"pnpm --filter @repo/shared dev\" \"nest start --watch\" \"pnpm run watch:openapi\" ",
     "watch:openapi": "chokidar \"src/**/*.dto.ts\" \"src/**/*.controller.ts\" \"src/**/*.entity.ts\" -c \"pnpm run build:openapi && pnpm --filter @repo/types generate\" "
   },
   "dependencies": {

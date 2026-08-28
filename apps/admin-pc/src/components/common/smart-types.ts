@@ -187,6 +187,8 @@ export interface ColumnSettingsProps {
 // 预设按钮类型（支持字符串简写）
 export type PresetAction = 'edit' | 'delete'
 
+export type PermissionMode = 'AND' | 'OR' | 'NOT'
+
 export interface CustomAction<RecordType> extends Omit<
   ButtonProps,
   'onClick' | 'disabled' | 'hidden'
@@ -200,11 +202,15 @@ export interface CustomAction<RecordType> extends Omit<
   popTitle?: string
   popDescription?: string
   permission?: string[]
-  permissionMode?: 'AND' | 'OR' | 'NOT'
+  permissionMode?: PermissionMode
 }
 
 export type ActionItem<RecordType> = PresetAction | CustomAction<RecordType>
-
+export type ButtonPermissionObj = {
+  permission: string[]
+  permissionMode?: PermissionMode
+}
+export type ButtonPermission = string[] | ButtonPermissionObj
 // 操作列配置：继承 ColumnType
 export interface ActionColumnConfig<RecordType> extends ColumnType<RecordType> {
   buttons: ActionItem<RecordType>[] | ((record: RecordType) => ActionItem<RecordType>[])
@@ -216,6 +222,10 @@ export interface ActionColumnConfig<RecordType> extends ColumnType<RecordType> {
   onEdit?: (record: RecordType) => void
   onDelete?: (record: RecordType) => void
   onAction?: (key: string, record: RecordType) => void
+  actionPermission?: {
+    edit?: ButtonPermission
+    delete?: ButtonPermission
+  }
 }
 
 export interface DragOrderChangeInfo<T = any> {

@@ -42,6 +42,11 @@ export const getRoleFormSchema = (): SmartSchema => {
       itemProps: {
         rules: [{ required: true, message: '请输入角色等级' }],
       },
+      props: {
+        min: 0,
+        max: 99,
+        step: 1,
+      },
       colProps: { span: 12 },
     },
     userIds: {

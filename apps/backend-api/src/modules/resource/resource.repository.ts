@@ -1,4 +1,4 @@
-import { DataSource, EntityManager, getMetadataArgsStorage, Repository } from 'typeorm'
+import { Brackets, DataSource, EntityManager, getMetadataArgsStorage, Repository } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 import { Resource } from '@/modules/resource/entities/resource.entity'
 import { ResourcePageDto } from '@/modules/resource/dto/resource.page.dto'
@@ -6,6 +6,7 @@ import { isTargetOrParent } from '@/utils/fns'
 import { ResourceCreateDto } from './dto/resource.create.dto'
 import { ResourceUpdateDto } from './dto/resource.update.dto'
 import { ResourcePartialDto } from './dto/resource.base.dto'
+import { ADMIN_ROLE_CODE } from '@/constants'
 
 @Injectable()
 export class ResourceRepository extends Repository<Resource> {
@@ -33,10 +34,43 @@ export class ResourceRepository extends Repository<Resource> {
 
     return await qb.getManyAndCount()
   }
-  async searchResourcesByUser(userId: number) {
+  async searchResourcesByUser(
+    userId: number,
+    roleCodes: string[],
+    types?: string,
+    notInMenu?: string,
+  ) {
     const qb = this.createQueryBuilder('resource')
+    if (!(roleCodes.length && roleCodes.includes(ADMIN_ROLE_CODE))) {
+      const subQuery = qb
+        .subQuery()
+        .select('1')
+        .from('system_user_role', 'ur')
+        .innerJoin('system_role_resource', 'rr', 'rr.role_id = ur.role_id')
+        .where('ur.user_id = :userId', { userId })
+        .andWhere('rr.resource_id = resource.id')
+        .getQuery()
 
-    // todo 排序应该从前端传入
+      qb.where(`EXISTS (${subQuery})`)
+    }
+    if (types) {
+      const typeList = types
+        .split(',')
+        .map((s) => parseInt(s.trim(), 10))
+        .filter((n) => !isNaN(n))
+      if (typeList.length) {
+        qb.andWhere('resource.type IN (:...typeList)', { typeList })
+      }
+    }
+    if (notInMenu === '1') {
+      qb.andWhere('resource.notInMenu = :notInMenu', { notInMenu })
+    } else if (notInMenu === '0') {
+      qb.andWhere(
+        new Brackets((qb) => {
+          qb.where('resource.notInMenu = :notInMenu or resource.notInMenu is null', { notInMenu })
+        }),
+      )
+    }
     qb.orderBy('resource.createdAt', 'DESC')
 
     return await qb.getManyAndCount()

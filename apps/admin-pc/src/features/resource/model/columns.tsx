@@ -27,6 +27,7 @@ export const getResourceColumns = (callbacks: {
     {
       title: '唯一编码',
       dataIndex: 'uniqueProp',
+      width: 180,
     },
     // {
     //   title: '唯一父编码',
@@ -36,6 +37,7 @@ export const getResourceColumns = (callbacks: {
     {
       title: '菜单路径',
       dataIndex: 'menuPath',
+      width: 180,
     },
     // {
     //   title: '类型',
@@ -47,7 +49,7 @@ export const getResourceColumns = (callbacks: {
       title: '包含按钮',
       dataIndex: 'buttons',
       key: 'buttons',
-      width: 220,
+      width: 260,
       render: (buttons?: MetaTreeNode[]) => {
         if (!buttons || buttons.length === 0) return <span style={{ color: '#ccc' }}>-</span>
         return (
@@ -82,7 +84,7 @@ export const getResourceColumns = (callbacks: {
     {
       title: '菜单是否隐藏',
       dataIndex: 'notInMenu',
-      width: 110,
+      width: 120,
       render: (value) => <span>{value === '1' ? '是' : ''}</span>,
     },
     {

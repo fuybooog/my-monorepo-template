@@ -10,6 +10,29 @@ export interface TreeConfig<T extends TreeNode = TreeNode> {
   sortKey?: keyof T
   sortAsc?: boolean
   rootParentValues?: any[] // 标识根节点的 parentId 集合
+  /**
+   * 节点转换函数，用于将原始节点（含子节点）映射为自定义结构
+   * @param node 当前原始节点（深拷贝后的，已包含排序和位置元数据）
+   * @param children 已经转换后的子节点数组（如果存在）
+   * @returns 转换后的节点对象（会被直接放入最终树中）
+   *
+   * @example 示例代码
+   * transformNode: (node, children) => {
+   *     // node 包含原始字段（如 uniqueProp, label, menuPath 等）和位置元数据
+   *     // children 已经是转换后的子节点数组
+   *     const menuItem: any = {
+   *       key: node.uniqueProp,
+   *       label: node.label,
+   *     }
+   *     if (children && children.length > 0) {
+   *       menuItem.children = children
+   *     }
+   *     // 如果需要 icon，可以从 node 中读取或映射
+   *     // menuItem.icon = getIcon(node.uniqueProp)
+   *     return menuItem
+   *   }
+   */
+  transformNode?: (node: T, children: any[]) => any
 }
 
 /**
@@ -43,6 +66,7 @@ export function arrayToTree<T extends TreeNode = TreeNode>(
     sortKey = 'sortNumber',
     sortAsc = true,
     rootParentValues = [null, undefined, 0, '0', ''],
+    transformNode,
   } = config
 
   const tree: T[] = []
@@ -52,26 +76,23 @@ export function arrayToTree<T extends TreeNode = TreeNode>(
   const idParentMap = new Map<string | number, T>()
   const rootValueSet = new Set(rootParentValues)
 
-  // 第一遍遍历：深拷贝节点并建立节点映射表
+  // 1. 深拷贝节点并建立映射
   for (const item of list) {
     const id = item[idKey]
     if (id !== undefined && id !== null) {
       const nodeCopy = { ...item, [childrenKey]: [] }
       nodeMap.set(id, nodeCopy)
-
-      // 新增：如果原始数据有 'id' 字段，则同时存入 idNodeMap
       if (item.id !== undefined && item.id !== null) {
         idNodeMap.set(item.id, nodeCopy)
       }
     }
   }
 
-  // 第二遍遍历：构建树形关系与父子节点映射
+  // 2. 构建父子关系
   for (const item of list) {
     const id = item[idKey]
     const parentId = item[parentKey]
     const currentNode = nodeMap.get(id)
-
     if (!currentNode) continue
 
     const isRoot = rootValueSet.has(parentId)
@@ -88,9 +109,9 @@ export function arrayToTree<T extends TreeNode = TreeNode>(
     }
   }
 
-  // 递归处理节点排序、计算层级位置与清理空的 children 字段
-  const processNode = (nodes: T[]) => {
-    // 1. 先进行当前层级的排序
+  // 3. 递归处理：排序、注入位置元数据、递归转换子节点、应用 transformNode
+  const processNode = (nodes: T[]): any[] => {
+    // 排序
     if (sortKey) {
       nodes.sort((a, b) => {
         const valA = a[sortKey] ?? Infinity
@@ -100,30 +121,53 @@ export function arrayToTree<T extends TreeNode = TreeNode>(
     }
 
     const total = nodes.length
+    const result: any[] = []
 
-    // 2. 遍历当前层级，计算并注入位置属性，然后递归处理子节点
     for (let i = 0; i < total; i++) {
       const node = nodes[i]
 
-      // 注入位置信息：索引、是否第一位、是否最后一位
+      // 注入位置元数据（可在 transformNode 中访问）
       Object.assign(node, {
         _index: i,
         _isFirst: i === 0,
         _isLast: i === total - 1,
       })
 
-      const children = node[childrenKey]
-      if (Array.isArray(children) && children.length === 0) {
-        delete node[childrenKey]
-      } else if (children && children.length > 0) {
-        processNode(children)
+      // 获取原始子节点
+      const rawChildren = node[childrenKey] || []
+      // 递归处理子节点，得到转换后的子节点数组
+      const transformedChildren = rawChildren.length > 0 ? processNode(rawChildren) : []
+
+      let transformedNode: any
+      if (transformNode) {
+        // 用户提供的转换函数，传入当前节点和已转换的子节点
+        transformedNode = transformNode(node, transformedChildren)
+      } else {
+        // 无转换函数：保留原节点，但替换子节点为转换后的子节点（并清理空 children）
+        transformedNode = { ...node }
+        if (transformedChildren.length > 0) {
+          transformedNode[childrenKey] = transformedChildren
+        } else {
+          delete transformedNode[childrenKey]
+        }
       }
+
+      result.push(transformedNode)
     }
+
+    return result
   }
 
-  processNode(tree)
+  // 处理整个树
+  const finalTree = processNode(tree)
 
-  return { tree, nodeMap, parentMap, idNodeMap, idParentMap }
+  return {
+    tree: finalTree,
+    nodeMap,
+    parentMap,
+    idNodeMap,
+    idParentMap,
+  }
 }
 
 /**

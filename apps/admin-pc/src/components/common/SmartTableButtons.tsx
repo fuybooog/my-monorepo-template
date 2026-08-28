@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Space, Button, Dropdown, Popconfirm } from 'antd'
 import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons'
-import type { ActionColumnConfig, CustomAction } from './smart-types'
+import { ActionColumnConfig, ButtonPermissionObj, CustomAction } from './smart-types'
 import type { ButtonProps } from 'antd'
 import { useAuthStore } from '@/store/authStore'
 
@@ -23,6 +23,7 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
     moreIcon,
     moreDropdownProps,
     onlyIcon = false,
+    actionPermission,
   } = actionColumn
 
   // 将预设按钮转为 CustomAction
@@ -47,6 +48,12 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
               : {
                   label: '编辑',
                 }),
+            permission: actionPermission?.edit
+              ? Array.isArray(actionPermission.edit)
+                ? actionPermission.edit
+                : actionPermission.edit.permission
+              : [],
+            permissionMode: (actionPermission?.edit as ButtonPermissionObj)?.permissionMode || 'OR',
           })
         }
         return
@@ -65,6 +72,13 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
               : {
                   label: '删除',
                 }),
+            permission: actionPermission?.delete
+              ? Array.isArray(actionPermission.delete)
+                ? actionPermission.delete
+                : actionPermission.delete.permission
+              : [],
+            permissionMode:
+              (actionPermission?.delete as ButtonPermissionObj)?.permissionMode || 'OR',
           })
         }
         return
@@ -72,14 +86,14 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
       result.push(item as CustomAction<RecordType>)
     })
     return result
-  }, [buttons, onEdit, onDelete, onlyIcon, record])
+  }, [buttons, onEdit, onDelete, onlyIcon, record, actionPermission])
 
   // 过滤隐藏
   const visibleActions = useMemo(() => {
     return allActions.filter((action) => {
       if (typeof action.hidden === 'function') return !action.hidden(record)
       if (action.permission?.length) {
-        if (!hasPermission(action.permission, action.permissionMode)) {
+        if (!hasPermission(action.permission, action.permissionMode || 'OR')) {
           return false
         }
       }

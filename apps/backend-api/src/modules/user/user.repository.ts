@@ -13,7 +13,7 @@ export class UserRepository extends Repository<User> {
     super(User, dataSource.createEntityManager())
   }
 
-  async searchUsersByPage(query: UserPageDto, maxLevel: number) {
+  async searchUsersByPage(query: UserPageDto, maxLevel = 0) {
     const { page = 1, pageSize = 10, userName, sort, status, birthStart, birthEnd, keyword } = query
 
     const qb = this.createQueryBuilder('user')
@@ -43,7 +43,7 @@ export class UserRepository extends Repository<User> {
     if (maxLevel !== MAX_ROLE_LEVEL) {
       qb.leftJoin('user.roles', 'role').groupBy('user.id')
 
-      const havingClause = 'MAX(role.level) < :maxLevel'
+      const havingClause = 'MAX(role.level) <= :maxLevel'
       qb.having(`${havingClause} OR MAX(role.level) IS NULL`, { maxLevel })
     }
     if (sort && Object.keys(sort).length > 0) {

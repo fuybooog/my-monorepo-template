@@ -31,7 +31,7 @@ export class UserService {
   ) {}
   async pageUser(
     userPageDto: UserPageDto,
-    maxLevel: number,
+    maxLevel = 0,
   ): Promise<PaginatedResult<UserPageRespDto>> {
     const [entities, total] = await this.userRepository.searchUsersByPage(userPageDto, maxLevel)
     const list = plainToInstance(UserPageRespDto, entities, {
@@ -46,7 +46,7 @@ export class UserService {
   }
   async pageOptionUser(
     userPageOptionDto: UserPageOptionDto,
-    maxLevel: number,
+    maxLevel = 0,
   ): Promise<PaginatedResult<UserPageRespDto>> {
     const { keyword, fields, page, pageSize } = userPageOptionDto
     const queryBuilder = this.userRepository.createQueryBuilder('user')
@@ -63,7 +63,7 @@ export class UserService {
     if (maxLevel !== MAX_ROLE_LEVEL) {
       queryBuilder.leftJoin('user.roles', 'role').groupBy('user.id')
 
-      const havingClause = 'MAX(role.level) < :maxLevel'
+      const havingClause = 'MAX(role.level) <= :maxLevel'
       queryBuilder.having(`${havingClause} OR MAX(role.level) IS NULL`, { maxLevel })
     }
     const skip = (page - 1) * pageSize

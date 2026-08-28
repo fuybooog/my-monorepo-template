@@ -383,6 +383,7 @@ const SmartTableInner = <RecordType extends object>(
     } else {
       return (
         <Table
+          bordered
           rowKey={finalRowKey}
           loading={loading}
           dataSource={dataSource}

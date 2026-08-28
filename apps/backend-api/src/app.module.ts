@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config'
 import { BusinessModule } from './modules/business.module'
 import { SharedRedisModule } from './utils/redis/shared-redis.module'
 import { SharedMysqlModule } from './utils/database/shared-mysql.module'
+import { PermissionsGuard } from '@/modules/auth/auth-permission.guard'
 
 @Module({
   imports: [
@@ -21,6 +22,10 @@ import { SharedMysqlModule } from './utils/database/shared-mysql.module'
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
     },
   ],
 })

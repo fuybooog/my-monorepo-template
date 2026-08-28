@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "declaration": true,
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "strict": true,
-    "skipLibCheck": true
-  },
-  "include": ["src/**/*"]
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true
+  }
 }

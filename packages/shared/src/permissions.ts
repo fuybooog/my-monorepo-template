@@ -18,6 +18,8 @@ export const PERMISSIONS = {
   SYS_ROLE_LIST_DELETE: 'sys:role-list:delete',
   SYS_ROLE_LIST_EXPORT: 'sys:role-list:export',
   SYS_ROLE_LIST_ASSIGN_PERMISSION: 'sys:role-list:assign-permission',
+  SYS_ROLE_LIST_IMPORT: 'sys:role-list:import',
+  SYS_ROLE_LIST_VIEW: 'sys:role-list:view',
 
   // 资源管理
   SYS_RESOURCE_DIR: 'sys:resource:dir',
@@ -25,6 +27,9 @@ export const PERMISSIONS = {
   SYS_RESOURCE_LIST_CREATE: 'sys:resource-list:create',
   SYS_RESOURCE_LIST_EDIT: 'sys:resource-list:edit',
   SYS_RESOURCE_LIST_DELETE: 'sys:resource-list:delete',
+  SYS_RESOURCE_LIST_EXPORT: 'sys:resource-list:export',
+  SYS_RESOURCE_LIST_IMPORT: 'sys:resource-list:import',
+  SYS_RESOURCE_LIST_VIEW: 'sys:resource-list:view',
 
   // 值集管理
   SYS_VALUE_SET_DIR: 'sys:value-set:dir',
@@ -33,7 +38,6 @@ export const PERMISSIONS = {
   SYS_VALUE_SET_LIST_EDIT: 'sys:value-set-list:edit',
   SYS_VALUE_SET_LIST_DELETE: 'sys:value-set-list:delete',
   SYS_VALUE_SET_LIST_EXPORT: 'sys:value-set-list:export',
+  SYS_VALUE_SET_LIST_IMPORT: 'sys:value-set-list:import',
+  SYS_VALUE_SET_LIST_VIEW: 'sys:value-set-list:view',
 } as const
-
-// 打平写法下的联合类型生成极其简洁
-export type PermissionCode = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]

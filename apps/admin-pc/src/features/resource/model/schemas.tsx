@@ -54,6 +54,9 @@ export const getResourceFormSchema = (): SmartSchema => {
       dependencyField: 'type',
       hideWhen: ['0', '2', '3'],
       requiredWhen: ['1'],
+      itemProps: {
+        rules: [{ pattern: /^\//, message: '必须以/开头' }],
+      },
     },
     notInMenu: {
       title: '菜单是否隐藏',

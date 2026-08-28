@@ -2,6 +2,7 @@ import { applyDecorators, Type } from '@nestjs/common'
 import { ApiOkResponse, getSchemaPath, ApiExtraModels } from '@nestjs/swagger'
 import { ApiResponseDto } from '../dto/api-response.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
+import { ListResp } from '@/dto/base.dto'
 
 /**
  * 响应装饰器
@@ -70,6 +71,39 @@ export const ApiSuccessPageResponse = <TModel extends Type<any>>(model: TModel) 
                       total: { type: 'number', description: '总条数', example: 100 },
                       page: { type: 'number', description: '当前页码', example: 1 },
                       pageSize: { type: 'number', description: '每页条数', example: 10 },
+                      list: {
+                        type: 'array',
+                        items: { $ref: getSchemaPath(model) },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+            required: ['data'],
+          },
+        ],
+      },
+    }),
+  )
+}
+
+export const ApiSuccessListResponse = <TModel extends Type<any>>(model: TModel) => {
+  return applyDecorators(
+    ApiExtraModels(ApiResponseDto, ListResp, model),
+    ApiOkResponse({
+      description: 'list成功响应',
+      schema: {
+        allOf: [
+          { $ref: getSchemaPath(ApiResponseDto) },
+          {
+            properties: {
+              data: {
+                allOf: [
+                  { $ref: getSchemaPath(ListResp) },
+                  {
+                    required: ['list'],
+                    properties: {
                       list: {
                         type: 'array',
                         items: { $ref: getSchemaPath(model) },

@@ -2022,6 +2022,13 @@ export interface components {
       /** @description 删除时间 */
       deletedAt?: string
     }
+    ListResp: {
+      /**
+       * @description 列表
+       * @example
+       */
+      list: string[]
+    }
     ResourcePageDto: {
       /** @description 资源名称 */
       label?: string
@@ -3776,15 +3783,16 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
+      /** @description list成功响应 */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
+            data: components['schemas']['ListResp'] & {
+              list: components['schemas']['ResourcePageRespDto'][]
+            }
           }
         }
       }
