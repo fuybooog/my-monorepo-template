@@ -147,8 +147,6 @@ export class ValueSetRepository extends Repository<ValueSet> {
 
     queryBuilder.select(Array.from(new Set(safeFields)))
 
-    queryBuilder.leftJoinAndSelect('valueSet.roles', 'role')
-
     return await queryBuilder.where('valueSet.id = :id', { id }).getOne()
   }
 

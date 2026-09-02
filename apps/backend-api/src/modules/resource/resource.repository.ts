@@ -86,8 +86,6 @@ export class ResourceRepository extends Repository<Resource> {
 
     queryBuilder.select(Array.from(new Set(safeFields)))
 
-    queryBuilder.leftJoinAndSelect('resource.roles', 'role')
-
     return await queryBuilder.where('resource.id = :id', { id }).getOne()
   }
 

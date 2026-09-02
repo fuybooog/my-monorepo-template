@@ -88,7 +88,7 @@ export class RoleRepository extends Repository<Role> {
 
     queryBuilder.select(Array.from(new Set(safeFields)))
 
-    queryBuilder.leftJoinAndSelect('role.roles', 'role')
+    queryBuilder.leftJoinAndSelect('role.resources', 'resources')
 
     return await queryBuilder.where('role.id = :id', { id }).getOne()
   }
