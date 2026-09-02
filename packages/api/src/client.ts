@@ -52,6 +52,17 @@ declare module 'axios' {
     onError?: (error: { head: { errCode: number; errMsg: string } }) => void
     autoCleanParams?: boolean
     mockError?: MockErrorConfig
+    /**
+     * 401 时刷新令牌的处理函数（返回是否刷新成功）。
+     * 配置后，请求遇 401 会自动调用它，成功则重放原请求，失败则走原错误流程。
+     */
+    refreshTokenHandler?: () => Promise<boolean>
+    /**
+     * 标记该请求为刷新令牌请求自身，遇 401 不触发刷新逻辑，避免递归。
+     */
+    skipAuthRefresh?: boolean
+    /** 内部标记：请求已重放过一次，防止无限重试循环 */
+    _isRetried?: boolean
   }
 }
 
@@ -84,6 +95,9 @@ export class HttpClient {
   private cacheMap = new Map<string, CachedRequest>()
   private pendingMap = new Map<string, PendingRequest>()
   private debounceMap = new Map<string, DebounceTask>()
+
+  /** 正在进行的刷新令牌 Promise（并发 401 时共享，只刷新一次） */
+  private refreshingPromise: Promise<boolean> | null = null
 
   // 🌟 [改动 3]: 改用 Map 存储 AbortController
   private abortControllerMap = new Map<string, AbortController>()
@@ -381,6 +395,31 @@ export class HttpClient {
         return serverData
       },
       (error) => {
+        const config = error?.config as AxiosRequestConfig | undefined
+        const status = error?.response?.status
+
+        // 401 且非刷新请求自身、未重试过、且配置了刷新处理函数 → 刷新后重放原请求
+        const shouldRefresh =
+          status === 401 &&
+          config &&
+          !config.skipAuthRefresh &&
+          !config._isRetried &&
+          typeof this.options.refreshTokenHandler === 'function'
+
+        if (shouldRefresh) {
+          return this.retryAfterRefresh(config).catch((refreshError) => {
+            // 刷新失败：走原错误流程（onError → 跳转登录等）
+            const normalized = this.normalizeError(refreshError?.originalError || error)
+            if (normalized && normalized.head && normalized.head.errCode !== 0) {
+              this.handleBusinessError(normalized, error.response)
+            }
+            if (this.options.onError) {
+              this.options.onError(normalized)
+            }
+            return Promise.reject(normalized)
+          })
+        }
+
         const normalized = this.normalizeError(error)
         if (normalized && normalized.head && normalized.head.errCode !== 0) {
           this.handleBusinessError(normalized, error.response)
@@ -391,6 +430,36 @@ export class HttpClient {
         return Promise.reject(normalized)
       },
     )
+  }
+
+  /**
+   * 401 后刷新令牌并重放原请求。
+   * 并发多个 401 请求共享同一个刷新 Promise，避免重复刷新。
+   */
+  private retryAfterRefresh(config: AxiosRequestConfig): Promise<any> {
+    if (!this.refreshingPromise) {
+      this.refreshingPromise = Promise.resolve()
+        .then(() => (this.options.refreshTokenHandler as () => Promise<boolean>)())
+        .then((ok) => {
+          if (!ok) {
+            throw new Error('refresh token failed')
+          }
+          return true
+        })
+        .catch((refreshError) => {
+          // 原样抛出，供上层决定错误处理（fallback 到原 401 错误 → 跳登录）
+          throw refreshError
+        })
+        .finally(() => {
+          this.refreshingPromise = null
+        })
+    }
+
+    return this.refreshingPromise.then(() => {
+      // 重放原请求（标记已重试，避免再次触发刷新循环）
+      const retryConfig: AxiosRequestConfig = { ...config, _isRetried: true, signal: undefined }
+      return this.instance(retryConfig)
+    })
   }
 
   // 🌟 [改动 6]: 取消请求错误的准确识别与标准化

@@ -51,6 +51,18 @@ export class AuthController {
     return Promise.resolve(user || null)
   }
 
+  @Post('refresh')
+  @Public()
+  @ApiOperation({ summary: '刷新令牌' })
+  @ApiSuccessResponse(LoginResponseDto)
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<LoginResponseDto> {
+    const refreshToken = req.cookies?.['refresh_token']
+    return await this.authService.refresh(refreshToken, res)
+  }
+
   @Post('logout')
   @Public()
   @ApiOperation({ summary: '退出登录' })

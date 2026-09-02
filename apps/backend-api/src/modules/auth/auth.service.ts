@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
 import {
   CurrentLoginResponseDto,
   LoginResponseDto,
@@ -12,6 +12,7 @@ import forge from 'node-forge'
 import svgCaptcha from 'svg-captcha'
 import { v4 as uuidv4 } from 'uuid'
 import { UserService } from '@/modules/user/user.service'
+import { UserRespDto } from '@/modules/user/dto/user.resp.dto'
 import bcrypt from 'bcrypt'
 import { RoleService } from '@/modules/role/role.service'
 import { JwtPayload } from '@/types'
@@ -27,6 +28,11 @@ export class AuthService {
   private readonly CAPTCHA_EXPIRE = 180
   private readonly KEY_PREFIX = 'auth:rsa:pair:'
   private readonly KEY_EXPIRE_SECONDS = 600
+
+  /** access token 有效期（秒）：30 分钟 */
+  private readonly ACCESS_TOKEN_EXPIRE = 30 * 60
+  /** refresh token 有效期（秒）：7 天 */
+  private readonly REFRESH_TOKEN_EXPIRE = 7 * 24 * 60 * 60
 
   constructor(
     private readonly jwtService: JwtService,
@@ -165,6 +171,26 @@ export class AuthService {
     if (user.status === BaseStatusEnum.DISABLE) {
       throw new UnauthorizedException('用户已被禁用')
     }
+
+    const { roleCodes } = await this.issueTokenPair(user, res)
+
+    return {
+      roleCodes,
+      id: user!.id as number,
+      userName: user!.userName as string,
+      nickName: user!.nickName as string,
+    }
+  }
+
+  /**
+   * 构建 JWT payload（登录与刷新复用，保证角色/权限变更及时生效）
+   */
+  private async buildAuthPayload(user: {
+    id?: number
+    userName?: string
+    nickName?: string | null
+    roleIds?: number[]
+  }): Promise<JwtPayload> {
     let roleCodes: string[] = []
     let maxLevel: number = 0
     if (user.roleIds && user.roleIds.length > 0) {
@@ -180,33 +206,110 @@ export class AuthService {
       permissions = await this.roleService.getResourceIdsByRoleIds(user.roleIds!)
     }
 
-    const payload: JwtPayload = {
-      sub: String(user!.id!),
-      userName: user!.userName!,
-      nickName: user!.nickName!,
+    return {
+      sub: String(user.id!),
+      userName: user.userName!,
+      nickName: user.nickName!,
       roleCodes: roleCodes.join(),
       maxLevel,
       permissions: permissions.join(),
     }
-    const jwtToken = this.jwtService.sign(payload)
+  }
 
-    const redisKey = `auth:token:${user!.id}`
-    const EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000
+  /**
+   * 签发 access + refresh 双 Token：写入 Redis（仅最新 token 有效，保持单点登录语义）并种下 Cookie
+   */
+  private async issueTokenPair(
+    user: { id?: number; userName?: string; nickName?: string | null; roleIds?: number[] },
+    res: Response,
+  ): Promise<{ roleCodes: string[] }> {
+    const payload = await this.buildAuthPayload(user)
+    const roleCodes = payload.roleCodes.split(',').filter(Boolean)
 
-    await this.redisService.set(redisKey, jwtToken, EXPIRE_TIME)
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: this.ACCESS_TOKEN_EXPIRE,
+    })
+    const refreshToken = this.jwtService.sign(
+      { ...payload, type: 'refresh' },
+      { expiresIn: this.REFRESH_TOKEN_EXPIRE },
+    )
 
-    res.cookie('access_token', jwtToken, {
+    await this.redisService.set(`auth:token:${user.id}`, accessToken, this.ACCESS_TOKEN_EXPIRE)
+    await this.redisService.set(`auth:refresh:${user.id}`, refreshToken, this.REFRESH_TOKEN_EXPIRE)
+
+    const secure = process.env.NODE_ENV === 'production'
+    res.cookie('access_token', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure,
       sameSite: 'lax',
-      maxAge: EXPIRE_TIME,
+      maxAge: this.ACCESS_TOKEN_EXPIRE * 1000,
       path: '/',
     })
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure,
+      sameSite: 'lax',
+      maxAge: this.REFRESH_TOKEN_EXPIRE * 1000,
+      path: '/',
+    })
+
+    return { roleCodes }
+  }
+
+  /**
+   * 刷新令牌：校验 refresh token 有效性后重新签发双 Token
+   */
+  async refresh(refreshToken: string, res: Response): Promise<LoginResponseDto> {
+    if (!refreshToken) {
+      throw new UnauthorizedException('登录状态已过期，请重新登录')
+    }
+
+    let payload: JwtPayload
+    try {
+      payload = await this.jwtService.verifyAsync<JwtPayload>(refreshToken)
+    } catch {
+      throw new UnauthorizedException('登录状态已过期，请重新登录')
+    }
+
+    // 仅 refresh token 允许调用刷新接口，防止 access token 冒用
+    if (payload.type !== 'refresh') {
+      throw new UnauthorizedException('登录状态已过期，请重新登录')
+    }
+
+    const userId = Number(payload.sub)
+
+    // Redis 校验：仅最新签发的 refresh token 有效（复用单点登录/踢下线语义）
+    // 注意：key 不存在（已登出/被踢下线）同样视为失效，严格拒绝
+    const redisRefresh = await this.redisService.get(`auth:refresh:${userId}`)
+    if (redisRefresh !== refreshToken) {
+      throw new UnauthorizedException('登录状态已过期，请重新登录')
+    }
+
+    let user: UserRespDto | null = null
+    try {
+      user = await this.userService.findUserById(userId)
+    } catch (error) {
+      // 用户已被删除：刷新语义上等同登录失效
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException('登录状态已过期，请重新登录')
+      }
+      throw error
+    }
+    if (!user) {
+      throw new UnauthorizedException('登录状态已过期，请重新登录')
+    }
+    if (user.status === BaseStatusEnum.DISABLE) {
+      throw new UnauthorizedException('用户已被禁用')
+    }
+
+    // 重新构建 payload 签发新 Token（角色/权限变更即时生效）
+    const { roleCodes } = await this.issueTokenPair(user, res)
+
     return {
       roleCodes,
-      id: user!.id as number,
-      userName: user!.userName as string,
-      nickName: user!.nickName as string,
+      id: user.id as number,
+      userName: user.userName as string,
+      nickName: user.nickName as string,
     }
   }
   async phoneLogin(loginDto: PhoneLoginDto, res: Response) {
@@ -220,8 +323,16 @@ export class AuthService {
       // 清除对应的redis
       const redisKey = `auth:token:${user.id}`
       await this.redisService.del(redisKey)
+      await this.redisService.del(`auth:refresh:${user.id}`)
     }
     res.cookie('access_token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 0,
+      path: '/',
+    })
+    res.cookie('refresh_token', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

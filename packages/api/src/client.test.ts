@@ -37,9 +37,12 @@ const createMockAdapter = (handler: (config: any) => any) => {
 describe('HttpClient', () => {
   beforeEach(() => {
     localStorage.clear()
+    // mockError 仅在生产关闭，测试环境需开启 DEV
+    vi.stubEnv('DEV', 'true')
   })
 
   afterEach(() => {
+    vi.unstubAllEnvs()
     vi.useRealTimers()
   })
 
@@ -244,6 +247,124 @@ describe('HttpClient', () => {
           cacheOptions: { enable: false },
         } as any),
       ).rejects.toMatchObject({ head: { errCode: -1 } })
+    })
+  })
+
+  describe('401 自动刷新', () => {
+    /** 构造 401 响应（带 config，供拦截器读取） */
+    const unauthorized = (config: any) => ({
+      response: {
+        status: 401,
+        statusText: 'Unauthorized',
+        headers: {},
+        data: { head: { errCode: -2, errMsg: '未登录' } },
+      },
+      config,
+    })
+
+    /** adapter：首次 401，重放（_isRetried）成功 */
+    const createUnauthAdapter = (calls: any[]) => (config: any) => {
+      calls.push(config)
+      if (config._isRetried) {
+        return Promise.resolve(okResponse(config))
+      }
+      return Promise.reject(unauthorized(config))
+    }
+
+    it('401 时刷新成功并重放原请求', async () => {
+      const refreshHandler = vi.fn().mockResolvedValue(true)
+      const calls: any[] = []
+      const client = new HttpClient({
+        baseURL: 'https://api.test.com',
+        adapter: createUnauthAdapter(calls) as any,
+        refreshTokenHandler: refreshHandler,
+      })
+
+      const res = await client.get('/refresh-me', {}, { cacheOptions: { enable: false } } as any)
+
+      expect(refreshHandler).toHaveBeenCalledTimes(1)
+      expect(calls).toHaveLength(2)
+      expect(calls[0].url).toBe('/api/refresh-me')
+      expect(calls[1].url).toBe('/api/refresh-me')
+      expect(calls[1]._isRetried).toBe(true)
+      expect(res).toBeTruthy()
+    })
+
+    it('刷新失败时不重放，走原错误流程并 reject', async () => {
+      const refreshHandler = vi.fn().mockResolvedValue(false)
+      const onError = vi.fn()
+      const calls: any[] = []
+      const client = new HttpClient({
+        baseURL: 'https://api.test.com',
+        adapter: createUnauthAdapter(calls) as any,
+        refreshTokenHandler: refreshHandler,
+        onError,
+      })
+
+      await expect(
+        client.get('/x', {}, { cacheOptions: { enable: false } } as any),
+      ).rejects.toMatchObject({ head: { errCode: -2 } })
+      expect(refreshHandler).toHaveBeenCalledTimes(1)
+      expect(calls).toHaveLength(1) // 未重放
+      expect(onError).toHaveBeenCalled()
+    })
+
+    it('skipAuthRefresh 的请求不触发刷新', async () => {
+      const refreshHandler = vi.fn()
+      const calls: any[] = []
+      const client = new HttpClient({
+        baseURL: 'https://api.test.com',
+        adapter: createUnauthAdapter(calls) as any,
+        refreshTokenHandler: refreshHandler,
+      })
+
+      await expect(
+        client.get('/x', {}, { skipAuthRefresh: true, cacheOptions: { enable: false } } as any),
+      ).rejects.toMatchObject({ head: { errCode: -2 } })
+      expect(refreshHandler).not.toHaveBeenCalled()
+      expect(calls).toHaveLength(1)
+    })
+
+    it('重放请求再次 401 时不再刷新（防循环）', async () => {
+      const refreshHandler = vi.fn().mockResolvedValue(true)
+      const onError = vi.fn()
+      const calls: any[] = []
+      const alwaysUnauth = (config: any) => {
+        calls.push(config)
+        return Promise.reject(unauthorized(config)) // 永远 401
+      }
+      const client = new HttpClient({
+        baseURL: 'https://api.test.com',
+        adapter: alwaysUnauth as any,
+        refreshTokenHandler: refreshHandler,
+        onError,
+      })
+
+      await expect(
+        client.get('/x', {}, { cacheOptions: { enable: false } } as any),
+      ).rejects.toMatchObject({ head: { errCode: -2 } })
+      expect(refreshHandler).toHaveBeenCalledTimes(1)
+      expect(calls).toHaveLength(2) // 原请求 + 一次重放
+    })
+
+    it('并发 401 只刷新一次，全部重放成功', async () => {
+      const refreshHandler = vi.fn().mockResolvedValue(true)
+      const calls: any[] = []
+      const client = new HttpClient({
+        baseURL: 'https://api.test.com',
+        adapter: createUnauthAdapter(calls) as any,
+        refreshTokenHandler: refreshHandler,
+      })
+
+      const [r1, r2] = await Promise.all([
+        client.get('/a', {}, { cacheOptions: { enable: false } } as any),
+        client.get('/b', {}, { cacheOptions: { enable: false } } as any),
+      ])
+
+      expect(refreshHandler).toHaveBeenCalledTimes(1)
+      expect(calls).toHaveLength(4) // 2 个原请求 + 2 个重放
+      expect(r1).toBeTruthy()
+      expect(r2).toBeTruthy()
     })
   })
 })

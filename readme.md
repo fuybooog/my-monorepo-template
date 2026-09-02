@@ -48,3 +48,17 @@ mysql -u root -p'8ik,(OL>' -e "DROP DATABASE IF EXISTS mydb_test; CREATE DATABAS
 ```
 pnpm run generate:module user system_user y
 ```
+
+### todo
+
+```
+修复 3 处关系查询 bug（阻断性，详情页必现 500）
+auth：补刷新 token + 找回密码接口（与前端占位路由配套）
+五个模块的 Excel 导入/导出/模板（后端 + 前端入口）
+操作日志模块（后端实体 + 拦截器 + 前端页面）
+前端收尾：403/404、面包屑、个人中心改密、动态菜单
+安全与体验优化：登录锁定、密码策略、角色边界校验
+h5-wechat 从零开发（需先确认产品需求）
+
+
+```

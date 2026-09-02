@@ -11,6 +11,10 @@ const authApi = {
   currentLogin(): Promise<Backend.CurrentLoginRes> {
     return http.get('/auth/currentLogin')
   },
+  refresh(): Promise<Backend.PasswordLoginRes> {
+    // skipAuthRefresh：刷新请求自身遇 401 不再触发刷新，直接走错误流程
+    return http.post('/auth/refresh', {}, { skipAuthRefresh: true })
+  },
   logout(): Promise<Backend.LogoutRes> {
     return http.post('/auth/logout')
   },

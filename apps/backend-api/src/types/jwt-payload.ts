@@ -7,6 +7,7 @@ export interface JwtPayload {
   roleCodes: string
   maxLevel: number
   permissions: string
+  type?: 'access' | 'refresh'
 }
 declare module 'express' {
   interface Request {
