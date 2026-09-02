@@ -25,17 +25,17 @@ export class ResourceBaseRespDto {
   @Expose()
   parentUniqueProp?: string | null
 
-  @ApiPropertyOptional({ description: '状态：0-禁用，1-启用', type: String })
-  @IsString()
+  @ApiPropertyOptional({ description: '状态：0-禁用，1-启用', type: Number })
+  @IsInt()
   @IsOptional()
   @Expose()
-  status?: string | null
+  status?: number
 
-  @ApiPropertyOptional({ description: '资源类型：0-目录 1-页面 2-按钮 3-列', type: String })
-  @IsString()
+  @ApiPropertyOptional({ description: '资源类型：0-目录 1-页面 2-按钮 3-列', type: Number })
+  @IsInt()
   @IsOptional()
   @Expose()
-  type?: string | null
+  type?: number
 
   @ApiPropertyOptional({ description: '菜单路径', type: String })
   @IsString()
@@ -44,13 +44,13 @@ export class ResourceBaseRespDto {
   menuPath?: string | null
 
   @ApiPropertyOptional({
-    description: '是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示',
-    type: String,
+    description: '是否在菜单中显示：0-显示，1-不显示',
+    type: Number,
   })
-  @IsString()
+  @IsInt()
   @IsOptional()
   @Expose()
-  notInMenu?: string | null
+  notInMenu?: number
 
   @ApiPropertyOptional({ description: '排序号', type: Number })
   @IsInt()

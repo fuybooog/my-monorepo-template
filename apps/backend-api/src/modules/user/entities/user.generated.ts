@@ -109,13 +109,11 @@ export class UserGenerated {
   })
   email: string | null
 
-  @Column('varchar', {
+  @Column('int', {
     name: 'status',
-    nullable: true,
     comment: '状态：0-禁用，1-启用',
-    length: 2,
   })
-  status: string | null
+  status: number
 
   @CreateDateColumn({ name: 'created_at', comment: '创建时间', nullable: true })
   createdAt: Date | null

@@ -1126,6 +1126,43 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/value-set/sets/page': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 集维度分页查询（按 setCode 去重） */
+    get: operations['ValueSetController_pageValueSetGroups']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/value-set/schema-generator-holder-sets-page-value-set': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * 请勿调用，用于生成前端DTO
+     * @deprecated
+     */
+    post: operations['ValueSetController__pageValueSetGroups']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/value-set/option': {
     parameters: {
       query?: never
@@ -1532,7 +1569,7 @@ export interface components {
       /** @description 邮箱 */
       email?: string
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -1566,7 +1603,7 @@ export interface components {
       /** @description 邮箱 */
       email?: string
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -1668,7 +1705,7 @@ export interface components {
       /** @description 邮箱 */
       email?: string
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -1721,7 +1758,7 @@ export interface components {
       /** @description 邮箱 */
       email?: string
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -1761,7 +1798,7 @@ export interface components {
       /** @description 邮箱 */
       email?: string
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -1794,9 +1831,9 @@ export interface components {
     UpdateStatusDto: {
       /**
        * @description 状态值
-       * @enum {string}
+       * @enum {number}
        */
-      status: '1' | '0'
+      status: 1 | 0
     }
     BatchUpdateStatusDto: {
       /**
@@ -1806,9 +1843,9 @@ export interface components {
       ids: string
       /**
        * @description 状态
-       * @enum {string}
+       * @enum {number}
        */
-      status: '1' | '0'
+      status: 1 | 0
     }
     AdminResetPasswordDto: {
       /** @description 解密id */
@@ -1840,7 +1877,7 @@ export interface components {
       /** @description 角色等级 */
       level: number
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -1860,7 +1897,7 @@ export interface components {
       /** @description 角色等级 */
       level: number
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -1923,7 +1960,7 @@ export interface components {
       /** @description 角色等级 */
       level: number
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -1948,7 +1985,7 @@ export interface components {
       /** @description 角色等级 */
       level: number
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -1978,7 +2015,7 @@ export interface components {
       /** @description 角色等级 */
       level: number
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -2006,13 +2043,13 @@ export interface components {
       /** @description 唯一父编码 */
       parentUniqueProp?: string
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
-      type?: string
+      type?: number
       /** @description 菜单路径 */
       menuPath?: string
-      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
-      notInMenu?: string
+      /** @description 是否在菜单中显示：0-显示，1-不显示 */
+      notInMenu?: number
       /** @description 排序号 */
       sortNumber?: number
       /** @description 创建时间 */
@@ -2037,11 +2074,11 @@ export interface components {
       /** @description 唯一父编码 */
       parentUniqueProp?: string
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
-      type?: string
-      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
-      notInMenu?: string
+      type?: number
+      /** @description 是否在菜单中显示：0-显示，1-不显示 */
+      notInMenu?: number
       /** @description 排序号 */
       sortNumber?: number
       /** @description 菜单路径 */
@@ -2103,13 +2140,13 @@ export interface components {
       /** @description 唯一父编码 */
       parentUniqueProp?: string
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
-      type?: string
+      type?: number
       /** @description 菜单路径 */
       menuPath?: string
-      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
-      notInMenu?: string
+      /** @description 是否在菜单中显示：0-显示，1-不显示 */
+      notInMenu?: number
       /** @description 排序号 */
       sortNumber?: number
       /** @description 创建时间 */
@@ -2136,11 +2173,11 @@ export interface components {
       /** @description 唯一父编码 */
       parentUniqueProp?: string
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
-      type?: string
-      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
-      notInMenu?: string
+      type?: number
+      /** @description 是否在菜单中显示：0-显示，1-不显示 */
+      notInMenu?: number
       /** @description 排序号 */
       sortNumber?: number
       /** @description 菜单路径 */
@@ -2160,11 +2197,11 @@ export interface components {
       /** @description 唯一父编码 */
       parentUniqueProp?: string
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
-      type?: string
-      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
-      notInMenu?: string
+      type?: number
+      /** @description 是否在菜单中显示：0-显示，1-不显示 */
+      notInMenu?: number
       /** @description 排序号 */
       sortNumber?: number
       /** @description 菜单路径 */
@@ -2186,11 +2223,11 @@ export interface components {
       /** @description 唯一父编码 */
       parentUniqueProp?: string
       /** @description 状态：0-禁用，1-启用 */
-      status?: string
+      status?: number
       /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
-      type?: string
-      /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
-      notInMenu?: string
+      type?: number
+      /** @description 是否在菜单中显示：0-显示，1-不显示 */
+      notInMenu?: number
       /** @description 排序号 */
       sortNumber?: number
       /** @description 菜单路径 */
@@ -2221,8 +2258,10 @@ export interface components {
       parentSetCode?: string
       /** @description 父名称 */
       parentSetName?: string
-      /** @description 状态  0-禁用 1-启用 */
-      status?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: number
+      /** @description 排序号 */
+      sortNumber?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -2243,8 +2282,10 @@ export interface components {
       parentSetCode?: string
       /** @description 父名称 */
       parentSetName?: string
-      /** @description 状态  0-禁用 1-启用 */
-      status?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: number
+      /** @description 排序号 */
+      sortNumber?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -2304,6 +2345,56 @@ export interface components {
        */
       updatedAtEnd?: string
     }
+    ValueSetGroupPageRespDto: {
+      /** @description 集编码 */
+      setCode: string
+      /** @description 集名称 */
+      setName: string
+      /** @description 集下值的数量 */
+      valueCount: number
+      /** @description 状态（取集下值状态的最大值：1=启用，0=禁用） */
+      status: number
+      /** @description 创建时间 */
+      createdAt: string
+      /** @description 更新时间 */
+      updatedAt: string
+    }
+    ValueSetGroupPageDto: {
+      /** @description 页码 */
+      page?: number
+      /** @description 每页条数 */
+      pageSize?: number
+      /**
+       * @description 集CODE
+       * @example SYS_GENDER
+       */
+      setCode?: string
+      /**
+       * @description 集NAME
+       * @example 性别
+       */
+      setName?: string
+      /**
+       * @description 创建时间开始
+       * @example 2000-10-10 00:00:00
+       */
+      createdAtStart?: string
+      /**
+       * @description 创建时间结束
+       * @example 2000-10-10 23:59:59
+       */
+      createdAtEnd?: string
+      /**
+       * @description 修改时间开始
+       * @example 2000-10-10 00:00:00
+       */
+      updatedAtStart?: string
+      /**
+       * @description 修改时间结束
+       * @example 2000-10-10 23:59:59
+       */
+      updatedAtEnd?: string
+    }
     ValueSetPageOptionDto: {
       /** @description 页码 */
       page?: number
@@ -2335,8 +2426,10 @@ export interface components {
       parentSetCode?: string
       /** @description 父名称 */
       parentSetName?: string
-      /** @description 状态  0-禁用 1-启用 */
-      status?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: number
+      /** @description 排序号 */
+      sortNumber?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -2378,8 +2471,12 @@ export interface components {
       parentSetCode?: string
       /** @description 父名称 */
       parentSetName?: string
-      /** @description 状态  0-禁用 1-启用 */
-      status?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: number
+      /** @description 排序号 */
+      sortNumber?: number
+      /** @description 排序号 */
+      sortNumber?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -2400,16 +2497,20 @@ export interface components {
       setCode: string
       /** @description 集名称 */
       setName: string
-      /** @description 字典编码 */
-      code: string
-      /** @description 字典名称 */
-      name: string
+      /** @description 值编码（编辑集时无需传） */
+      code?: string
+      /** @description 值名称（编辑集时无需传） */
+      name?: string
       /** @description 父编码 */
       parentSetCode?: string
       /** @description 父名称 */
       parentSetName?: string
-      /** @description 状态  0-禁用 1-启用 */
-      status?: string
+      /** @description 状态：0-禁用，1-启用 */
+      status?: number
+      /** @description 排序号 */
+      sortNumber?: number
+      /** @description 排序号 */
+      sortNumber?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -2617,7 +2718,7 @@ export interface operations {
         /** @description 邮箱 */
         email?: string
         /** @description 状态：0-禁用，1-启用 */
-        status?: string
+        status?: number
         /** @description 创建时间 */
         createdAt?: string
         /** @description 修改时间 */
@@ -3200,7 +3301,7 @@ export interface operations {
         /** @description 角色等级 */
         level: number
         /** @description 状态：0-禁用，1-启用 */
-        status?: string
+        status?: number
         /** @description 创建时间 */
         createdAt?: string
         /** @description 修改时间 */
@@ -3636,11 +3737,11 @@ export interface operations {
         /** @description 唯一父编码 */
         parentUniqueProp?: string
         /** @description 状态：0-禁用，1-启用 */
-        status?: string
+        status?: number
         /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
-        type?: string
-        /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
-        notInMenu?: string
+        type?: number
+        /** @description 是否在菜单中显示：0-显示，1-不显示 */
+        notInMenu?: number
         /** @description 排序号 */
         sortNumber?: number
         /** @description 菜单路径 */
@@ -3710,11 +3811,11 @@ export interface operations {
         /** @description 唯一父编码 */
         parentUniqueProp?: string
         /** @description 状态：0-禁用，1-启用 */
-        status?: string
+        status?: number
         /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
-        type?: string
-        /** @description 是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示 */
-        notInMenu?: string
+        type?: number
+        /** @description 是否在菜单中显示：0-显示，1-不显示 */
+        notInMenu?: number
         /** @description 排序号 */
         sortNumber?: number
         /** @description 菜单路径 */
@@ -4261,8 +4362,10 @@ export interface operations {
         parentSetCode?: string
         /** @description 父名称 */
         parentSetName?: string
-        /** @description 状态  0-禁用 1-启用 */
-        status?: string
+        /** @description 状态：0-禁用，1-启用 */
+        status?: number
+        /** @description 排序号 */
+        sortNumber?: number
         /** @description 创建时间 */
         createdAt?: string
         /** @description 修改时间 */
@@ -4344,6 +4447,83 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': components['schemas']['ValueSetPageDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ValueSetController_pageValueSetGroups: {
+    parameters: {
+      query?: {
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 集CODE */
+        setCode?: string
+        /** @description 集NAME */
+        setName?: string
+        /** @description 创建时间开始 */
+        createdAtStart?: string
+        /** @description 创建时间结束 */
+        createdAtEnd?: string
+        /** @description 修改时间开始 */
+        updatedAtStart?: string
+        /** @description 修改时间结束 */
+        updatedAtEnd?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 分页成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['PaginatedResult'] & {
+              /**
+               * @description 总条数
+               * @example 100
+               */
+              total: number
+              /**
+               * @description 当前页码
+               * @example 1
+               */
+              page: number
+              /**
+               * @description 每页条数
+               * @example 10
+               */
+              pageSize: number
+              list: components['schemas']['ValueSetGroupPageRespDto'][]
+            }
+          }
+        }
+      }
+    }
+  }
+  ValueSetController__pageValueSetGroups: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValueSetGroupPageDto']
       }
     }
     responses: {

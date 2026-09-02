@@ -17,7 +17,7 @@ export interface CreateStatusRenderOptions<RecordType = any, StatusType = any> {
  * 状态 Switch 渲染高阶函数
  */
 export function createStatusRender<RecordType extends object = any, StatusType = any>({
-  statusMap = ['1', '0'] as StatusMapConfig<StatusType>,
+  statusMap = [1, 0] as StatusMapConfig<StatusType>,
   onStatusChange,
   refreshList,
   disabled,

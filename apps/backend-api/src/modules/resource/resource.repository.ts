@@ -1,4 +1,4 @@
-import { Brackets, DataSource, EntityManager, getMetadataArgsStorage, Repository } from 'typeorm'
+import { DataSource, EntityManager, getMetadataArgsStorage, Repository } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 import { Resource } from '@/modules/resource/entities/resource.entity'
 import { ResourcePageDto } from '@/modules/resource/dto/resource.page.dto'
@@ -38,7 +38,7 @@ export class ResourceRepository extends Repository<Resource> {
     userId: number,
     roleCodes: string[],
     types?: string,
-    notInMenu?: string,
+    notInMenu?: number,
   ) {
     const qb = this.createQueryBuilder('resource')
     if (!(roleCodes.length && roleCodes.includes(ADMIN_ROLE_CODE))) {
@@ -62,14 +62,9 @@ export class ResourceRepository extends Repository<Resource> {
         qb.andWhere('resource.type IN (:...typeList)', { typeList })
       }
     }
-    if (notInMenu === '1') {
+    // not_in_menu 已改为 INT NOT NULL，不再存在 NULL 值，直接等值比较即可
+    if (notInMenu !== undefined && notInMenu !== null) {
       qb.andWhere('resource.notInMenu = :notInMenu', { notInMenu })
-    } else if (notInMenu === '0') {
-      qb.andWhere(
-        new Brackets((qb) => {
-          qb.where('resource.notInMenu = :notInMenu or resource.notInMenu is null', { notInMenu })
-        }),
-      )
     }
     qb.orderBy('resource.createdAt', 'DESC')
 
@@ -120,11 +115,11 @@ export class ResourceRepository extends Repository<Resource> {
     })
     return await manager.save(resources)
   }
-  async updateResourceStatus(resource: Resource, status: string, manager: EntityManager) {
+  async updateResourceStatus(resource: Resource, status: number, manager: EntityManager) {
     resource.status = status
     return await manager.save(Resource, resource)
   }
-  async batchUpdateResourceStatus(resources: Resource[], status: string, manager: EntityManager) {
+  async batchUpdateResourceStatus(resources: Resource[], status: number, manager: EntityManager) {
     resources.forEach((resource) => {
       resource.status = status
     })

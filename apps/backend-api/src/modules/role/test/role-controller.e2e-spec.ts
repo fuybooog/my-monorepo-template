@@ -15,9 +15,9 @@ describe('RoleController(E2E)', () => {
     const roleRepository = dataSource.getRepository(Role)
     await roleRepository.clear()
     await roleRepository.save([
-      { roleName: 'test_role_1', password: 'hashed_password_1', status: '1' },
-      { roleName: 'test_role_2', password: 'hashed_password_2', status: '2' },
-      { roleName: 'test_role_3', password: 'hashed_password_3', status: '1' },
+      { roleName: 'test_role_1', password: 'hashed_password_1', status: 1 },
+      { roleName: 'test_role_2', password: 'hashed_password_2', status: 0 },
+      { roleName: 'test_role_3', password: 'hashed_password_3', status: 1 },
     ])
   })
 

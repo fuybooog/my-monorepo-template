@@ -47,37 +47,17 @@ export class ResourceGenerated {
   })
   parentUniqueProp: string | null
 
-  @Column('varchar', {
+  @Column('int', {
     name: 'status',
-    nullable: true,
     comment: '状态：0-禁用，1-启用',
-    length: 2,
   })
-  status: string | null
+  status: number
 
-  @Column('varchar', {
+  @Column('int', {
     name: 'type',
-    nullable: true,
     comment: '资源类型：0-目录 1-页面 2-按钮 3-列',
-    length: 2,
   })
-  type: string | null
-
-  @Column('varchar', {
-    name: 'menu_path',
-    nullable: true,
-    comment: '菜单路径',
-    length: 100,
-  })
-  menuPath: string | null
-
-  @Column('varchar', {
-    name: 'not_in_menu',
-    nullable: true,
-    comment: '是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示',
-    length: 2,
-  })
-  notInMenu: string | null
+  type: number
 
   @Column('int', { name: 'sort_number', nullable: true, comment: '排序号' })
   sortNumber: number | null
@@ -90,4 +70,18 @@ export class ResourceGenerated {
 
   @DeleteDateColumn({ name: 'deleted_at', comment: '删除时间', nullable: true })
   deletedAt: Date | null
+
+  @Column('int', {
+    name: 'not_in_menu',
+    comment: '是否在菜单中显示：0-显示，1-不显示',
+  })
+  notInMenu: number
+
+  @Column('varchar', {
+    name: 'menu_path',
+    nullable: true,
+    comment: '菜单路径',
+    length: 100,
+  })
+  menuPath: string | null
 }

@@ -6,6 +6,7 @@ import userApi from '../api/resource'
 import { Backend } from '@repo/types'
 import { getResourceFormSchema } from '../model'
 import { getMessage } from '@/utils/antd-instance'
+import { SUCCESS_MESSAGE } from '@/constants'
 import { ResourcePageRespDto } from '../types'
 import { typeList } from '../model/model'
 
@@ -34,17 +35,17 @@ export const ResourceFormContainer: React.FC<ResourceFormContainerProps> = ({
     const schema = getResourceFormSchema()
     if (formType === 'createSub' && drawerData) {
       const parentType = drawerData.type
-      let allowedTypes: string[] = []
-      if (parentType === '0') {
-        allowedTypes = ['0', '1']
-      } else if (parentType === '1') {
-        allowedTypes = ['2', '3']
+      let allowedTypes: number[] = []
+      if (parentType === 0) {
+        allowedTypes = [0, 1]
+      } else if (parentType === 1) {
+        allowedTypes = [2, 3]
       } else {
         allowedTypes = []
       }
       filteredOptions = typeList.filter((typeItem) => allowedTypes.includes(typeItem.id))
     } else if (formType === 'createLast' || formType === 'createPrev' || formType === 'copyPrev') {
-      filteredOptions = typeList.filter((typeItem) => ['0', '1'].includes(typeItem.id))
+      filteredOptions = typeList.filter((typeItem) => [0, 1].includes(typeItem.id))
     }
     schema.type = {
       ...schema.type,
@@ -64,7 +65,7 @@ export const ResourceFormContainer: React.FC<ResourceFormContainerProps> = ({
    */
   const transformResData2Form = useCallback((resData: ResourcePageRespDto) => {
     const formData = { ...resData }
-    formData.notInMenu = resData.notInMenu === '1' ? '1' : '0'
+    formData.notInMenu = resData.notInMenu === 1 ? 1 : 0
     return formData
   }, [])
 
@@ -125,12 +126,12 @@ export const ResourceFormContainer: React.FC<ResourceFormContainerProps> = ({
         await userApi.create({
           ...cleanParams,
           sortNumber: (sameLevelList?.length ?? 0) + 1,
-          status: '1',
+          status: 1,
         } as Backend.ResourceCreateDto)
-        getMessage().success('创建资源成功')
+        getMessage().success(SUCCESS_MESSAGE.RESOURCE_CREATE)
       } else if (formType === 'edit') {
         await userApi.update(drawerData!.id!, cleanParams as Backend.ResourceUpdateDto)
-        getMessage().success('更新资源成功')
+        getMessage().success(SUCCESS_MESSAGE.RESOURCE_UPDATE)
       } else if (formType === 'createPrev' || formType === 'copyPrev') {
         let index = 0
         let rest: Backend.ResourcePartialDto[] = []

@@ -2,6 +2,7 @@ import { DataSource, EntityManager, getMetadataArgsStorage, Repository } from 't
 import { Injectable } from '@nestjs/common'
 import { ValueSet } from '@/modules/value-set/entities/value-set.entity'
 import { ValueSetPageDto } from '@/modules/value-set/dto/value-set.page.dto'
+import { ValueSetGroupPageDto } from '@/modules/value-set/dto/value-set-set.page.dto'
 import { isTargetOrParent } from '@/utils/fns'
 import { ValueSetCreateDto } from './dto/value-set.create.dto'
 import { ValueSetUpdateDto } from './dto/value-set.update.dto'
@@ -13,16 +14,122 @@ export class ValueSetRepository extends Repository<ValueSet> {
   }
 
   async searchValueSetsByPage(query: ValueSetPageDto) {
-    const { page = 1, pageSize = 10 } = query
+    const {
+      page = 1,
+      pageSize = 10,
+      setCode,
+      setName,
+      code,
+      name,
+      createdAtStart,
+      createdAtEnd,
+      updatedAtStart,
+      updatedAtEnd,
+    } = query
 
     const qb = this.createQueryBuilder('valueSet')
 
-    // todo 排序应该从前端传入
-    qb.orderBy('valueSet.createdAt', 'DESC')
+    if (setCode) {
+      const codeExact = setCode.startsWith('"') && setCode.endsWith('"')
+      const setCodeValue = codeExact ? setCode.slice(1, -1) : setCode
+      if (codeExact) {
+        qb.andWhere('valueSet.setCode = :setCode', { setCode: setCodeValue })
+      } else {
+        qb.andWhere('valueSet.setCode LIKE :setCode', { setCode: `%${setCodeValue}%` })
+      }
+    }
+    if (setName) {
+      qb.andWhere('valueSet.setName LIKE :setName', { setName: `%${setName}%` })
+    }
+    if (code) {
+      const codeExact = code.startsWith('"') && code.endsWith('"')
+      const codeValue = codeExact ? code.slice(1, -1) : code
+      if (codeExact) {
+        qb.andWhere('valueSet.code = :code', { code: codeValue })
+      } else {
+        qb.andWhere('valueSet.code LIKE :code', { code: `%${codeValue}%` })
+      }
+    }
+    if (name) {
+      qb.andWhere('valueSet.name LIKE :name', { name: `%${name}%` })
+    }
+    if (createdAtStart) {
+      qb.andWhere('valueSet.createdAt >= :createdAtStart', { createdAtStart })
+    }
+    if (createdAtEnd) {
+      qb.andWhere('valueSet.createdAt <= :createdAtEnd', { createdAtEnd })
+    }
+    if (updatedAtStart) {
+      qb.andWhere('valueSet.updatedAt >= :updatedAtStart', { updatedAtStart })
+    }
+    if (updatedAtEnd) {
+      qb.andWhere('valueSet.updatedAt <= :updatedAtEnd', { updatedAtEnd })
+    }
+
+    // 按排序号升序，排序号相同按创建时间倒序
+    qb.orderBy('valueSet.sortNumber', 'ASC')
+      .addOrderBy('valueSet.createdAt', 'DESC')
       .skip((page - 1) * pageSize)
       .take(pageSize)
 
     return await qb.getManyAndCount()
+  }
+
+  /** 按 setCode 去重聚合，返回集列表（含值数量） */
+  async searchValueSetGroupsByPage(query: ValueSetGroupPageDto) {
+    const { page = 1, pageSize = 10, setCode, setName, createdAtStart, createdAtEnd } = query
+
+    const qb = this.createQueryBuilder('valueSet')
+
+    qb.select([
+      'valueSet.setCode AS setCode',
+      'MAX(valueSet.setName) AS setName',
+      'COUNT(valueSet.id) AS valueCount',
+      'MAX(valueSet.status) AS status',
+      'MAX(valueSet.createdAt) AS createdAt',
+      'MAX(valueSet.updatedAt) AS updatedAt',
+    ]).groupBy('valueSet.setCode')
+
+    if (setCode) {
+      qb.andWhere('valueSet.setCode LIKE :setCode', { setCode: `%${setCode}%` })
+    }
+    if (setName) {
+      qb.andWhere('valueSet.setName LIKE :setName', { setName: `%${setName}%` })
+    }
+    if (createdAtStart) {
+      qb.andWhere('valueSet.createdAt >= :createdAtStart', { createdAtStart })
+    }
+    if (createdAtEnd) {
+      qb.andWhere('valueSet.createdAt <= :createdAtEnd', { createdAtEnd })
+    }
+
+    qb.orderBy('MAX(valueSet.createdAt)', 'DESC')
+      .offset((page - 1) * pageSize)
+      .limit(pageSize)
+
+    const [rows, totalQb] = await Promise.all([
+      qb.getRawMany(),
+      (() => {
+        const countQb = this.createQueryBuilder('valueSet')
+        countQb.select('COUNT(DISTINCT valueSet.setCode)', 'cnt')
+        if (setCode) {
+          countQb.andWhere('valueSet.setCode LIKE :setCode', { setCode: `%${setCode}%` })
+        }
+        if (setName) {
+          countQb.andWhere('valueSet.setName LIKE :setName', { setName: `%${setName}%` })
+        }
+        if (createdAtStart) {
+          countQb.andWhere('valueSet.createdAt >= :createdAtStart', { createdAtStart })
+        }
+        if (createdAtEnd) {
+          countQb.andWhere('valueSet.createdAt <= :createdAtEnd', { createdAtEnd })
+        }
+        return countQb.getRawOne()
+      })(),
+    ])
+
+    const total = Number(totalQb?.cnt ?? 0)
+    return { rows, total }
   }
   async findValueSetById(id: number) {
     const queryBuilder = this.createQueryBuilder('valueSet')
@@ -69,11 +176,11 @@ export class ValueSetRepository extends Repository<ValueSet> {
     })
     return await manager.save(valueSets)
   }
-  async updateValueSetStatus(valueSet: ValueSet, status: string, manager: EntityManager) {
+  async updateValueSetStatus(valueSet: ValueSet, status: number, manager: EntityManager) {
     valueSet.status = status
     return await manager.save(ValueSet, valueSet)
   }
-  async batchUpdateValueSetStatus(valueSets: ValueSet[], status: string, manager: EntityManager) {
+  async batchUpdateValueSetStatus(valueSets: ValueSet[], status: number, manager: EntityManager) {
     valueSets.forEach((valueSet) => {
       valueSet.status = status
     })

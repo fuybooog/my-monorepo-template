@@ -12,6 +12,7 @@ import bcrypt from 'bcrypt'
 import { RoleService } from '@/modules/role/role.service'
 import { RoleRepository } from '@/modules/role/role.repository'
 import { MAX_ROLE_LEVEL } from '@/constants'
+import { BaseStatusEnum } from '@/enum/base-status.enum'
 
 @Injectable()
 export class AuthInitService implements OnModuleInit {
@@ -64,7 +65,7 @@ export class AuthInitService implements OnModuleInit {
         nickName: '超级管理员',
         password: passwordHash,
         mobile: '18800000000',
-        status: '1',
+        status: BaseStatusEnum.ENABLE,
         py: 'cjgly',
         pinyin: 'chaojiguanliyuan',
       })
@@ -94,7 +95,7 @@ export class AuthInitService implements OnModuleInit {
         {
           roleCode: 'admin',
           roleName: '超级管理员',
-          status: '1',
+          status: BaseStatusEnum.ENABLE,
         },
         MAX_ROLE_LEVEL,
       )

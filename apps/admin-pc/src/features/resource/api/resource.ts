@@ -18,7 +18,7 @@ const resourceApi = {
   listByUser(params?: {
     userId?: number
     types: string
-    notInMenu?: '0' | '1'
+    notInMenu?: 0 | 1
   }): Promise<Backend.ListResourceByUserRes> {
     return http.get('/resource/listByUser', params)
   },

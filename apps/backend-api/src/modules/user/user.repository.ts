@@ -115,11 +115,11 @@ export class UserRepository extends Repository<User> {
     })
     return await manager.save(users)
   }
-  async updateUserStatus(user: User, status: string, manager: EntityManager) {
+  async updateUserStatus(user: User, status: number, manager: EntityManager) {
     user.status = status
     return await manager.save(User, user)
   }
-  async batchUpdateUserStatus(users: User[], status: string, manager: EntityManager) {
+  async batchUpdateUserStatus(users: User[], status: number, manager: EntityManager) {
     users.forEach((user) => {
       user.status = status
     })

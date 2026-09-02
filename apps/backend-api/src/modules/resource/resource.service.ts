@@ -52,7 +52,7 @@ export class ResourceService {
     userId: number,
     roleCodes: string[] = [],
     types?: string,
-    notInMenu?: string,
+    notInMenu?: number,
   ): Promise<ListResp<ResourcePageRespDto>> {
     // todo 判断userId 若非本人，则必须为管理员
     const [entities] = await this.resourceRepository.searchResourcesByUser(

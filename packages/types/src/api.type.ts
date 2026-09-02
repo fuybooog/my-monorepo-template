@@ -51,6 +51,8 @@ export namespace Backend {
   export type UpdateFileDto = components['schemas']['UpdateFileDto']
   export type ValueSetPageRespDto = components['schemas']['ValueSetPageRespDto']
   export type ValueSetPageDto = components['schemas']['ValueSetPageDto']
+  export type ValueSetGroupPageRespDto = components['schemas']['ValueSetGroupPageRespDto']
+  export type ValueSetGroupPageDto = components['schemas']['ValueSetGroupPageDto']
   export type ValueSetPageOptionDto = components['schemas']['ValueSetPageOptionDto']
   export type ValueSetRespDto = components['schemas']['ValueSetRespDto']
   export type ValueSetListRespDto = components['schemas']['ValueSetListRespDto']
@@ -738,6 +740,28 @@ export namespace Backend {
     }
       ? R
       : operations['ValueSetController__pageValueSet']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type PageValueSetGroupsRes =
+    operations['ValueSetController_pageValueSetGroups']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ValueSetController_pageValueSetGroups']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type _pageValueSetGroupsRes =
+    operations['ValueSetController__pageValueSetGroups']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['ValueSetController__pageValueSetGroups']['responses'] extends {
             '201': { content: { 'application/json': infer R } }
           }
         ? R

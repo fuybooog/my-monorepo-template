@@ -31,10 +31,15 @@ export class ValueSetBaseDto {
   @IsOptional()
   parentSetName?: string | null
 
-  @ApiPropertyOptional({ description: '状态  0-禁用 1-启用', type: String })
-  @IsString()
+  @ApiPropertyOptional({ description: '状态：0-禁用，1-启用', type: Number })
+  @IsInt()
   @IsOptional()
-  status?: string | null
+  status?: number
+
+  @ApiPropertyOptional({ description: '排序号', type: Number })
+  @IsInt()
+  @IsOptional()
+  sortNumber?: number | null
 
   @ApiPropertyOptional({ description: '创建时间', type: String })
   @IsOptional()

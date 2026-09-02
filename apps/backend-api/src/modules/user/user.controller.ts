@@ -25,6 +25,8 @@ import {
 } from '@/modules/user/dto/user.dto'
 import { CurrentUser } from '@/decorators/current-user.decorator'
 import { CurrentLoginResponseDto } from '@/modules/auth/auth.dto'
+import { RequirePermissions } from '@/decorators/require-permissions.decorator'
+import { PERMISSIONS } from '@repo/shared'
 
 @ApiTags('用户模块')
 @Controller('user')
@@ -32,6 +34,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('page')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_PAGE)
   @ApiOperation({ summary: '分页查询用户列表' })
   @ApiSuccessPageResponse(UserPageRespDto)
   async pageUser(
@@ -49,6 +52,7 @@ export class UserController {
   }
 
   @Get('option')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_PAGE)
   @ApiOperation({ summary: '分页查询用户列表(可选字段)' })
   @ApiSuccessPageResponse(UserPageRespDto)
   async pageOptionUser(
@@ -66,6 +70,7 @@ export class UserController {
   }
 
   @Get('find/:id')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_VIEW)
   @ApiOperation({ summary: '按id查询用户' })
   @ApiSuccessResponse(UserRespDto)
   async findUserById(@Param('id', ParseIntPipe) id: number): Promise<UserRespDto | null> {
@@ -74,6 +79,7 @@ export class UserController {
   }
 
   @Get('findRolesByUserId/:id')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_VIEW)
   @ApiOperation({ summary: '按id查询角色' })
   @ApiSuccessResponse(FindRolesByUserIdResp)
   async findRolesByUserId(
@@ -83,6 +89,7 @@ export class UserController {
   }
 
   @Post('assignRolesToUser/:id')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_ASSIGN_ROLE)
   @ApiOperation({ summary: '按id查询角色' })
   @ApiSuccessResponse()
   async assignRolesToUser(
@@ -93,6 +100,7 @@ export class UserController {
   }
 
   @Get('batch/query')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_VIEW)
   @ApiOperation({ summary: '按ids查询用户' })
   @ApiSuccessResponse(UserListRespDto)
   async findUserListByIds(@Query() query: BatchDto): Promise<UserListRespDto | null> {
@@ -100,6 +108,7 @@ export class UserController {
   }
 
   @Post('create')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_CREATE)
   @ApiOperation({ summary: '创建用户' })
   @ApiSuccessResponse(UserRespDto)
   async createUser(@Body() body: UserCreateDto): Promise<UserRespDto | null> {
@@ -107,6 +116,7 @@ export class UserController {
   }
 
   @Post('update/:id')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_EDIT)
   @ApiOperation({ summary: '修改用户' })
   @ApiSuccessResponse(UserRespDto)
   async updateUser(
@@ -117,6 +127,7 @@ export class UserController {
   }
 
   @Post('delete/:id')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_DELETE)
   @ApiOperation({ summary: '删除用户' })
   @ApiSuccessResponse()
   async removeUser(@Param('id') id: number) {
@@ -124,6 +135,7 @@ export class UserController {
   }
 
   @Post('batch/delete')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_DELETE)
   @ApiOperation({ summary: '批量删除用户' })
   @ApiSuccessResponse(BatchRespDto)
   async batchRemoveUser(@Body() body: BatchDto): Promise<BatchRespDto | null> {
@@ -131,6 +143,7 @@ export class UserController {
   }
 
   @Post('updateStatus/:id')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_EDIT)
   @ApiOperation({ summary: '修改用户状态' })
   @ApiSuccessResponse()
   async updateUserStatus(@Param('id') id: number, @Body() body: UpdateStatusDto) {
@@ -138,6 +151,7 @@ export class UserController {
   }
 
   @Post('batch/status')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_EDIT)
   @ApiOperation({ summary: '批量修改用户状态' })
   @ApiSuccessResponse(BatchRespDto)
   async batchUpdateUserStatus(@Body() body: BatchUpdateStatusDto): Promise<BatchRespDto | null> {
@@ -145,6 +159,7 @@ export class UserController {
   }
 
   @Post('template')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_IMPORT)
   @ApiOperation({ summary: '下载导入用户模板' })
   @ApiSuccessResponse()
   async downloadUserTemplate() {
@@ -152,6 +167,7 @@ export class UserController {
   }
 
   @Post('import')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_IMPORT)
   @ApiOperation({ summary: '导入用户数据' })
   @ApiSuccessResponse()
   async importUser() {
@@ -159,18 +175,21 @@ export class UserController {
   }
 
   @Post('export')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_EXPORT)
   @ApiOperation({ summary: '导出用户数据' })
   @ApiSuccessResponse()
   async exportUser() {
     return await this.userService.exportUser()
   }
   @Get('check-unique')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_VIEW)
   @ApiOperation({ summary: '检测字段是否唯一' })
   @ApiSuccessBooleanResponse()
   async checkUnique(userCheckUniqueDto: UserCheckUniqueDto): Promise<boolean> {
     return await this.userService.checkUserFieldUnique(userCheckUniqueDto)
   }
   @Post('adminResetPassword')
+  @RequirePermissions(PERMISSIONS.SYS_USER_LIST_RESET_PWD)
   @ApiOperation({ summary: '重置密码' })
   @ApiSuccessResponse()
   async adminResetPassword(@Body() body: AdminResetPasswordDto) {

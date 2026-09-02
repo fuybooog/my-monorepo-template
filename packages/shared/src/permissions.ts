@@ -9,6 +9,7 @@ export const PERMISSIONS = {
   SYS_USER_LIST_IMPORT: 'sys:user-list:import',
   SYS_USER_LIST_RESET_PWD: 'sys:user-list:reset-pwd',
   SYS_USER_LIST_ASSIGN_ROLE: 'sys:user-list:assign-role',
+  SYS_USER_LIST_VIEW: 'sys:user-list:view',
 
   // 角色管理
   SYS_ROLE_DIR: 'sys:role:dir',

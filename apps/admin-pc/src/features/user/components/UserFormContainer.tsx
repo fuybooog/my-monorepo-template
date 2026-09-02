@@ -8,6 +8,7 @@ import { getUserFormSchema } from '../model'
 import { transformDateFieldsValue } from '@/utils/fns'
 import { pinyin } from 'pinyin-pro'
 import { getMessage } from '@/utils/antd-instance'
+import { SUCCESS_MESSAGE } from '@/constants'
 
 interface UserFormContainerProps {
   id?: string | number
@@ -101,10 +102,10 @@ export const UserFormContainer: React.FC<UserFormContainerProps> = ({
     try {
       if (mode === 'create') {
         await userApi.create(cleanParams as Backend.UserCreateDto)
-        getMessage().success('创建用户成功')
+        getMessage().success(SUCCESS_MESSAGE.USER_CREATE)
       } else if (mode === 'edit') {
         await userApi.update(id!, cleanParams as Backend.UserUpdateDto)
-        getMessage().success('更新用户成功')
+        getMessage().success(SUCCESS_MESSAGE.USER_UPDATE)
       }
       onSuccess()
     } catch (err) {

@@ -49,13 +49,19 @@ export class ValueSetGenerated {
   })
   parentSetName: string | null
 
-  @Column('varchar', {
+  @Column('int', {
     name: 'status',
-    nullable: true,
-    comment: '状态  0-禁用 1-启用',
-    length: 45,
+    comment: '状态：0-禁用，1-启用',
+    default: () => "'1'",
   })
-  status: string | null
+  status: number
+
+  @Column('int', {
+    name: 'sort_number',
+    nullable: true,
+    comment: '排序号',
+  })
+  sortNumber: number | null
 
   @CreateDateColumn({ name: 'created_at', comment: '创建时间', nullable: true })
   createdAt: Date | null

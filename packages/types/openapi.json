@@ -328,7 +328,7 @@
             "in": "query",
             "description": "状态：0-禁用，1-启用",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           },
           {
@@ -1408,7 +1408,7 @@
             "in": "query",
             "description": "状态：0-禁用，1-启用",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           },
           {
@@ -2210,7 +2210,7 @@
             "in": "query",
             "description": "状态：0-禁用，1-启用",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           },
           {
@@ -2219,16 +2219,16 @@
             "in": "query",
             "description": "资源类型：0-目录 1-页面 2-按钮 3-列",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           },
           {
             "name": "notInMenu",
             "required": false,
             "in": "query",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示",
+            "description": "是否在菜单中显示：0-显示，1-不显示",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           },
           {
@@ -2430,7 +2430,7 @@
             "in": "query",
             "description": "状态：0-禁用，1-启用",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           },
           {
@@ -2439,16 +2439,16 @@
             "in": "query",
             "description": "资源类型：0-目录 1-页面 2-按钮 3-列",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           },
           {
             "name": "notInMenu",
             "required": false,
             "in": "query",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示",
+            "description": "是否在菜单中显示：0-显示，1-不显示",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           },
           {
@@ -3406,9 +3406,18 @@
             "name": "status",
             "required": false,
             "in": "query",
-            "description": "状态  0-禁用 1-启用",
+            "description": "状态：0-禁用，1-启用",
             "schema": {
-              "type": "string"
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortNumber",
+            "required": false,
+            "in": "query",
+            "description": "排序号",
+            "schema": {
+              "type": "number"
             }
           },
           {
@@ -3642,6 +3651,171 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ValueSetPageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "请勿调用，用于生成前端DTO",
+        "tags": ["值集模块"]
+      }
+    },
+    "/value-set/sets/page": {
+      "get": {
+        "operationId": "ValueSetController_pageValueSetGroups",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "页码",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "setCode",
+            "required": false,
+            "in": "query",
+            "description": "集CODE",
+            "schema": {
+              "example": "SYS_GENDER",
+              "type": "string"
+            }
+          },
+          {
+            "name": "setName",
+            "required": false,
+            "in": "query",
+            "description": "集NAME",
+            "schema": {
+              "example": "性别",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAtStart",
+            "required": false,
+            "in": "query",
+            "description": "创建时间开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "创建时间结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtStart",
+            "required": false,
+            "in": "query",
+            "description": "修改时间开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "修改时间结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "分页成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/PaginatedResult"
+                            },
+                            {
+                              "required": ["total", "page", "pageSize", "list"],
+                              "properties": {
+                                "total": {
+                                  "type": "number",
+                                  "description": "总条数",
+                                  "example": 100
+                                },
+                                "page": {
+                                  "type": "number",
+                                  "description": "当前页码",
+                                  "example": 1
+                                },
+                                "pageSize": {
+                                  "type": "number",
+                                  "description": "每页条数",
+                                  "example": 10
+                                },
+                                "list": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/components/schemas/ValueSetGroupPageRespDto"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "集维度分页查询（按 setCode 去重）",
+        "tags": ["值集模块"]
+      }
+    },
+    "/value-set/schema-generator-holder-sets-page-value-set": {
+      "post": {
+        "deprecated": true,
+        "operationId": "ValueSetController__pageValueSetGroups",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValueSetGroupPageDto"
               }
             }
           }
@@ -4541,7 +4715,7 @@
             "description": "邮箱"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "createdAt": {
@@ -4611,7 +4785,7 @@
             "description": "邮箱"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "createdAt": {
@@ -4768,7 +4942,7 @@
             "description": "邮箱"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "createdAt": {
@@ -4889,7 +5063,7 @@
             "description": "邮箱"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "createdAt": {
@@ -4977,7 +5151,7 @@
             "description": "邮箱"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "createdAt": {
@@ -5041,9 +5215,9 @@
         "type": "object",
         "properties": {
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态值",
-            "enum": ["1", "0"]
+            "enum": [1, 0]
           }
         },
         "required": ["status"]
@@ -5057,9 +5231,9 @@
             "example": ""
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态",
-            "enum": ["1", "0"]
+            "enum": [1, 0]
           }
         },
         "required": ["ids", "status"]
@@ -5128,7 +5302,7 @@
             "description": "角色等级"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "createdAt": {
@@ -5170,7 +5344,7 @@
             "description": "角色等级"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "createdAt": {
@@ -5264,7 +5438,7 @@
             "description": "角色等级"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "createdAt": {
@@ -5319,7 +5493,7 @@
             "description": "角色等级"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "createdAt": {
@@ -5371,7 +5545,7 @@
             "description": "角色等级"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "createdAt": {
@@ -5419,11 +5593,11 @@
             "description": "唯一父编码"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "type": {
-            "type": "string",
+            "type": "number",
             "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
           },
           "menuPath": {
@@ -5431,8 +5605,8 @@
             "description": "菜单路径"
           },
           "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+            "type": "number",
+            "description": "是否在菜单中显示：0-显示，1-不显示"
           },
           "sortNumber": {
             "type": "number",
@@ -5483,16 +5657,16 @@
             "description": "唯一父编码"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "type": {
-            "type": "string",
+            "type": "number",
             "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
           },
           "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+            "type": "number",
+            "description": "是否在菜单中显示：0-显示，1-不显示"
           },
           "sortNumber": {
             "type": "number",
@@ -5587,11 +5761,11 @@
             "description": "唯一父编码"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "type": {
-            "type": "string",
+            "type": "number",
             "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
           },
           "menuPath": {
@@ -5599,8 +5773,8 @@
             "description": "菜单路径"
           },
           "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+            "type": "number",
+            "description": "是否在菜单中显示：0-显示，1-不显示"
           },
           "sortNumber": {
             "type": "number",
@@ -5658,16 +5832,16 @@
             "description": "唯一父编码"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "type": {
-            "type": "string",
+            "type": "number",
             "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
           },
           "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+            "type": "number",
+            "description": "是否在菜单中显示：0-显示，1-不显示"
           },
           "sortNumber": {
             "type": "number",
@@ -5707,16 +5881,16 @@
             "description": "唯一父编码"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "type": {
-            "type": "string",
+            "type": "number",
             "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
           },
           "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+            "type": "number",
+            "description": "是否在菜单中显示：0-显示，1-不显示"
           },
           "sortNumber": {
             "type": "number",
@@ -5760,16 +5934,16 @@
             "description": "唯一父编码"
           },
           "status": {
-            "type": "string",
+            "type": "number",
             "description": "状态：0-禁用，1-启用"
           },
           "type": {
-            "type": "string",
+            "type": "number",
             "description": "资源类型：0-目录 1-页面 2-按钮 3-列"
           },
           "notInMenu": {
-            "type": "string",
-            "description": "是否在菜单中显示，默认为空，表示显示，设置为1时表示不显示"
+            "type": "number",
+            "description": "是否在菜单中显示：0-显示，1-不显示"
           },
           "sortNumber": {
             "type": "number",
@@ -5841,8 +6015,12 @@
             "description": "父名称"
           },
           "status": {
-            "type": "string",
-            "description": "状态  0-禁用 1-启用"
+            "type": "number",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
           },
           "createdAt": {
             "type": "string",
@@ -5887,8 +6065,12 @@
             "description": "父名称"
           },
           "status": {
-            "type": "string",
-            "description": "状态  0-禁用 1-启用"
+            "type": "number",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
           },
           "createdAt": {
             "type": "string",
@@ -5968,6 +6150,79 @@
           }
         }
       },
+      "ValueSetGroupPageRespDto": {
+        "type": "object",
+        "properties": {
+          "setCode": {
+            "type": "string",
+            "description": "集编码"
+          },
+          "setName": {
+            "type": "string",
+            "description": "集名称"
+          },
+          "valueCount": {
+            "type": "number",
+            "description": "集下值的数量"
+          },
+          "status": {
+            "type": "number",
+            "description": "状态（取集下值状态的最大值：1=启用，0=禁用）"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "更新时间"
+          }
+        },
+        "required": ["setCode", "setName", "valueCount", "status", "createdAt", "updatedAt"]
+      },
+      "ValueSetGroupPageDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "description": "页码"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "每页条数"
+          },
+          "setCode": {
+            "type": "string",
+            "description": "集CODE",
+            "example": "SYS_GENDER"
+          },
+          "setName": {
+            "type": "string",
+            "description": "集NAME",
+            "example": "性别"
+          },
+          "createdAtStart": {
+            "type": "string",
+            "description": "创建时间开始",
+            "example": "2000-10-10 00:00:00"
+          },
+          "createdAtEnd": {
+            "type": "string",
+            "description": "创建时间结束",
+            "example": "2000-10-10 23:59:59"
+          },
+          "updatedAtStart": {
+            "type": "string",
+            "description": "修改时间开始",
+            "example": "2000-10-10 00:00:00"
+          },
+          "updatedAtEnd": {
+            "type": "string",
+            "description": "修改时间结束",
+            "example": "2000-10-10 23:59:59"
+          }
+        }
+      },
       "ValueSetPageOptionDto": {
         "type": "object",
         "properties": {
@@ -6023,8 +6278,12 @@
             "description": "父名称"
           },
           "status": {
-            "type": "string",
-            "description": "状态  0-禁用 1-启用"
+            "type": "number",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
           },
           "createdAt": {
             "type": "string",
@@ -6116,8 +6375,12 @@
             "description": "父名称"
           },
           "status": {
-            "type": "string",
-            "description": "状态  0-禁用 1-启用"
+            "type": "number",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
           },
           "createdAt": {
             "type": "string",
@@ -6163,11 +6426,11 @@
           },
           "code": {
             "type": "string",
-            "description": "字典编码"
+            "description": "值编码（编辑集时无需传）"
           },
           "name": {
             "type": "string",
-            "description": "字典名称"
+            "description": "值名称（编辑集时无需传）"
           },
           "parentSetCode": {
             "type": "string",
@@ -6178,8 +6441,12 @@
             "description": "父名称"
           },
           "status": {
-            "type": "string",
-            "description": "状态  0-禁用 1-启用"
+            "type": "number",
+            "description": "状态：0-禁用，1-启用"
+          },
+          "sortNumber": {
+            "type": "number",
+            "description": "排序号"
           },
           "createdAt": {
             "type": "string",
@@ -6210,7 +6477,7 @@
             "description": "删除时间"
           }
         },
-        "required": ["setCode", "setName", "code", "name"]
+        "required": ["setCode", "setName"]
       }
     }
   }

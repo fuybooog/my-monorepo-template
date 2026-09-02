@@ -15,7 +15,7 @@ export class BatchUpdateStatusDto {
   @ApiProperty({ description: '状态', enum: BaseStatusEnum })
   @IsEnum(BaseStatusEnum, { message: '不合法的状态值' })
   @IsNotEmpty({ message: '状态值不能为空' })
-  status: string
+  status: number
 }
 export class BatchRespDto {
   @Expose()

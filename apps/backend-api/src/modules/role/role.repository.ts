@@ -114,11 +114,11 @@ export class RoleRepository extends Repository<Role> {
     })
     return await (manager || this.manager).save(roles)
   }
-  async updateRoleStatus(role: Role, status: string, manager?: EntityManager) {
+  async updateRoleStatus(role: Role, status: number, manager?: EntityManager) {
     role.status = status
     return await (manager || this.manager).save(Role, role)
   }
-  async batchUpdateRoleStatus(roles: Role[], status: string, manager?: EntityManager) {
+  async batchUpdateRoleStatus(roles: Role[], status: number, manager?: EntityManager) {
     roles.forEach((role) => {
       role.status = status
     })

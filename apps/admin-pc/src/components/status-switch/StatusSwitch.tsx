@@ -1,6 +1,7 @@
 import { getMessage } from '@/utils'
 import { Switch } from 'antd'
 import { useState } from 'react'
+import { SUCCESS_MESSAGE } from '@/constants'
 
 export function StatusSwitch<RecordType, StatusType>({
   value,
@@ -24,7 +25,7 @@ export function StatusSwitch<RecordType, StatusType>({
     setLoading(true)
     try {
       await onStatusChange(record, nextStatus)
-      getMessage().success('状态更新成功')
+      getMessage().success(SUCCESS_MESSAGE.STATUS_UPDATE)
       refreshList?.()
     } catch (error) {
       console.error('更新状态失败', error)

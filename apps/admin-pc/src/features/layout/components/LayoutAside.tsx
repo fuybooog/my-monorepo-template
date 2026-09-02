@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 export function LayoutAside() {
   const location = useLocation()
   const navigate = useNavigate()
-  const [items, setItems] = useState<Backend.ResourcePageRespDto[]>([])
+  const [items, setItems] = useState<MenuProps['items']>([])
   const [nodeMap, setNodeMap] = useState<Map<string | number, Backend.ResourcePageRespDto>>(
     new Map(),
   )
@@ -20,7 +20,7 @@ export function LayoutAside() {
 
   useEffect(() => {
     async function fetchResource() {
-      const res = await resourceApi.listByUser({ types: '0,1', notInMenu: '0' })
+      const res = await resourceApi.listByUser({ types: '0,1', notInMenu: 0 })
       const treeConfig = {
         idKey: 'uniqueProp',
         parentKey: 'parentUniqueProp',
@@ -34,7 +34,7 @@ export function LayoutAside() {
         }),
       } as const
       const { tree, nodeMap } = arrayToTree(res.data.list, treeConfig)
-      setItems(tree)
+      setItems(tree as unknown as MenuProps['items'])
       setNodeMap(nodeMap)
     }
     fetchResource()
@@ -108,7 +108,7 @@ export function LayoutAside() {
         openKeys={openKeys}
         onOpenChange={onOpenChange}
         mode="inline"
-        items={items as MenuProps['items']}
+        items={items}
       />
     </div>
   )

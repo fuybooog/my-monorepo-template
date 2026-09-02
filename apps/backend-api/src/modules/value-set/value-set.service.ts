@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 
 import { ValueSetPageRespDto } from '@/modules/value-set/dto/value-set.page.resp.dto'
 import { ValueSetListDto, ValueSetPageDto } from '@/modules/value-set/dto/value-set.page.dto'
+import { ValueSetGroupPageDto } from '@/modules/value-set/dto/value-set-set.page.dto'
+import { ValueSetGroupPageRespDto } from '@/modules/value-set/dto/value-set-set.page.resp.dto'
 import { ValueSetPageOptionDto } from '@/modules/value-set/dto/value-set.page.option.dto'
 import { ValueSetRespDto } from '@/modules/value-set/dto/value-set.resp.dto'
 import { ValueSetListRespDto } from '@/modules/value-set/dto/value-set.list.resp.dto'
@@ -35,6 +37,27 @@ export class ValueSetService {
       total,
       page: valueSetPageDto.page,
       pageSize: valueSetPageDto.pageSize,
+    }
+  }
+  /** 集维度（按 setCode 去重）分页 */
+  async pageValueSetGroups(
+    valueSetGroupPageDto: ValueSetGroupPageDto,
+  ): Promise<PaginatedResult<ValueSetGroupPageRespDto>> {
+    const { rows, total } =
+      await this.valueSetRepository.searchValueSetGroupsByPage(valueSetGroupPageDto)
+    const list = rows.map((row) => ({
+      setCode: row.setCode,
+      setName: row.setName,
+      valueCount: Number(row.valueCount),
+      status: Number(row.status),
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    }))
+    return {
+      list,
+      total,
+      page: valueSetGroupPageDto.page,
+      pageSize: valueSetGroupPageDto.pageSize,
     }
   }
   async pageOptionValueSet(

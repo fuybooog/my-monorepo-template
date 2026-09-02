@@ -4,6 +4,7 @@ import { SmartForm, SmartSchema } from '@/components/common'
 import userApi from '../api/user'
 import { getMessage } from '@/utils/antd-instance'
 import { RoleSelect } from '@/components/remote-select/RoleSelect'
+import { SUCCESS_MESSAGE, ERROR_MESSAGE } from '@/constants'
 
 interface AssignRolesProps {
   visible: boolean
@@ -39,12 +40,12 @@ export const AssignRolesDrawer: React.FC<AssignRolesProps> = ({ visible, onCance
     try {
       // 调用API，将新密码和用户ID发送给后端
       await userApi.assignRolesToUser(userId, { roleIds: values.roleIds })
-      getMessage().success('角色分配成功！')
+      getMessage().success(SUCCESS_MESSAGE.ROLE_ASSIGN)
       form.resetFields() // 成功后再次重置
       onCancel() // 关闭弹窗
     } catch (error) {
       console.error('角色分配失败，请重试', error)
-      getMessage().error('角色分配失败，请重试')
+      getMessage().error(ERROR_MESSAGE.ROLE_ASSIGN)
     } finally {
       // setLoading(false)
     }

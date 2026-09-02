@@ -4,6 +4,7 @@ import { SmartForm, SmartFormMode, SmartSchema } from '@/components/common'
 import userApi from '@/features/user/api/user'
 import { getMessage } from '@/utils/antd-instance'
 import authApi from '@/features/auth/api/auth'
+import { SUCCESS_MESSAGE, ERROR_MESSAGE } from '@/constants'
 import { encryptPassword } from '@/utils'
 import { useAuthStore } from '@/store/authStore'
 
@@ -97,11 +98,11 @@ export const UserInfoDrawer: React.FC<UserInfoDrawerProps> = ({ visible, onCance
             newPasswordPublicKey: newRes.data.publicKey,
           })
         } else {
-          getMessage().error('获取加密密钥失败，请刷新重试')
+          getMessage().error(ERROR_MESSAGE.FETCH_ENCRYPT_KEY_REFRESH)
         }
       } catch (error) {
         console.error('获取加密密钥失败，请检查网络', error)
-        getMessage().error('获取加密密钥失败，请检查网络')
+        getMessage().error(ERROR_MESSAGE.FETCH_ENCRYPT_KEY_NETWORK)
       }
     }
 
@@ -137,12 +138,12 @@ export const UserInfoDrawer: React.FC<UserInfoDrawerProps> = ({ visible, onCance
       await userApi.resetPassword(params)
       setUpdatePasswordFlag(false)
       setMode('view')
-      getMessage().success('密码重置成功！')
+      getMessage().success(SUCCESS_MESSAGE.PASSWORD_RESET)
       form.resetFields()
       handleClose()
     } catch (error) {
       console.error('密码重置失败，请重试', error)
-      getMessage().error('密码重置失败，请重试！')
+      getMessage().error(ERROR_MESSAGE.PASSWORD_RESET)
     }
   }
 
@@ -152,7 +153,7 @@ export const UserInfoDrawer: React.FC<UserInfoDrawerProps> = ({ visible, onCance
       setLoading(true)
       await userApi.update(auth!.id!, baseInfoForm.getFieldsValue())
       setBaseInfoMode('view')
-      getMessage().success('保存成功！昵称在重新登录后生效！')
+      getMessage().success(SUCCESS_MESSAGE.PROFILE_SAVED)
     } catch (e) {
       console.error('保存失败', e)
     } finally {

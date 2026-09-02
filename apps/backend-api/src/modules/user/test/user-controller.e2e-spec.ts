@@ -15,9 +15,9 @@ describe('UserController(E2E)', () => {
     const userRepository = dataSource.getRepository(User)
     await userRepository.clear()
     await userRepository.save([
-      { userName: 'test_user_1', password: 'hashed_password_1', status: '1' },
-      { userName: 'test_user_2', password: 'hashed_password_2', status: '2' },
-      { userName: 'test_user_3', password: 'hashed_password_3', status: '1' },
+      { userName: 'test_user_1', password: 'hashed_password_1', status: 1 },
+      { userName: 'test_user_2', password: 'hashed_password_2', status: 0 },
+      { userName: 'test_user_3', password: 'hashed_password_3', status: 1 },
     ])
   })
 

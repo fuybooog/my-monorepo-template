@@ -30,6 +30,7 @@ export class ResourceController {
   constructor(private readonly resourceService: ResourceService) {}
 
   @Get('page')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_PAGE)
   @ApiOperation({ summary: '分页查询资源列表' })
   @ApiSuccessPageResponse(ResourcePageRespDto)
   async pageResource(
@@ -39,6 +40,7 @@ export class ResourceController {
   }
 
   @Get('list')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_PAGE)
   @ApiOperation({ summary: '查询全量资源列表' })
   @ApiSuccessPageResponse(ResourcePageRespDto)
   async listAllResource(@Query() query: ResourcePageDto): Promise<ListResp<ResourcePageRespDto>> {
@@ -52,7 +54,7 @@ export class ResourceController {
   async listResourceByUser(
     @Query('id', new ParseIntPipe({ optional: true })) id: number | undefined,
     @Query('types') types: string | undefined,
-    @Query('notInMenu') notInMenu: string | undefined,
+    @Query('notInMenu', new ParseIntPipe({ optional: true })) notInMenu: number | undefined,
     @CurrentUser() user: CurrentLoginResponseDto,
   ): Promise<ListResp<ResourcePageRespDto>> {
     return await this.resourceService.listByUser(id || user.id, user.roleCodes, types, notInMenu)
@@ -66,6 +68,7 @@ export class ResourceController {
   }
 
   @Get('option')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_PAGE)
   @ApiOperation({ summary: '分页查询资源列表(可选字段)' })
   @ApiSuccessPageResponse(ResourcePageRespDto)
   async pageOptionResource(
@@ -82,6 +85,7 @@ export class ResourceController {
   }
 
   @Get('find/:id')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_VIEW)
   @ApiOperation({ summary: '按id查询资源' })
   @ApiSuccessResponse(ResourceRespDto)
   async findResourceById(@Param('id', ParseIntPipe) id: number): Promise<ResourceRespDto | null> {
@@ -90,6 +94,7 @@ export class ResourceController {
   }
 
   @Get('batch/query')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_VIEW)
   @ApiOperation({ summary: '按ids查询资源' })
   @ApiSuccessResponse(ResourceListRespDto)
   async findResourceListByIds(@Query() query: BatchDto): Promise<ResourceListRespDto | null> {
@@ -105,6 +110,7 @@ export class ResourceController {
   }
 
   @Post('update/:id')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_EDIT)
   @ApiOperation({ summary: '修改资源' })
   @ApiSuccessResponse(ResourceRespDto)
   async updateResource(
@@ -115,6 +121,7 @@ export class ResourceController {
   }
 
   @Post('batchUpdate')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_EDIT)
   @ApiOperation({ summary: '批量修改资源' })
   @ApiSuccessResponse()
   async batchUpdateResource(
@@ -124,6 +131,7 @@ export class ResourceController {
   }
 
   @Post('delete/:id')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_DELETE)
   @ApiOperation({ summary: '删除资源' })
   @ApiSuccessResponse()
   async removeResource(@Param('id') id: number) {
@@ -131,6 +139,7 @@ export class ResourceController {
   }
 
   @Post('batch/delete')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_DELETE)
   @ApiOperation({ summary: '批量删除资源' })
   @ApiSuccessResponse(BatchRespDto)
   async batchRemoveResource(@Body() body: BatchDto): Promise<BatchRespDto | null> {
@@ -138,6 +147,7 @@ export class ResourceController {
   }
 
   @Post('updateStatus/:id')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_EDIT)
   @ApiOperation({ summary: '修改资源状态' })
   @ApiSuccessResponse()
   async updateResourceStatus(@Param('id') id: number, @Body() body: UpdateStatusDto) {
@@ -145,6 +155,7 @@ export class ResourceController {
   }
 
   @Post('batch/status')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_EDIT)
   @ApiOperation({ summary: '批量修改资源状态' })
   @ApiSuccessResponse(BatchRespDto)
   async batchUpdateResourceStatus(
@@ -153,6 +164,7 @@ export class ResourceController {
     return await this.resourceService.batchUpdateResourceStatus(body)
   }
   @Post('resetSort')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_EDIT)
   @ApiOperation({ summary: '重置列表顺序' })
   @ApiSuccessResponse()
   async resetResourceListSort(): Promise<null> {
@@ -160,6 +172,7 @@ export class ResourceController {
   }
 
   @Post('template')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_IMPORT)
   @ApiOperation({ summary: '下载导入资源模板' })
   @ApiSuccessResponse()
   async downloadResourceTemplate() {
@@ -167,6 +180,7 @@ export class ResourceController {
   }
 
   @Post('import')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_IMPORT)
   @ApiOperation({ summary: '导入资源数据' })
   @ApiSuccessResponse()
   async importResource() {
@@ -174,6 +188,7 @@ export class ResourceController {
   }
 
   @Post('export')
+  @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_EXPORT)
   @ApiOperation({ summary: '导出资源数据' })
   @ApiSuccessResponse()
   async exportResource() {

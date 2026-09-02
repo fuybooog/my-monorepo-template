@@ -1,11 +1,12 @@
 import { getMessage } from '@/utils/antd-instance'
 import { HttpClient } from '@repo/api'
+import { ERROR_MESSAGE } from '@/constants'
 
 const http = new HttpClient({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   withCredentials: true,
   onBusinessError(errMsg) {
-    getMessage().error('【系统错误】' + errMsg)
+    getMessage().error(ERROR_MESSAGE.SYSTEM + errMsg)
   },
   onError(error) {
     // 鉴权错误，跳转登录

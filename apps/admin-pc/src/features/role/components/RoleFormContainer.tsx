@@ -6,6 +6,7 @@ import roleApi from '../api/role'
 import { Backend } from '@repo/types'
 import { getRoleFormSchema } from '../model'
 import { getMessage } from '@/utils/antd-instance'
+import { SUCCESS_MESSAGE } from '@/constants'
 import { filterObjectKeys } from '@/utils/fns'
 
 interface RoleFormContainerProps {
@@ -107,10 +108,10 @@ export const RoleFormContainer: React.FC<RoleFormContainerProps> = ({
       setLoading(true)
       if (mode === 'create') {
         await roleApi.create(cleanParams as Backend.RoleCreateDto)
-        getMessage().success('创建角色成功')
+        getMessage().success(SUCCESS_MESSAGE.ROLE_CREATE)
       } else if (mode === 'edit') {
         await roleApi.update(drawerData!.id!, cleanParams as Backend.RoleUpdateDto)
-        getMessage().success('更新角色成功')
+        getMessage().success(SUCCESS_MESSAGE.ROLE_UPDATE)
       }
       setLoading(false)
       onSuccess()

@@ -15,9 +15,9 @@ describe('ValueSetController(E2E)', () => {
     const valueSetRepository = dataSource.getRepository(ValueSet)
     await valueSetRepository.clear()
     await valueSetRepository.save([
-      { valueSetName: 'test_value_set_1', password: 'hashed_password_1', status: '1' },
-      { valueSetName: 'test_value_set_2', password: 'hashed_password_2', status: '2' },
-      { valueSetName: 'test_value_set_3', password: 'hashed_password_3', status: '1' },
+      { valueSetName: 'test_value_set_1', password: 'hashed_password_1', status: 1 },
+      { valueSetName: 'test_value_set_2', password: 'hashed_password_2', status: 0 },
+      { valueSetName: 'test_value_set_3', password: 'hashed_password_3', status: 1 },
     ])
   })
 

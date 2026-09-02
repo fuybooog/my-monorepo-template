@@ -15,9 +15,9 @@ describe('ResourceController(E2E)', () => {
     const resourceRepository = dataSource.getRepository(Resource)
     await resourceRepository.clear()
     await resourceRepository.save([
-      { resourceName: 'test_resource_1', password: 'hashed_password_1', status: '1' },
-      { resourceName: 'test_resource_2', password: 'hashed_password_2', status: '2' },
-      { resourceName: 'test_resource_3', password: 'hashed_password_3', status: '1' },
+      { resourceName: 'test_resource_1', password: 'hashed_password_1', status: 1 },
+      { resourceName: 'test_resource_2', password: 'hashed_password_2', status: 0 },
+      { resourceName: 'test_resource_3', password: 'hashed_password_3', status: 1 },
     ])
   })
 

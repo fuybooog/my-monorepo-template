@@ -16,15 +16,15 @@ describe('UserService (E2E/Integration)', () => {
       userName: 'alex_test',
       mobile: '13800000001',
       pinyin: 'alex',
-      status: '1',
+      status: 1,
       nickName: '亚历山大',
     },
-    { userName: 'bob_test', mobile: '13800000002', pinyin: 'bob', status: '0', nickName: '鲍勃' },
+    { userName: 'bob_test', mobile: '13800000002', pinyin: 'bob', status: 0, nickName: '鲍勃' },
     {
       userName: 'charlie_test',
       mobile: '13800000003',
       pinyin: 'charlie',
-      status: '1',
+      status: 1,
       nickName: '查理',
     },
   ]
@@ -63,7 +63,7 @@ describe('UserService (E2E/Integration)', () => {
         maritalStatus: '0',
         maritalStatusName: '未婚',
         email: 'david@test.com',
-        status: '1',
+        status: 1,
       }
 
       const result = await userService.createUser(fullUserDto)
@@ -195,11 +195,11 @@ describe('UserService (E2E/Integration)', () => {
   // ==========================================
   describe('批量处理与状态维护机制', () => {
     it('updateUserStatus: 应单条正常转换目标用户状态', async () => {
-      const target = await dataSource.getRepository(User).findOneBy({ userName: 'bob_test' }) // 初始状态为 '0'
-      await userService.updateUserStatus(target!.id, { status: '1' })
+      const target = await dataSource.getRepository(User).findOneBy({ userName: 'bob_test' }) // 初始状态为 0
+      await userService.updateUserStatus(target!.id, { status: 1 })
 
       const updated = await userService.findUserById(target!.id)
-      expect(updated?.status).toBe('1')
+      expect(updated?.status).toBe(1)
     })
 
     it('batchUpdateUserStatus: 应成批批量更新选中用户的状态，并识别漏掉的 IDs', async () => {
@@ -208,7 +208,7 @@ describe('UserService (E2E/Integration)', () => {
 
       const res = await userService.batchUpdateUserStatus({
         ids: idsStr,
-        status: '0',
+        status: 0,
       })
 
       expect(res?.notFoundIds).toContain(7777)
@@ -217,7 +217,7 @@ describe('UserService (E2E/Integration)', () => {
       const updatedUsers = await dataSource
         .getRepository(User)
         .findBy({ id: In([users[0].id, users[1].id]) })
-      expect(updatedUsers.every((u) => u.status === '0')).toBe(true)
+      expect(updatedUsers.every((u) => u.status === 0)).toBe(true)
     })
 
     it('batchRemoveUser: 应批量连带抹除多条记录', async () => {

@@ -4,6 +4,7 @@ import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons'
 import { ActionColumnConfig, ButtonPermissionObj, CustomAction } from './smart-types'
 import type { ButtonProps } from 'antd'
 import { useAuthStore } from '@/store/authStore'
+import { CONFIRM_MESSAGE } from '@/constants'
 
 export interface SmartTableButtonsProps<RecordType> {
   record: RecordType
@@ -111,7 +112,17 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
   // 渲染单个按钮
   const renderButton = (action: CustomAction<RecordType>) => {
     // 1. 提取自定义字段，剩余作为原生按钮属性
-    const { key, label, icon, disabled, hidden: _hidden, onClick, ...nativeProps } = action
+    const {
+      key,
+      label,
+      icon,
+      disabled,
+      hidden: _hidden,
+      onClick,
+      permissionMode,
+      permission,
+      ...nativeProps
+    } = action
 
     // 2. 计算 disabled 值（可能是函数）
     const finalDisabled = typeof disabled === 'function' ? disabled(record) : disabled
@@ -146,7 +157,7 @@ export function SmartTableButtons<RecordType>(props: SmartTableButtonsProps<Reco
       return (
         <Popconfirm
           title={action.popTitle || '确认删除'}
-          description={action.popDescription || '确定要删除该条数据吗？此操作不可撤销。'}
+          description={action.popDescription || CONFIRM_MESSAGE.DELETE_SINGLE}
           onConfirm={() => (onClick || onDelete)?.(record)}
           okText="确定"
           cancelText="取消"

@@ -95,13 +95,12 @@ export class SystemUser {
   })
   email: string | null
 
-  @Column('varchar', {
+  @Column('int', {
     name: 'status',
-    nullable: true,
     comment: '状态：0-禁用，1-启用',
-    length: 2,
+    default: () => "'0'",
   })
-  status: string | null
+  status: number
 
   @Column('datetime', {
     name: 'created_at',

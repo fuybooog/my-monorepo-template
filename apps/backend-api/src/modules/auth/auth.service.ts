@@ -17,6 +17,7 @@ import { RoleService } from '@/modules/role/role.service'
 import { JwtPayload } from '@/types'
 import { HelperService } from '@/modules/shared/helper.service'
 import { ConfigService } from '@nestjs/config'
+import { BaseStatusEnum } from '@/enum/base-status.enum'
 
 const DUMMY_HASH = '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6L6s5gG73aG2W2O2'
 
@@ -161,7 +162,7 @@ export class AuthService {
       throw new UnauthorizedException('用户名或密码错误')
     }
 
-    if (user.status === '0') {
+    if (user.status === BaseStatusEnum.DISABLE) {
       throw new UnauthorizedException('用户已被禁用')
     }
     let roleCodes: string[] = []

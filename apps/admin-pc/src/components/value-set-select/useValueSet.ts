@@ -1,5 +1,5 @@
 import { useState, useEffect, startTransition } from 'react'
-import setCodeApi from '@/features/value-set/api/valueSet'
+import valueSetApi from '@/features/value-set/api/value-set'
 import { Backend } from '@repo/types'
 
 export interface ValueSetOption<T = Backend.ValueSetPageRespDto> {
@@ -19,7 +19,7 @@ export const useValueSet = <T = Backend.ValueSetPageRespDto>(setCode: string) =>
       })
       return
     }
-    setCodeApi
+    valueSetApi
       .getValueSetBySetCodes({ setCodes: setCode })
       .then((res) => {
         const formatted = (res.data.list || []).map((item) => ({

@@ -5,6 +5,7 @@ import userApi from '../api/user'
 import { generateStrongPassword } from '@/utils/fns'
 import { getMessage } from '@/utils/antd-instance'
 import authApi from '@/features/auth/api/auth'
+import { SUCCESS_MESSAGE, ERROR_MESSAGE } from '@/constants'
 import { encryptPassword } from '@/utils'
 
 interface ResetPasswordDrawerProps {
@@ -73,12 +74,12 @@ export const ResetPasswordDrawer: React.FC<ResetPasswordDrawerProps> = ({
       const hashedPassword = encryptPassword(values.newPassword, publicKey)
       // 调用API，将新密码和用户ID发送给后端
       await userApi.adminResetPassword({ newPassword: hashedPassword, keyId, userId })
-      getMessage().success('密码重置成功！')
+      getMessage().success(SUCCESS_MESSAGE.PASSWORD_RESET)
       form.resetFields() // 成功后再次重置
       onCancel() // 关闭弹窗
     } catch (error) {
       console.error('密码重置失败，请重试', error)
-      getMessage().error('密码重置失败，请重试')
+      getMessage().error(ERROR_MESSAGE.PASSWORD_RESET)
     } finally {
       // setLoading(false)
     }

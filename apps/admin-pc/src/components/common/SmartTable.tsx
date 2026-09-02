@@ -10,6 +10,7 @@ import React, {
 } from 'react'
 import { Table, TableProps } from 'antd'
 import { SorterResult } from 'antd/es/table/interface'
+import { formatMessage } from '@/constants'
 import { isEqual } from 'lodash'
 import { SmartTableInstance, SmartTableProps } from './smart-types'
 import { SmartTableToolbar } from './SmartTableToolbar'
@@ -396,7 +397,7 @@ const SmartTableInner = <RecordType extends object>(
                   pageSize: pagination.pageSize,
                   total,
                   showSizeChanger: true,
-                  showTotal: (totalCount) => `共 ${totalCount} 条数据`,
+                  showTotal: (totalCount) => formatMessage.totalCount(totalCount),
                 }
               : false
           }

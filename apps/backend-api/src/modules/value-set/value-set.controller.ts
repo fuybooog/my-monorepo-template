@@ -5,6 +5,8 @@ import { ValueSetListDto, ValueSetPageDto } from '@/modules/value-set/dto/value-
 import { ValueSetPageOptionDto } from '@/modules/value-set/dto/value-set.page.option.dto'
 import { ValueSetRespDto } from '@/modules/value-set/dto/value-set.resp.dto'
 import { ValueSetListRespDto } from '@/modules/value-set/dto/value-set.list.resp.dto'
+import { ValueSetGroupPageDto } from '@/modules/value-set/dto/value-set-set.page.dto'
+import { ValueSetGroupPageRespDto } from '@/modules/value-set/dto/value-set-set.page.resp.dto'
 import { ValueSetCreateDto } from '@/modules/value-set/dto/value-set.create.dto'
 import { ValueSetUpdateDto } from '@/modules/value-set/dto/value-set.update.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
@@ -12,6 +14,8 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { ApiSuccessPageResponse, ApiSuccessResponse } from '@/decorators/api-response.decorator'
 import { BatchDto, BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
+import { RequirePermissions } from '@/decorators/require-permissions.decorator'
+import { PERMISSIONS } from '@repo/shared'
 
 @ApiTags('值集模块')
 @Controller('value-set')
@@ -19,6 +23,7 @@ export class ValueSetController {
   constructor(private readonly valueSetService: ValueSetService) {}
 
   @Get('page')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_PAGE)
   @ApiOperation({ summary: '分页查询值集列表' })
   @ApiSuccessPageResponse(ValueSetPageRespDto)
   async pageValueSet(
@@ -34,7 +39,25 @@ export class ValueSetController {
     return null
   }
 
+  @Get('sets/page')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_PAGE)
+  @ApiOperation({ summary: '集维度分页查询（按 setCode 去重）' })
+  @ApiSuccessPageResponse(ValueSetGroupPageRespDto)
+  async pageValueSetGroups(
+    @Query() query: ValueSetGroupPageDto,
+  ): Promise<PaginatedResult<ValueSetGroupPageRespDto>> {
+    return await this.valueSetService.pageValueSetGroups(query)
+  }
+
+  @Post('schema-generator-holder-sets-page-value-set')
+  @HttpCode(200)
+  @ApiOperation({ summary: '请勿调用，用于生成前端DTO', deprecated: true })
+  async _pageValueSetGroups(@Body() body: ValueSetGroupPageDto) {
+    return null
+  }
+
   @Get('option')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_PAGE)
   @ApiOperation({ summary: '分页查询值集列表(可选字段)' })
   @ApiSuccessPageResponse(ValueSetPageRespDto)
   async pageOptionValueSet(
@@ -51,6 +74,7 @@ export class ValueSetController {
   }
 
   @Get('by-set-codes')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_VIEW)
   @ApiOperation({ summary: '按集code查询值集' })
   @ApiSuccessResponse(ValueSetListRespDto)
   async findValueSetBySetCodes(
@@ -67,6 +91,7 @@ export class ValueSetController {
   }
 
   @Get('find/:id')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_VIEW)
   @ApiOperation({ summary: '按id查询值集' })
   @ApiSuccessResponse(ValueSetRespDto)
   async findValueSetById(@Param('id', ParseIntPipe) id: number): Promise<ValueSetRespDto | null> {
@@ -74,6 +99,7 @@ export class ValueSetController {
   }
 
   @Get('batch/query')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_VIEW)
   @ApiOperation({ summary: '按ids查询值集' })
   @ApiSuccessResponse(ValueSetListRespDto)
   async findValueSetListByIds(@Query() query: BatchDto): Promise<ValueSetListRespDto | null> {
@@ -81,6 +107,7 @@ export class ValueSetController {
   }
 
   @Post('create')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_CREATE)
   @ApiOperation({ summary: '创建值集' })
   @ApiSuccessResponse(ValueSetRespDto)
   async createValueSet(@Body() body: ValueSetCreateDto): Promise<ValueSetRespDto | null> {
@@ -88,6 +115,7 @@ export class ValueSetController {
   }
 
   @Post('update/:id')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_EDIT)
   @ApiOperation({ summary: '修改值集' })
   @ApiSuccessResponse(ValueSetRespDto)
   async updateValueSet(
@@ -98,6 +126,7 @@ export class ValueSetController {
   }
 
   @Post('delete/:id')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_DELETE)
   @ApiOperation({ summary: '删除值集' })
   @ApiSuccessResponse()
   async removeValueSet(@Param('id') id: number) {
@@ -105,6 +134,7 @@ export class ValueSetController {
   }
 
   @Post('batch/delete')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_DELETE)
   @ApiOperation({ summary: '批量删除值集' })
   @ApiSuccessResponse(BatchRespDto)
   async batchRemoveValueSet(@Body() body: BatchDto): Promise<BatchRespDto | null> {
@@ -112,6 +142,7 @@ export class ValueSetController {
   }
 
   @Post('updateStatus/:id')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_EDIT)
   @ApiOperation({ summary: '修改值集状态' })
   @ApiSuccessResponse()
   async updateValueSetStatus(@Param('id') id: number, @Body() body: UpdateStatusDto) {
@@ -119,6 +150,7 @@ export class ValueSetController {
   }
 
   @Post('batch/status')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_EDIT)
   @ApiOperation({ summary: '批量修改值集状态' })
   @ApiSuccessResponse(BatchRespDto)
   async batchUpdateValueSetStatus(
@@ -128,6 +160,7 @@ export class ValueSetController {
   }
 
   @Post('template')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_IMPORT)
   @ApiOperation({ summary: '下载导入值集模板' })
   @ApiSuccessResponse()
   async downloadValueSetTemplate() {
@@ -135,6 +168,7 @@ export class ValueSetController {
   }
 
   @Post('import')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_IMPORT)
   @ApiOperation({ summary: '导入值集数据' })
   @ApiSuccessResponse()
   async importValueSet() {
@@ -142,6 +176,7 @@ export class ValueSetController {
   }
 
   @Post('export')
+  @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_EXPORT)
   @ApiOperation({ summary: '导出值集数据' })
   @ApiSuccessResponse()
   async exportValueSet() {

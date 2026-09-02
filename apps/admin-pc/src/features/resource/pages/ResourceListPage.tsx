@@ -13,6 +13,7 @@ import { resourceSearchSchema, getResourceColumns } from '../model'
 import { useDrawer } from '@/hooks/useDrawer'
 import { useResourceList } from '../hooks/useResourceList'
 import userApi from '../api/resource'
+import { SUCCESS_MESSAGE, ERROR_MESSAGE, CONFIRM_MESSAGE } from '@/constants'
 import {
   ArrowDownOutlined,
   ArrowUpOutlined,
@@ -89,7 +90,7 @@ export function ResourceListPage() {
           // console.log('handleDeleteMeta', record)
           getModal().confirm({
             title: '提示',
-            content: '确定要删除吗？',
+            content: CONFIRM_MESSAGE.DELETE,
             okText: '确认',
             cancelText: '取消',
             okButtonProps: { danger: true },
@@ -183,7 +184,7 @@ export function ResourceListPage() {
         ],
       })
       refreshTable()
-      getMessage().success('排序完成')
+      getMessage().success(SUCCESS_MESSAGE.SORT_DONE)
     },
   })
   const moveDownButton = (record: ResourcePageRespDto): CustomAction<ResourcePageRespDto> => ({
@@ -213,7 +214,7 @@ export function ResourceListPage() {
         ],
       })
       refreshTable()
-      getMessage().success('排序完成')
+      getMessage().success(SUCCESS_MESSAGE.SORT_DONE)
     },
   })
   const moveToTopButton = (record: ResourcePageRespDto): CustomAction<ResourcePageRespDto> => ({
@@ -243,7 +244,7 @@ export function ResourceListPage() {
         ],
       })
       refreshTable()
-      getMessage().success('排序完成')
+      getMessage().success(SUCCESS_MESSAGE.SORT_DONE)
     },
   })
   const moveToBottomButton = (record: ResourcePageRespDto): CustomAction<ResourcePageRespDto> => ({
@@ -273,7 +274,7 @@ export function ResourceListPage() {
         ],
       })
       refreshTable()
-      getMessage().success('排序完成')
+      getMessage().success(SUCCESS_MESSAGE.SORT_DONE)
     },
   })
 
@@ -290,10 +291,10 @@ export function ResourceListPage() {
         })),
       })
       // 注意，这里是拖拽排序，一般来讲是乐观更新，成功后不需要重新请求最新列表
-      getMessage().success('排序完成')
+      getMessage().success(SUCCESS_MESSAGE.SORT_DONE)
     } catch (e) {
       refreshTable()
-      getMessage().error('排序失败')
+      getMessage().error(ERROR_MESSAGE.SORT_FAILED)
       console.error('排序失败', e)
     }
   }
@@ -329,14 +330,14 @@ export function ResourceListPage() {
               onClick() {
                 getModal().confirm({
                   title: '提示',
-                  content: '确定要重置顺序吗？',
+                  content: CONFIRM_MESSAGE.RESET_SORT,
                   okText: '确认',
                   cancelText: '取消',
                   okButtonProps: { danger: true },
                   onOk: async () => {
                     await resourceApi.resetSort()
                     refreshTable()
-                    getMessage().success('操作成功')
+                    getMessage().success(SUCCESS_MESSAGE.OPERATION)
                   },
                 })
               },

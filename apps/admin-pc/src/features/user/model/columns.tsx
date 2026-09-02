@@ -2,6 +2,7 @@ import { SmartColumnType } from '@/components/common'
 import { Backend } from '@repo/types'
 import { commonTimeRender, createStatusRender } from '@/utils'
 import { PERMISSIONS } from '@repo/shared'
+import { ADMIN_USER_NAME } from '@/constants'
 
 /**
  * 获取用户列表表格列配置
@@ -95,6 +96,9 @@ export const getUserColumns = (callbacks: {
       render: createStatusRender({
         onStatusChange,
         refreshList,
+        disabled(record) {
+          return record.userName === ADMIN_USER_NAME
+        },
         permission: [PERMISSIONS.SYS_USER_LIST_EDIT],
       }),
     },

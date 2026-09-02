@@ -33,21 +33,19 @@ export class SystemResource {
   })
   parentUniqueProp: string | null
 
-  @Column('varchar', {
+  @Column('int', {
     name: 'status',
-    nullable: true,
     comment: '状态：0-禁用，1-启用',
-    length: 2,
+    default: () => "'1'",
   })
-  status: string | null
+  status: number
 
-  @Column('varchar', {
+  @Column('int', {
     name: 'type',
-    nullable: true,
-    comment: '资源类型：1-页面 2-按钮 3-列',
-    length: 2,
+    comment: '资源类型：0-目录 1-页面 2-按钮 3-列',
+    default: () => "'0'",
   })
-  type: string | null
+  type: number
 
   @Column('int', { name: 'sort_number', nullable: true, comment: '排序号' })
   sortNumber: number | null
@@ -74,4 +72,19 @@ export class SystemResource {
     comment: '删除时间',
   })
   deletedAt: Date | null
+
+  @Column('int', {
+    name: 'not_in_menu',
+    comment: '是否在菜单中显示：0-显示，1-不显示',
+    default: () => "'0'",
+  })
+  notInMenu: number
+
+  @Column('varchar', {
+    name: 'menu_path',
+    nullable: true,
+    comment: '菜单路径',
+    length: 100,
+  })
+  menuPath: string | null
 }

@@ -35,18 +35,18 @@ export class SystemValueSet {
   })
   parentSetName: string | null
 
-  @Column('varchar', {
+  @Column('int', {
     name: 'status',
-    nullable: true,
-    comment: '状态  0-禁用 1-启用',
-    length: 45,
+    comment: '状态：0-禁用，1-启用',
+    default: () => "'1'",
   })
-  status: string | null
+  status: number
 
   @Column('datetime', {
     name: 'created_at',
     nullable: true,
     comment: '创建时间',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
   })
   createdAt: Date | null
 
@@ -54,6 +54,7 @@ export class SystemValueSet {
     name: 'updated_at',
     nullable: true,
     comment: '修改时间',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
   })
   updatedAt: Date | null
 

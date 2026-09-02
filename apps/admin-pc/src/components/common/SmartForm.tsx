@@ -337,6 +337,7 @@ const SmartFormItemField: React.FC<{
         label={item.title}
         {...item.itemProps}
         rules={mergeRules}
+        style={{ ...(mode === 'query' ? { marginBottom: 8 } : {}), ...item.itemProps?.style }}
       >
         {item.render ? (
           <RenderCustomField renderFn={item.render} form={form} />
