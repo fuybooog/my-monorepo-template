@@ -1,6 +1,15 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common'
 import {
   CurrentLoginResponseDto,
+  ForgotPasswordDto,
+  ForgotPasswordResetDto,
+  ForgotPasswordRespDto,
   LoginResponseDto,
   PasswordLoginDto,
   PhoneLoginDto,
@@ -19,11 +28,13 @@ import { JwtPayload } from '@/types'
 import { HelperService } from '@/modules/shared/helper.service'
 import { ConfigService } from '@nestjs/config'
 import { BaseStatusEnum } from '@/enum/base-status.enum'
+import { MailService } from '@/modules/mail/mail.service'
 
 const DUMMY_HASH = '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6L6s5gG73aG2W2O2'
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name)
   private readonly CAPTCHA_PREFIX = 'auth:captcha:'
   private readonly CAPTCHA_EXPIRE = 180
   private readonly KEY_PREFIX = 'auth:rsa:pair:'
@@ -33,6 +44,10 @@ export class AuthService {
   private readonly ACCESS_TOKEN_EXPIRE = 30 * 60
   /** refresh token 有效期（秒）：7 天 */
   private readonly REFRESH_TOKEN_EXPIRE = 7 * 24 * 60 * 60
+  /** 找回密码邮箱验证码前缀 */
+  private readonly FORGOT_CODE_PREFIX = 'auth:forgot:code:'
+  /** 找回密码邮箱验证码有效期（秒）：10 分钟 */
+  private readonly FORGOT_CODE_EXPIRE = 10 * 60
 
   constructor(
     private readonly jwtService: JwtService,
@@ -41,6 +56,7 @@ export class AuthService {
     private readonly roleService: RoleService,
     private readonly helperService: HelperService,
     private readonly configService: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
   async validatePassword(rawPassword: string, dbHashPassword?: string) {
@@ -339,6 +355,83 @@ export class AuthService {
       maxAge: 0,
       path: '/',
     })
+    return null
+  }
+
+  /**
+   * 找回密码：向邮箱发送验证码，验证码存 Redis（10 分钟 TTL）
+   * 无论账号是否存在都返回成功，防止枚举已注册邮箱
+   */
+  async forgotPassword(dto: ForgotPasswordDto, req: Request): Promise<ForgotPasswordRespDto> {
+    const isHttpClient = req.headers['x-req-method'] === 'httpClient'
+    const isDev = this.configService.get('NODE_ENV') === 'development' && isHttpClient
+    const user = await this.userService.findUserWithPasswordByEmail(dto.email)
+
+    // 生成 6 位数字验证码
+    const code = Math.floor(100000 + Math.random() * 900000).toString()
+    const redisKey = `${this.FORGOT_CODE_PREFIX}${dto.email}`
+
+    // 账号不存在：写入一个无效验证码占位，保持响应一致，防止邮箱枚举（同时不发送邮件）
+    const codeToStore = user ? code : '000000'
+    await this.redisService.set(redisKey, codeToStore, this.FORGOT_CODE_EXPIRE)
+
+    if (user) {
+      // 异步发送邮件，不阻塞接口响应（验证码已写入 Redis，邮件送达与否不影响本次请求）；
+      // 发送失败仅记录错误日志，保持响应一致，防止邮箱枚举
+      void this.mailService.sendVerificationCode(dto.email, code).catch((error) => {
+        this.logger.error(`验证码邮件发送失败 email=${dto.email}`, error)
+      })
+    }
+
+    this.logger.log(
+      `[forgotPassword] email=${dto.email}, code=${codeToStore}, ttl=${this.FORGOT_CODE_EXPIRE}s`,
+    )
+    return isDev ? { devCode: codeToStore } : {}
+  }
+
+  /**
+   * 找回密码：校验邮箱验证码并重置密码，同时踢掉该用户所有已登录会话
+   */
+  async forgotResetPassword(dto: ForgotPasswordResetDto, req: Request): Promise<null> {
+    const isHttpClient = req.headers['x-req-method'] === 'httpClient'
+    const isDev = this.configService.get('NODE_ENV') === 'development' && isHttpClient
+
+    // 1. 校验验证码（一次性：无论成败立即销毁）
+    const redisKey = `${this.FORGOT_CODE_PREFIX}${dto.email}`
+    const realCode = await this.redisService.get(redisKey)
+    if (realCode) {
+      await this.redisService.del(redisKey)
+    }
+    if (!realCode || realCode !== dto.code.trim()) {
+      throw new UnauthorizedException('验证码错误或已过期')
+    }
+
+    // 2. 查找用户
+    const user = await this.userService.findUserWithPasswordByEmail(dto.email)
+    if (!user || !user.id) {
+      throw new NotFoundException('未找到该邮箱对应的用户')
+    }
+
+    // 3. 解密新密码（开发环境直传明文），解密后校验明文长度（6-32 位，与前端校验一致）
+    let plainPassword: string
+    if (isDev) {
+      plainPassword = dto.newPassword
+    } else {
+      if (!dto.keyId) {
+        throw new UnauthorizedException('验证不通过')
+      }
+      plainPassword = await this.helperService.decryptPassword(dto.newPassword, dto.keyId)
+    }
+    if (!plainPassword || plainPassword.length < 6 || plainPassword.length > 32) {
+      throw new BadRequestException('密码长度需为 6-32 位')
+    }
+    const passwordHash = await bcrypt.hash(plainPassword, 10)
+
+    // 4. 更新密码并踢掉旧会话
+    await this.userService.updateUserPassword(user.id, passwordHash)
+    await this.redisService.del(`auth:token:${user.id}`)
+    await this.redisService.del(`auth:refresh:${user.id}`)
+
     return null
   }
 }

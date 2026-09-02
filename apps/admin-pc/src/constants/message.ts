@@ -39,6 +39,10 @@ export const SUCCESS_MESSAGE = {
   STATUS_UPDATE: '状态更新成功',
   /** 个人资料保存成功 */
   PROFILE_SAVED: '保存成功！昵称在重新登录后生效！',
+  /** 验证码发送成功 */
+  FORGOT_CODE_SENT: '验证码已发送，请查收邮箱（10 分钟内有效）',
+  /** 密码重置成功，请重新登录 */
+  FORGOT_RESET_DONE: '密码重置成功，请使用新密码登录',
 }
 
 /** 失败 / 错误类提示 */

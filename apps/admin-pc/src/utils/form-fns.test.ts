@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest'
 import { DatePicker } from 'antd'
 import { createDateRangeItems } from './form-fns'

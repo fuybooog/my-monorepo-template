@@ -9,6 +9,7 @@ import { UserModule } from '@/modules/user/user.module'
 import { RoleModule } from '@/modules/role/role.module'
 import { ResourceModule } from '@/modules/resource/resource.module'
 import { SharedModule } from '@/modules/shared/shared.module'
+import { MailModule } from '@/modules/mail/mail.module'
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SharedModule } from '@/modules/shared/shared.module'
     RoleModule,
     ResourceModule,
     SharedModule,
+    MailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

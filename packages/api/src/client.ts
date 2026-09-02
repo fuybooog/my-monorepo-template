@@ -79,7 +79,7 @@ interface PendingRequest {
 }
 
 interface DebounceTask {
-  timer: number
+  timer: ReturnType<typeof setTimeout> | null
   count: number
   config: AxiosRequestConfig
   listeners: Array<{
@@ -243,7 +243,7 @@ export class HttpClient {
       const existingTask = this.debounceMap.get(key)
 
       if (existingTask) {
-        clearTimeout(existingTask.timer)
+        clearTimeout(existingTask.timer ?? undefined)
         existingTask.count += 1
         existingTask.config = {
           ...config,
@@ -253,7 +253,7 @@ export class HttpClient {
         existingTask.listeners.push({ resolve, reject })
       } else {
         this.debounceMap.set(key, {
-          timer: null as any,
+          timer: null,
           count: 1,
           config: {
             ...config,

@@ -248,6 +248,31 @@ const onEdit = (record) => openDrawer('edit', record.id)
 - **必填用 `itemProps.rules: [{ required: true, message }]`**（文案取自 `constants/message.ts`），**不要用 `requiredWhen: true`**（`requiredWhen` 是动态依赖模式专用）。隐藏字段不会进入提交值，无需为其单独处理必填。
 - 回显取值要兼容响应包裹：`const data = (res.data as any)?.data ?? res.data`。
 
+## 12. antd 组件上加样式（间距等）：外层包一层原生元素
+
+**禁止**直接在 antd 组件上写 Tailwind 的 margin 类来加间距（如 `<Steps className="mb-6">`）。原因：
+
+- antd 组件根元素自带 `resetComponent`（`margin: 0`、`padding: 0` 等），且 cssinjs 生成的选择器带 hashId（如 `.ant-steps.ant-steps-css-var-xxx`），特异性（`0-2-0`）高于 Tailwind 类（`0-1-0`）；
+- Tailwind v4 的 `mb-*` / `mt-*` 等是**逻辑属性**（`margin-block-end` / `margin-block-start`），与 antd 的物理属性 `margin-bottom` 竞争同一盒模型位置，按 CSS 规范 antd 必然胜出 → 间距不生效。
+
+**正确做法**：把间距写在包在外层的原生元素上（与 LoginCard 的 `<div className="mt-3">` 写法一致）：
+
+```tsx
+{/* ✅ 外层 div 承载间距 */}
+<div className="mb-6">
+  <Steps current={step} items={[{ title: '填写邮箱' }, { title: '重置密码' }]} />
+</div>
+{/* ❌ 不要直接写在 antd 组件上 */}
+<Steps className="mb-6" current={step} items={[...]} />
+```
+
+**替代方案**（仅在无法包一层元素时使用）：
+
+- Tailwind v4 的 important 后缀：`className="mb-6!"`（v3 是前缀 `!mb-6`，v4 是后缀）
+- 内联样式：`style={{ marginBottom: 24 }}`
+
+> 附带提醒：antd 6 已弃用部分旧 API，开发时留意 IDE 的 `@deprecated` 提示并改用新 API。如 `Alert` 的 `message` 已弃用，改用 `title`；`Steps` 的 `labelPlacement` 改用 `titlePlacement`、`progressDot` 改用 `type="dot"`、`direction` 改用 `orientation`。
+
 ## 11. 后端 UpdateDto 字段可选 + 聚合列表状态列
 
 - **编辑时只改部分字段，后端 UpdateDto 必须让未编辑字段可选**。不要直接 `OmitType(BaseDto, ['id'])`（会把 `code`/`name` 等也设为必填，导致「code,name 必填」报错）。正确做法：用 `IntersectionType(OmitType(Base, ['id']), OptionalDto)` 把本次不提交的字段（`code`/`name` 等）显式标 `@IsOptional()`，需要提交的字段（如 `setCode`/`setName`）保持必填。

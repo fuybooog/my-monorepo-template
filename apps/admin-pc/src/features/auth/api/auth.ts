@@ -32,5 +32,13 @@ const authApi = {
       },
     )
   },
+  forgotPassword(params: Backend.ForgotPasswordDto): Promise<Backend.ForgotPasswordRes> {
+    return http.post('/auth/forgotPassword', params)
+  },
+  forgotResetPassword(
+    params: Backend.ForgotPasswordResetDto,
+  ): Promise<Backend.ForgotResetPasswordRes> {
+    return http.post('/auth/forgotResetPassword', params)
+  },
 }
 export default authApi

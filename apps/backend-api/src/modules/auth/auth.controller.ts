@@ -3,6 +3,9 @@ import { AuthService } from '@/modules/auth/auth.service'
 import {
   CaptchaResponseDto,
   CurrentLoginResponseDto,
+  ForgotPasswordDto,
+  ForgotPasswordResetDto,
+  ForgotPasswordRespDto,
   LoginResponseDto,
   PasswordLoginDto,
   PhoneLoginDto,
@@ -96,5 +99,27 @@ export class AuthController {
   @ApiSuccessResponse()
   async initAdmin(@Body('plainPassword') plainPassword: string) {
     return this.authInitService.initAdmin(plainPassword)
+  }
+
+  @Post('forgotPassword')
+  @Public()
+  @ApiOperation({ summary: '找回密码：发送邮箱验证码' })
+  @ApiSuccessResponse(ForgotPasswordRespDto)
+  async forgotPassword(
+    @Body() body: ForgotPasswordDto,
+    @Req() req: Request,
+  ): Promise<ForgotPasswordRespDto> {
+    return await this.authService.forgotPassword(body, req)
+  }
+
+  @Post('forgotResetPassword')
+  @Public()
+  @ApiOperation({ summary: '找回密码：校验验证码并重置密码' })
+  @ApiSuccessResponse()
+  async forgotResetPassword(
+    @Body() body: ForgotPasswordResetDto,
+    @Req() req: Request,
+  ): Promise<null> {
+    return await this.authService.forgotResetPassword(body, req)
   }
 }

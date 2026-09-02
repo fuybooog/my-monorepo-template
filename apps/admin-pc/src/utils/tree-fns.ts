@@ -47,7 +47,8 @@ export interface TreeResult<T extends TreeNode = TreeNode> {
 }
 
 export interface MetaTreeNode extends TreeNode {
-  type?: '0' | '1' | '2' | '3' | string // 0: 目录, 1: 页面, 2: 按钮, 3: 列
+  // 0: 目录, 1: 页面, 2: 按钮, 3: 列（后端返回 number，历史数据兼容字符串）
+  type?: string | number
   buttons?: MetaTreeNode[]
   columns?: MetaTreeNode[]
 }

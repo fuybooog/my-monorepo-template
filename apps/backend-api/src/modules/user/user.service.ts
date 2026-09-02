@@ -124,6 +124,22 @@ export class UserService {
       roleIds: roles,
     }
   }
+  // 这个方法包返回结果含密码字段，使用时要谨慎
+  async findUserWithPasswordByEmail(
+    email: string,
+  ): Promise<(UserRespDto & { password: string | null }) | null> {
+    const userEntity = await this.userRepository.findOne({
+      where: { email },
+    })
+    if (!userEntity) {
+      return null
+    }
+    const roles = await this.userRepository.searchRoleIdsByUserId(userEntity!.id!)
+    return {
+      ...userEntity,
+      roleIds: roles,
+    }
+  }
   async findUserListByIds(ids: string): Promise<UserListRespDto | null> {
     const idList = ids.split(',').map((id) => Number.parseInt(id))
     const findOptions: FindManyOptions<User> = {

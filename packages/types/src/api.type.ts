@@ -15,6 +15,9 @@ export namespace Backend {
   export type CurrentLoginResponseDto = components['schemas']['CurrentLoginResponseDto']
   export type PublicKeyRespDto = components['schemas']['PublicKeyRespDto']
   export type CaptchaResponseDto = components['schemas']['CaptchaResponseDto']
+  export type ForgotPasswordRespDto = components['schemas']['ForgotPasswordRespDto']
+  export type ForgotPasswordDto = components['schemas']['ForgotPasswordDto']
+  export type ForgotPasswordResetDto = components['schemas']['ForgotPasswordResetDto']
   export type PaginatedResult = components['schemas']['PaginatedResult']
   export type UserPageRespDto = components['schemas']['UserPageRespDto']
   export type UserPageDto = components['schemas']['UserPageDto']
@@ -91,6 +94,16 @@ export namespace Backend {
       ? R
       : unknown
 
+  export type RefreshRes = operations['AuthController_refresh']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['AuthController_refresh']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
   export type LogoutRes = operations['AuthController_logout']['responses'] extends {
     '200': { content: { 'application/json': infer R } }
   }
@@ -130,6 +143,27 @@ export namespace Backend {
         }
       ? R
       : unknown
+
+  export type ForgotPasswordRes = operations['AuthController_forgotPassword']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['AuthController_forgotPassword']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type ForgotResetPasswordRes =
+    operations['AuthController_forgotResetPassword']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['AuthController_forgotResetPassword']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
 
   export type PageUserRes = operations['UserController_pageUser']['responses'] extends {
     '200': { content: { 'application/json': infer R } }

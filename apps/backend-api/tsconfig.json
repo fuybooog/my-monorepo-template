@@ -4,6 +4,7 @@
     "emitDecoratorMetadata": true, // NestJS 装饰器必须
     "experimentalDecorators": true, // NestJS 装饰器必须
     "strictPropertyInitialization": false,
+    "types": ["node", "jest"], // pnpm monorepo 下 IDE 可能无法自动探测 @types，显式声明避免 spec 文件报 jest/describe 未定义
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {

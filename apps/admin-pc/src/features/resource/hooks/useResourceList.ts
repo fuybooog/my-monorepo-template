@@ -47,7 +47,10 @@ export function useResourceList() {
       idKey: 'uniqueProp',
       parentKey: 'parentUniqueProp',
     } as const
-    const { tree, parentMap, nodeMap, idNodeMap } = arrayToTreeWithMeta(originData, treeConfig)
+    const { tree, parentMap, nodeMap, idNodeMap } = arrayToTreeWithMeta<ResourcePageRespDto>(
+      originData,
+      treeConfig,
+    )
     const {
       tree: originTree,
       parentMap: originParentMap,

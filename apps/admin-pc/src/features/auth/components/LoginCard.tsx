@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import authApi from '@/features/auth/api/auth'
 import { SmartForm, SmartSchema } from '@/components/common'
 import { Button, Form, Input, Space } from 'antd'
@@ -111,6 +111,11 @@ export function LoginCard({ className }: LoginCardProps) {
           登录
         </Button>
       </SmartForm>
+      <div className="mt-3 text-right">
+        <Link to="/resetPassword" className="text-sm text-blue-500 hover:text-blue-600">
+          忘记密码？
+        </Link>
+      </div>
     </div>
   )
 }

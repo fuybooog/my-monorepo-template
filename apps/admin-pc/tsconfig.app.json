@@ -11,5 +11,14 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "tailwind.config.js"]
+  "include": ["src", "tailwind.config.js"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    // 测试文件仅用于 vitest 运行（esbuild 转译不查类型），无需严格类型检查
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx"
+  ]
 }

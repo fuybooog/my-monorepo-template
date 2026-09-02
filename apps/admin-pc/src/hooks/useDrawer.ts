@@ -1,19 +1,19 @@
 import { SmartFormEditMode } from '@/components/common'
 import { useCallback, useState } from 'react'
 
-export const useDrawer = <T = any>(initialMode: SmartFormEditMode = 'create') => {
+export const useDrawer = <T = unknown>(initialMode: SmartFormEditMode = 'create') => {
   const [drawerState, setDrawerState] = useState<{
     drawerVisible: boolean
     formMode: SmartFormEditMode
     drawerData?: T | number
-    extendDrawerData?: T | any
+    extendDrawerData?: unknown
   }>({
     drawerVisible: false,
     formMode: initialMode,
   })
 
   const openDrawer = useCallback(
-    (formMode: SmartFormEditMode, drawerData?: T | number, extendDrawerData?: T | any) => {
+    (formMode: SmartFormEditMode, drawerData?: T | number, extendDrawerData?: unknown) => {
       setDrawerState({ drawerVisible: true, formMode, drawerData, extendDrawerData })
     },
     [],

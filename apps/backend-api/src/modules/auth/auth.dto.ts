@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 import { Expose } from 'class-transformer'
 
@@ -86,4 +86,41 @@ export class CaptchaResponseDto {
   @ApiProperty({ description: '图形验证码Key', example: '' })
   @Expose()
   captchaKey!: string
+}
+
+export class ForgotPasswordDto {
+  @ApiProperty({ description: '邮箱' })
+  @IsNotEmpty()
+  @IsEmail()
+  email!: string
+}
+
+export class ForgotPasswordResetDto {
+  @ApiProperty({ description: '邮箱' })
+  @IsNotEmpty()
+  @IsEmail()
+  email!: string
+
+  @ApiProperty({ description: '邮箱验证码' })
+  @IsNotEmpty()
+  @IsString()
+  code!: string
+
+  @ApiProperty({ description: '新密码' })
+  @IsNotEmpty()
+  @IsString()
+  // 注意：传输的是 RSA 加密后的密文（Base64，长度远超明文），
+  // 因此此处不做长度限制；6-32 位明文长度校验在解密后于 Service 层进行
+  newPassword!: string
+
+  @ApiProperty({ description: '公钥Key', example: '' })
+  @IsOptional()
+  @IsString()
+  keyId?: string
+}
+
+export class ForgotPasswordRespDto {
+  @ApiProperty({ description: '开发环境回显的验证码，生产环境不返回', example: '' })
+  @Expose()
+  devCode?: string
 }

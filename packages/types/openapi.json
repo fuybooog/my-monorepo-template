@@ -96,6 +96,38 @@
         "tags": ["鉴权模块"]
       }
     },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/LoginResponseDto"
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "刷新令牌",
+        "tags": ["鉴权模块"]
+      }
+    },
     "/auth/logout": {
       "post": {
         "operationId": "AuthController_logout",
@@ -225,6 +257,92 @@
           }
         },
         "summary": "初始化管理员",
+        "tags": ["鉴权模块"]
+      }
+    },
+    "/auth/forgotPassword": {
+      "post": {
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ForgotPasswordRespDto"
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "找回密码：发送邮箱验证码",
+        "tags": ["鉴权模块"]
+      }
+    },
+    "/auth/forgotResetPassword": {
+      "post": {
+        "operationId": "AuthController_forgotResetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordResetDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "找回密码：校验验证码并重置密码",
         "tags": ["鉴权模块"]
       }
     },
@@ -4658,6 +4776,50 @@
           }
         },
         "required": ["captchaImg", "captchaKey"]
+      },
+      "ForgotPasswordRespDto": {
+        "type": "object",
+        "properties": {
+          "devCode": {
+            "type": "string",
+            "description": "开发环境回显的验证码，生产环境不返回",
+            "example": ""
+          }
+        },
+        "required": ["devCode"]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "邮箱"
+          }
+        },
+        "required": ["email"]
+      },
+      "ForgotPasswordResetDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "邮箱"
+          },
+          "code": {
+            "type": "string",
+            "description": "邮箱验证码"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "新密码"
+          },
+          "keyId": {
+            "type": "string",
+            "description": "公钥Key",
+            "example": ""
+          }
+        },
+        "required": ["email", "code", "newPassword", "keyId"]
       },
       "PaginatedResult": {
         "type": "object",

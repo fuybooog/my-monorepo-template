@@ -53,6 +53,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/auth/refresh': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 刷新令牌 */
+    post: operations['AuthController_refresh']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/auth/logout': {
     parameters: {
       query?: never
@@ -115,6 +132,40 @@ export interface paths {
     put?: never
     /** 初始化管理员 */
     post: operations['AuthController_initAdmin']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/auth/forgotPassword': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 找回密码：发送邮箱验证码 */
+    post: operations['AuthController_forgotPassword']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/auth/forgotResetPassword': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 找回密码：校验验证码并重置密码 */
+    post: operations['AuthController_forgotResetPassword']
     delete?: never
     options?: never
     head?: never
@@ -1542,6 +1593,30 @@ export interface components {
        */
       captchaKey: string
     }
+    ForgotPasswordRespDto: {
+      /**
+       * @description 开发环境回显的验证码，生产环境不返回
+       * @example
+       */
+      devCode: string
+    }
+    ForgotPasswordDto: {
+      /** @description 邮箱 */
+      email: string
+    }
+    ForgotPasswordResetDto: {
+      /** @description 邮箱 */
+      email: string
+      /** @description 邮箱验证码 */
+      code: string
+      /** @description 新密码 */
+      newPassword: string
+      /**
+       * @description 公钥Key
+       * @example
+       */
+      keyId: string
+    }
     PaginatedResult: Record<string, never>
     UserPageRespDto: {
       /** @description 用户id */
@@ -2475,8 +2550,6 @@ export interface components {
       status?: number
       /** @description 排序号 */
       sortNumber?: number
-      /** @description 排序号 */
-      sortNumber?: number
       /** @description 创建时间 */
       createdAt?: string
       /** @description 修改时间 */
@@ -2507,8 +2580,6 @@ export interface components {
       parentSetName?: string
       /** @description 状态：0-禁用，1-启用 */
       status?: number
-      /** @description 排序号 */
-      sortNumber?: number
       /** @description 排序号 */
       sortNumber?: number
       /** @description 创建时间 */
@@ -2604,6 +2675,28 @@ export interface operations {
       }
     }
   }
+  AuthController_refresh: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['LoginResponseDto']
+          }
+        }
+      }
+    }
+  }
   AuthController_logout: {
     parameters: {
       query?: never
@@ -2679,6 +2772,59 @@ export interface operations {
       cookie?: never
     }
     requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
+      }
+    }
+  }
+  AuthController_forgotPassword: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ForgotPasswordDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['ForgotPasswordRespDto']
+          }
+        }
+      }
+    }
+  }
+  AuthController_forgotResetPassword: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ForgotPasswordResetDto']
+      }
+    }
     responses: {
       /** @description 成功响应 */
       200: {
