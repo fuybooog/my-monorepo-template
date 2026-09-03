@@ -1,4 +1,17 @@
-import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { ValueSetService } from '@/modules/value-set/value-set.service'
 import { ValueSetPageRespDto } from '@/modules/value-set/dto/value-set.page.resp.dto'
 import { ValueSetListDto, ValueSetPageDto } from '@/modules/value-set/dto/value-set.page.dto'
@@ -10,12 +23,14 @@ import { ValueSetGroupPageRespDto } from '@/modules/value-set/dto/value-set-set.
 import { ValueSetCreateDto } from '@/modules/value-set/dto/value-set.create.dto'
 import { ValueSetUpdateDto } from '@/modules/value-set/dto/value-set.update.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiConsumes, ApiOkResponse, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger'
 import { ApiSuccessPageResponse, ApiSuccessResponse } from '@/decorators/api-response.decorator'
 import { BatchDto, BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
 import { RequirePermissions } from '@/decorators/require-permissions.decorator'
 import { PERMISSIONS } from '@repo/shared'
+import { EXCEL_CONTENT_TYPE, ExcelUploadFile } from '@/modules/excel/excel.types'
+import { ImportResultDto } from '@/modules/excel/dto/import-result.dto'
 
 @ApiTags('值集模块')
 @Controller('value-set')
@@ -162,24 +177,28 @@ export class ValueSetController {
   @Post('template')
   @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_IMPORT)
   @ApiOperation({ summary: '下载导入值集模板' })
-  @ApiSuccessResponse()
-  async downloadValueSetTemplate() {
+  @ApiProduces(EXCEL_CONTENT_TYPE)
+  async downloadValueSetTemplate(): Promise<StreamableFile> {
     return await this.valueSetService.downloadTemplate()
   }
 
   @Post('import')
   @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_IMPORT)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: '导入值集数据' })
-  @ApiSuccessResponse()
-  async importValueSet() {
-    return await this.valueSetService.importValueSet()
+  @ApiOkResponse({ type: ImportResultDto })
+  async importValueSet(
+    @UploadedFile() file: ExcelUploadFile | undefined,
+  ): Promise<ImportResultDto> {
+    return await this.valueSetService.importValueSet(file)
   }
 
   @Post('export')
   @RequirePermissions(PERMISSIONS.SYS_VALUE_SET_LIST_EXPORT)
   @ApiOperation({ summary: '导出值集数据' })
-  @ApiSuccessResponse()
-  async exportValueSet() {
-    return await this.valueSetService.exportValueSet()
+  @ApiProduces(EXCEL_CONTENT_TYPE)
+  async exportValueSet(@Query() query: ValueSetPageDto): Promise<StreamableFile> {
+    return await this.valueSetService.exportValueSet(query)
   }
 }

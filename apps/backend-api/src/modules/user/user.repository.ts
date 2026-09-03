@@ -70,6 +70,73 @@ export class UserRepository extends Repository<User> {
 
     return await qb.getManyAndCount()
   }
+
+  /**
+   * 导出用：一次性全量查询（不分页），筛选条件与列表保持一致，
+   * 并把用户关联的角色名聚合到 roleNames 字段（逗号分隔）。
+   */
+  async searchUsersForExport(query: UserPageDto, maxLevel = 0) {
+    const { userName, sort, status, birthStart, birthEnd, keyword } = query
+
+    const qb = this.createQueryBuilder('user')
+      .select('user')
+      .leftJoin('user.roles', 'role')
+      .groupBy('user.id')
+      .addSelect('GROUP_CONCAT(DISTINCT role.roleName)', 'roleNames')
+
+    if (keyword) {
+      qb.andWhere(
+        new Brackets((qb) => {
+          qb.where('user.userName LIKE :keyword', { keyword: `%${keyword}%` }).orWhere(
+            'user.email LIKE :keyword',
+            { keyword: `%${keyword}%` },
+          )
+        }),
+      )
+    } else if (userName) {
+      qb.andWhere('user.userName LIKE :userName', { userName: `%${userName}%` })
+    }
+    if (status) {
+      qb.andWhere('user.status = :status', { status: status })
+    }
+    if (birthStart) {
+      qb.andWhere('user.birth >= :birthStart', { birthStart: birthStart })
+    }
+    if (birthEnd) {
+      qb.andWhere('user.birth <= :birthEnd', { birthEnd: birthEnd })
+    }
+
+    // 如果不是超级管理员，则需要限制（与列表页规则一致）
+    if (maxLevel !== MAX_ROLE_LEVEL) {
+      qb.having('MAX(role.level) <= :maxLevel OR MAX(role.level) IS NULL', { maxLevel })
+    }
+    if (sort && Object.keys(sort).length > 0) {
+      const allowedFields = ['userName', 'createdAt', 'updatedAt']
+      let isFirst = true
+
+      for (const [key, direction] of Object.entries(sort)) {
+        if (allowedFields.includes(key)) {
+          const orderField = `user.${key}`
+          if (isFirst) {
+            qb.orderBy(orderField, direction as 'ASC' | 'DESC')
+            isFirst = false
+          } else {
+            qb.addOrderBy(orderField, direction as 'ASC' | 'DESC')
+          }
+        }
+      }
+      qb.addOrderBy('user.id', 'ASC')
+    } else {
+      qb.orderBy('user.createdAt', 'DESC').addOrderBy('user.id', 'ASC')
+    }
+
+    const { entities, raw } = await qb.getRawAndEntities()
+    entities.forEach((entity, index) => {
+      ;(entity as User & { roleNames?: string }).roleNames = (raw[index]?.roleNames as string) ?? ''
+    })
+    return entities
+  }
+
   async findUserById(id: number) {
     const queryBuilder = this.createQueryBuilder('user')
     const storage = getMetadataArgsStorage()

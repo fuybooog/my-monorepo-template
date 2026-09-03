@@ -12,6 +12,7 @@ import { ResourceFormContainer } from '../components/ResourceFormContainer'
 import { resourceSearchSchema, getResourceColumns } from '../model'
 import { useDrawer } from '@/hooks/useDrawer'
 import { useResourceList } from '../hooks/useResourceList'
+import { useResourceExcel } from '../hooks/useResourceExcel'
 import userApi from '../api/resource'
 import { SUCCESS_MESSAGE, ERROR_MESSAGE, CONFIRM_MESSAGE } from '@/constants'
 import {
@@ -58,6 +59,8 @@ export function ResourceListPage() {
 
   const { drawerVisible, formMode, openDrawer, closeDrawer, drawerData } =
     useDrawer<ResourcePageRespDto>()
+
+  const excel = useResourceExcel(searchParams, refreshTable)
 
   const [formType, setFormType] = useState('')
 
@@ -319,6 +322,7 @@ export function ResourceListPage() {
         rowSelection={{}}
         handleOrderChange={handleOrderChange}
         treeConfig={{ idKey: 'uniqueProp', parentKey: 'parentUniqueProp' }}
+        excel={excel}
         toolbar={{
           onCreate,
           onBatchDelete,

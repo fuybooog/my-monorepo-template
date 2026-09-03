@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common'
 import { UserService } from '@/modules/user/user.service'
 import { UserPageRespDto } from '@/modules/user/dto/user.page.resp.dto'
 import { UserPageDto } from '@/modules/user/dto/user.page.dto'
@@ -8,7 +20,14 @@ import { UserListRespDto } from '@/modules/user/dto/user.list.resp.dto'
 import { UserCreateDto } from '@/modules/user/dto/user.create.dto'
 import { UserUpdateDto } from '@/modules/user/dto/user.update.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiOperation,
+  ApiProduces,
+  ApiTags,
+} from '@nestjs/swagger'
 import {
   ApiSuccessBooleanResponse,
   ApiSuccessPageResponse,
@@ -27,6 +46,10 @@ import { CurrentUser } from '@/decorators/current-user.decorator'
 import { CurrentLoginResponseDto } from '@/modules/auth/auth.dto'
 import { RequirePermissions } from '@/decorators/require-permissions.decorator'
 import { PERMISSIONS } from '@repo/shared'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { BusinessException } from '@/exceptions/business-exception'
+import { ExcelUploadFile, EXCEL_CONTENT_TYPE } from '@/modules/excel/excel.types'
+import { ImportResultDto } from '@/modules/excel/dto/import-result.dto'
 
 @ApiTags('用户模块')
 @Controller('user')
@@ -161,25 +184,54 @@ export class UserController {
   @Post('template')
   @RequirePermissions(PERMISSIONS.SYS_USER_LIST_IMPORT)
   @ApiOperation({ summary: '下载导入用户模板' })
-  @ApiSuccessResponse()
-  async downloadUserTemplate() {
-    return await this.userService.downloadTemplate()
+  @ApiProduces(EXCEL_CONTENT_TYPE)
+  @ApiOkResponse({ schema: { type: 'string', format: 'binary' } })
+  async downloadUserTemplate(): Promise<StreamableFile> {
+    return await this.userService.downloadUserImportTemplate()
   }
 
   @Post('import')
   @RequirePermissions(PERMISSIONS.SYS_USER_LIST_IMPORT)
-  @ApiOperation({ summary: '导入用户数据' })
-  @ApiSuccessResponse()
-  async importUser() {
-    return await this.userService.importUser()
+  @ApiOperation({ summary: '导入用户数据（上传 .xlsx）' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Excel 文件（.xlsx）',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: { file: { type: 'string', format: 'binary' } },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 20 * 1024 * 1024 },
+      fileFilter: (_request, file, callback) => {
+        if (!/\.xlsx$/i.test(file.originalname || '')) {
+          callback(new BusinessException('仅支持 .xlsx 格式的导入文件'), false)
+        } else {
+          callback(null, true)
+        }
+      },
+    }),
+  )
+  @ApiSuccessResponse(ImportResultDto)
+  async importUser(
+    @UploadedFile() file: ExcelUploadFile,
+    @CurrentUser() user: CurrentLoginResponseDto,
+  ): Promise<ImportResultDto> {
+    return await this.userService.importUserFile(file, user.maxLevel)
   }
 
   @Post('export')
   @RequirePermissions(PERMISSIONS.SYS_USER_LIST_EXPORT)
-  @ApiOperation({ summary: '导出用户数据' })
-  @ApiSuccessResponse()
-  async exportUser() {
-    return await this.userService.exportUser()
+  @ApiOperation({ summary: '导出用户数据（按查询条件全量导出）' })
+  @ApiProduces(EXCEL_CONTENT_TYPE)
+  @ApiOkResponse({ schema: { type: 'string', format: 'binary' } })
+  async exportUser(
+    @Query() query: UserPageDto,
+    @CurrentUser() user: CurrentLoginResponseDto,
+  ): Promise<StreamableFile> {
+    return await this.userService.exportUsers(query, user.maxLevel)
   }
   @Get('check-unique')
   @RequirePermissions(PERMISSIONS.SYS_USER_LIST_VIEW)

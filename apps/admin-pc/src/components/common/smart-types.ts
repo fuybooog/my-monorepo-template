@@ -10,6 +10,7 @@ import {
   ColProps,
 } from 'antd'
 import { ColumnType } from 'antd/es/table'
+import type { ExcelImportResult } from '@repo/types'
 import type { TreeConfig } from '@/utils'
 
 // form属
@@ -76,6 +77,31 @@ export type SmartFormProps = Omit<FormProps, 'children'> & SmartFormExtraProps
 
 // table属性
 
+/** 文件下载返回(blob + 可选文件名) */
+export interface SmartTableExcelDownloadPayload {
+  blob: Blob
+  /** 下载文件名;不传则由调用方使用兜底名 */
+  filename?: string
+}
+
+/** SmartTable 内建 Excel 导入导出能力配置(挂载在 SmartTable 顶层 excel prop 上) */
+export interface SmartTableExcelOptions {
+  /** 导入弹窗标题,默认「导入数据」 */
+  importTitle?: string
+  /** 下载导入模板;返回 null 表示失败(错误已由请求层提示),不提供则隐藏「下载模板」入口 */
+  downloadTemplate?: () => Promise<SmartTableExcelDownloadPayload | null>
+  /** 导入文件;返回 null 表示文件级失败(错误已提示) */
+  importFile?: (file: File) => Promise<ExcelImportResult | null>
+  /** 导出当前筛选数据;返回 null 表示失败(错误已提示) */
+  exportData?: () => Promise<SmartTableExcelDownloadPayload | null>
+  /** 导入按钮所需权限码,缺省不校验 */
+  importPermission?: string
+  /** 导出按钮所需权限码,缺省不校验 */
+  exportPermission?: string
+  /** 导入完成(含部分成功)后的回调,一般用于刷新列表 */
+  onImportSuccess?: () => void
+}
+
 export interface LinkConfig<RecordType> {
   onClick?: (record: RecordType) => void // 自定义点击，若不提供则触发全局 onLinkClick
   target?: '_blank' | '_self'
@@ -88,6 +114,8 @@ export interface SmartColumnType<RecordType> extends ColumnType<RecordType> {
 interface BaseSmartTableProps<RecordType> {
   storageKey?: string // 开启本地列持久化存储的唯一 key
   toolbar?: Partial<SmartTableToolbarProps<RecordType>> | false // 如果传 false 则彻底关闭工具栏
+  /** Excel 导入导出能力(内建导出/导入/模板下载按钮);不传则工具栏不显示导入导出 */
+  excel?: SmartTableExcelOptions
   // 是否使用默认排序规则
   defaultSort?: boolean
   // 首次渲染时是否自动查询
@@ -175,6 +203,10 @@ export interface SmartTableToolbarProps<T> {
   // 额外暴露出一些快捷操作
   onCreate?: () => void
   onBatchDelete?: (keys: React.Key[], rows?: T[]) => void
+  /** Excel 内建能力(由 SmartTable 注入,业务通过 SmartTable.excel 配置,无需直接设置) */
+  excel?: SmartTableExcelOptions
+  /** 打开导入弹窗(由 SmartTable 注入) */
+  onImportClick?: () => void
 }
 
 // columns属性

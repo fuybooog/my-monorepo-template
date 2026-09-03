@@ -9,6 +9,7 @@ import valueSetApi from '../api/value-set'
 import { useDrawer } from '@/hooks/useDrawer'
 import { ValueSetFormContainer } from '../components/ValueSetFormContainer'
 import { useValueSetDetailList } from '../hooks/useValueSetDetailList'
+import { useValueSetExcel } from '../hooks/useValueSetExcel'
 
 const formTitleMap = { create: '新增值', edit: '编辑值', view: '值详情' }
 
@@ -25,6 +26,8 @@ export function ValueSetDetailPage() {
     onDelete,
     onBatchDelete,
   } = useValueSetDetailList(setCode)
+
+  const excel = useValueSetExcel(searchParams, setCode, refreshTable)
 
   const {
     drawerVisible,
@@ -77,6 +80,8 @@ export function ValueSetDetailPage() {
         schema={valueSetSearchSchema}
         request={handleFetchData}
         columns={columns}
+        rowSelection={{}}
+        excel={excel}
         toolbar={{
           onCreate,
           onBatchDelete,

@@ -32,12 +32,6 @@ export class RoleGenerated {
   })
   roleName: string
 
-  @Column('int', {
-    name: 'status',
-    comment: '状态：0-禁用，1-启用',
-  })
-  status: number
-
   @CreateDateColumn({ name: 'created_at', comment: '创建时间', nullable: true })
   createdAt: Date | null
 
@@ -57,4 +51,7 @@ export class RoleGenerated {
 
   @Column('int', { name: 'level', comment: '角色等级' })
   level: number
+
+  @Column('int', { name: 'status', comment: '状态：0-禁用，1-启用' })
+  status: number
 }

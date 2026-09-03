@@ -1271,25 +1271,12 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "成功响应",
+            "description": "",
             "content": {
-              "application/json": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
@@ -1303,6 +1290,23 @@
       "post": {
         "operationId": "UserController_importUser",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Excel 文件（.xlsx）",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "成功响应",
@@ -1316,9 +1320,7 @@
                     {
                       "properties": {
                         "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
+                          "$ref": "#/components/schemas/ImportResultDto"
                         }
                       },
                       "required": ["data"]
@@ -1329,41 +1331,285 @@
             }
           }
         },
-        "summary": "导入用户数据",
+        "summary": "导入用户数据（上传 .xlsx）",
         "tags": ["用户模块"]
       }
     },
     "/user/export": {
       "post": {
         "operationId": "UserController_exportUser",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "nickName",
+            "required": false,
+            "in": "query",
+            "description": "昵称",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "gender",
+            "required": false,
+            "in": "query",
+            "description": "性别代码",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "genderName",
+            "required": false,
+            "in": "query",
+            "description": "性别名称",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "birth",
+            "required": false,
+            "in": "query",
+            "description": "生日",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mobile",
+            "required": false,
+            "in": "query",
+            "description": "手机号",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "address",
+            "required": false,
+            "in": "query",
+            "description": "地址",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "addressDetail",
+            "required": false,
+            "in": "query",
+            "description": "地址详情",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "maritalStatus",
+            "required": false,
+            "in": "query",
+            "description": "婚姻状况代码",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "maritalStatusName",
+            "required": false,
+            "in": "query",
+            "description": "婚姻状况名称",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "required": false,
+            "in": "query",
+            "description": "邮箱",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "状态：0-禁用，1-启用",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "createdAt",
+            "required": false,
+            "in": "query",
+            "description": "创建时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "required": false,
+            "in": "query",
+            "description": "修改时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deletedAt",
+            "required": false,
+            "in": "query",
+            "description": "删除时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pinyin",
+            "required": false,
+            "in": "query",
+            "description": "全拼",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "py",
+            "required": false,
+            "in": "query",
+            "description": "拼音首字母",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "页码",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "keyword",
+            "required": false,
+            "in": "query",
+            "description": "关键词",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userName",
+            "required": false,
+            "in": "query",
+            "description": "用户名",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "birthStart",
+            "required": false,
+            "in": "query",
+            "description": "生日日期开始",
+            "schema": {
+              "example": "2000-10-10",
+              "type": "string"
+            }
+          },
+          {
+            "name": "birthEnd",
+            "required": false,
+            "in": "query",
+            "description": "生日日期结束",
+            "schema": {
+              "example": "2000-10-10",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAtStart",
+            "required": false,
+            "in": "query",
+            "description": "创建日期开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "创建日期结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtStart",
+            "required": false,
+            "in": "query",
+            "description": "开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "排序对象",
+            "schema": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "example": {
+                "userName": "ASC",
+                "createdAt": "DESC"
+              },
+              "type": "object"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "成功响应",
+            "description": "",
             "content": {
-              "application/json": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
           }
         },
-        "summary": "导出用户数据",
+        "summary": "导出用户数据（按查询条件全量导出）",
         "tags": ["用户模块"]
       }
     },
@@ -2194,29 +2440,8 @@
         "operationId": "RoleController_downloadRoleTemplate",
         "parameters": [],
         "responses": {
-          "200": {
-            "description": "成功响应",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
-                }
-              }
-            }
+          "201": {
+            "description": ""
           }
         },
         "summary": "下载导入角色模板",
@@ -2229,25 +2454,11 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "成功响应",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
+                  "$ref": "#/components/schemas/ImportResultDto"
                 }
               }
             }
@@ -2260,31 +2471,132 @@
     "/role/export": {
       "post": {
         "operationId": "RoleController_exportRole",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功响应",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
-                }
-              }
+        "parameters": [
+          {
+            "name": "roleName",
+            "required": true,
+            "in": "query",
+            "description": "角色名称",
+            "schema": {
+              "type": "string"
             }
+          },
+          {
+            "name": "roleCode",
+            "required": true,
+            "in": "query",
+            "description": "角色编码",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "level",
+            "required": true,
+            "in": "query",
+            "description": "角色等级",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "状态：0-禁用，1-启用",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "createdAt",
+            "required": false,
+            "in": "query",
+            "description": "创建时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "required": false,
+            "in": "query",
+            "description": "修改时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deletedAt",
+            "required": false,
+            "in": "query",
+            "description": "删除时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "页码",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "createdAtStart",
+            "required": false,
+            "in": "query",
+            "description": "创建时间开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "创建时间结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtStart",
+            "required": false,
+            "in": "query",
+            "description": "修改时间开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "修改时间结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
           }
         },
         "summary": "导出角色数据",
@@ -3367,29 +3679,8 @@
         "operationId": "ResourceController_downloadResourceTemplate",
         "parameters": [],
         "responses": {
-          "200": {
-            "description": "成功响应",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
-                }
-              }
-            }
+          "201": {
+            "description": ""
           }
         },
         "summary": "下载导入资源模板",
@@ -3402,25 +3693,11 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "成功响应",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
+                  "$ref": "#/components/schemas/ImportResultDto"
                 }
               }
             }
@@ -3433,31 +3710,168 @@
     "/resource/export": {
       "post": {
         "operationId": "ResourceController_exportResource",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功响应",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
-                }
-              }
+        "parameters": [
+          {
+            "name": "label",
+            "required": false,
+            "in": "query",
+            "description": "资源名称",
+            "schema": {
+              "type": "string"
             }
+          },
+          {
+            "name": "uniqueProp",
+            "required": false,
+            "in": "query",
+            "description": "唯一编码",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parentUniqueProp",
+            "required": false,
+            "in": "query",
+            "description": "唯一父编码",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "状态：0-禁用，1-启用",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "资源类型：0-目录 1-页面 2-按钮 3-列",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "notInMenu",
+            "required": false,
+            "in": "query",
+            "description": "是否在菜单中显示：0-显示，1-不显示",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortNumber",
+            "required": false,
+            "in": "query",
+            "description": "排序号",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "menuPath",
+            "required": false,
+            "in": "query",
+            "description": "菜单路径",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAt",
+            "required": false,
+            "in": "query",
+            "description": "创建时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "required": false,
+            "in": "query",
+            "description": "修改时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deletedAt",
+            "required": false,
+            "in": "query",
+            "description": "删除时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "页码",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "createdAtStart",
+            "required": false,
+            "in": "query",
+            "description": "创建时间开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "创建时间结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtStart",
+            "required": false,
+            "in": "query",
+            "description": "修改时间开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "修改时间结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
           }
         },
         "summary": "导出资源数据",
@@ -3496,6 +3910,354 @@
           }
         },
         "tags": ["File"]
+      }
+    },
+    "/operation-log/page": {
+      "get": {
+        "operationId": "OperationLogController_pageLog",
+        "parameters": [
+          {
+            "name": "module",
+            "required": false,
+            "in": "query",
+            "description": "业务模块编码：user/role/resource/value-set",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "operationType",
+            "required": false,
+            "in": "query",
+            "description": "操作类型：CREATE/UPDATE/DELETE/ENABLE/DISABLE/ASSIGN/RESET_PWD",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "logLevel",
+            "required": false,
+            "in": "query",
+            "description": "日志级别：1-INFO，2-WARN，3-ERROR",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "operatorName",
+            "required": false,
+            "in": "query",
+            "description": "操作人用户名（模糊匹配）",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "keyword",
+            "required": false,
+            "in": "query",
+            "description": "业务对象关键字（businessText 模糊匹配），如 王五",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdStart",
+            "required": false,
+            "in": "query",
+            "description": "开始时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdEnd",
+            "required": false,
+            "in": "query",
+            "description": "结束时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "页码",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "分页成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/PaginatedResult"
+                            },
+                            {
+                              "required": ["total", "page", "pageSize", "list"],
+                              "properties": {
+                                "total": {
+                                  "type": "number",
+                                  "description": "总条数",
+                                  "example": 100
+                                },
+                                "page": {
+                                  "type": "number",
+                                  "description": "当前页码",
+                                  "example": 1
+                                },
+                                "pageSize": {
+                                  "type": "number",
+                                  "description": "每页条数",
+                                  "example": 10
+                                },
+                                "list": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/components/schemas/OperationLogPageRespDto"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "分页查询操作日志",
+        "tags": ["操作日志模块"]
+      }
+    },
+    "/operation-log/schema-generator-holder-page-operation-log": {
+      "post": {
+        "deprecated": true,
+        "operationId": "OperationLogController__pageOperationLog",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationLogPageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "请勿调用，用于生成前端DTO",
+        "tags": ["操作日志模块"]
+      }
+    },
+    "/operation-log/detail/{id}": {
+      "get": {
+        "operationId": "OperationLogController_findLogById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/OperationLogDetailRespDto"
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "查询操作日志详情（含字段级变更明细）",
+        "tags": ["操作日志模块"]
+      }
+    },
+    "/operation-log/export": {
+      "post": {
+        "operationId": "OperationLogController_exportLogs",
+        "parameters": [
+          {
+            "name": "module",
+            "required": false,
+            "in": "query",
+            "description": "业务模块编码：user/role/resource/value-set",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "operationType",
+            "required": false,
+            "in": "query",
+            "description": "操作类型：CREATE/UPDATE/DELETE/ENABLE/DISABLE/ASSIGN/RESET_PWD",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "logLevel",
+            "required": false,
+            "in": "query",
+            "description": "日志级别：1-INFO，2-WARN，3-ERROR",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "operatorName",
+            "required": false,
+            "in": "query",
+            "description": "操作人用户名（模糊匹配）",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "keyword",
+            "required": false,
+            "in": "query",
+            "description": "业务对象关键字（businessText 模糊匹配），如 王五",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdStart",
+            "required": false,
+            "in": "query",
+            "description": "开始时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdEnd",
+            "required": false,
+            "in": "query",
+            "description": "结束时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "页码",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "xlsx 文件流"
+          }
+        },
+        "summary": "按查询条件导出操作日志",
+        "tags": ["操作日志模块"]
+      }
+    },
+    "/operation-log/clean": {
+      "post": {
+        "operationId": "OperationLogController_cleanLogs",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationLogCleanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "null",
+                          "default": null,
+                          "nullable": true
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "清理操作日志（支持 dryRun 预览）",
+        "tags": ["操作日志模块"]
       }
     },
     "/value-set/page": {
@@ -4500,29 +5262,8 @@
         "operationId": "ValueSetController_downloadValueSetTemplate",
         "parameters": [],
         "responses": {
-          "200": {
-            "description": "成功响应",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
-                }
-              }
-            }
+          "201": {
+            "description": ""
           }
         },
         "summary": "下载导入值集模板",
@@ -4535,25 +5276,11 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "成功响应",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
+                  "$ref": "#/components/schemas/ImportResultDto"
                 }
               }
             }
@@ -4566,31 +5293,208 @@
     "/value-set/export": {
       "post": {
         "operationId": "ValueSetController_exportValueSet",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功响应",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "null",
-                          "default": null,
-                          "nullable": true
-                        }
-                      },
-                      "required": ["data"]
-                    }
-                  ]
-                }
-              }
+        "parameters": [
+          {
+            "name": "parentSetCode",
+            "required": false,
+            "in": "query",
+            "description": "父编码",
+            "schema": {
+              "type": "string"
             }
+          },
+          {
+            "name": "parentSetName",
+            "required": false,
+            "in": "query",
+            "description": "父名称",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "状态：0-禁用，1-启用",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortNumber",
+            "required": false,
+            "in": "query",
+            "description": "排序号",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "createdAt",
+            "required": false,
+            "in": "query",
+            "description": "创建时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "required": false,
+            "in": "query",
+            "description": "修改时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdUserId",
+            "required": false,
+            "in": "query",
+            "description": "创建人id",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "createdUserName",
+            "required": false,
+            "in": "query",
+            "description": "创建人名称",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedUserId",
+            "required": false,
+            "in": "query",
+            "description": "修改人id",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "updatedUserName",
+            "required": false,
+            "in": "query",
+            "description": "修改人姓名",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deletedAt",
+            "required": false,
+            "in": "query",
+            "description": "删除时间",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "页码",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "setCode",
+            "required": false,
+            "in": "query",
+            "description": "集CODE",
+            "schema": {
+              "example": "SYS_GENDER",
+              "type": "string"
+            }
+          },
+          {
+            "name": "setName",
+            "required": false,
+            "in": "query",
+            "description": "集NAME",
+            "schema": {
+              "example": "性别",
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "required": false,
+            "in": "query",
+            "description": "值CODE",
+            "schema": {
+              "example": "1",
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "description": "值NAME",
+            "schema": {
+              "example": "男",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAtStart",
+            "required": false,
+            "in": "query",
+            "description": "创建时间开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "创建时间结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtStart",
+            "required": false,
+            "in": "query",
+            "description": "修改时间开始",
+            "schema": {
+              "example": "2000-10-10 00:00:00",
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedAtEnd",
+            "required": false,
+            "in": "query",
+            "description": "修改时间结束",
+            "schema": {
+              "example": "2000-10-10 23:59:59",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
           }
         },
         "summary": "导出值集数据",
@@ -5400,6 +6304,53 @@
         },
         "required": ["ids", "status"]
       },
+      "ImportFailedRowDto": {
+        "type": "object",
+        "properties": {
+          "rowNo": {
+            "type": "number",
+            "description": "Excel 行号（表头下一行计为 2）",
+            "example": 2
+          },
+          "errors": {
+            "type": "object",
+            "description": "错误信息：中文列名 -> 错误原因",
+            "example": {
+              "用户名": "用户名「admin」与系统中已有数据重复",
+              "角色": "角色「super」不存在"
+            }
+          }
+        },
+        "required": ["rowNo", "errors"]
+      },
+      "ImportResultDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number",
+            "description": "文件数据总行数",
+            "example": 100
+          },
+          "successCount": {
+            "type": "number",
+            "description": "成功导入行数",
+            "example": 98
+          },
+          "failCount": {
+            "type": "number",
+            "description": "失败行数",
+            "example": 2
+          },
+          "failedRows": {
+            "description": "失败行明细（空数组表示全部成功）",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportFailedRowDto"
+            }
+          }
+        },
+        "required": ["total", "successCount", "failCount"]
+      },
       "AdminResetPasswordDto": {
         "type": "object",
         "properties": {
@@ -6144,6 +7095,231 @@
       "UpdateFileDto": {
         "type": "object",
         "properties": {}
+      },
+      "OperationLogPageRespDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "操作日志id"
+          },
+          "logLevel": {
+            "type": "number",
+            "description": "日志级别：1-INFO，2-WARN，3-ERROR"
+          },
+          "logLevelText": {
+            "type": "string",
+            "description": "日志级别中文：信息/警告/错误"
+          },
+          "module": {
+            "type": "string",
+            "description": "业务模块编码"
+          },
+          "moduleText": {
+            "type": "string",
+            "description": "业务模块名称"
+          },
+          "businessId": {
+            "type": "number",
+            "description": "业务对象id"
+          },
+          "businessText": {
+            "type": "string",
+            "description": "业务对象描述"
+          },
+          "operationType": {
+            "type": "string",
+            "description": "操作类型"
+          },
+          "operationText": {
+            "type": "string",
+            "description": "操作类型中文"
+          },
+          "operatorId": {
+            "type": "number",
+            "description": "操作人id"
+          },
+          "operatorName": {
+            "type": "string",
+            "description": "操作人用户名"
+          },
+          "operatorIp": {
+            "type": "string",
+            "description": "操作人IP"
+          },
+          "summary": {
+            "type": "string",
+            "description": "摘要"
+          },
+          "requestUri": {
+            "type": "string",
+            "description": "请求路径"
+          },
+          "requestMethod": {
+            "type": "string",
+            "description": "请求方法"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          }
+        },
+        "required": [
+          "id",
+          "logLevel",
+          "module",
+          "moduleText",
+          "businessText",
+          "operationType",
+          "operationText",
+          "operatorId",
+          "operatorName",
+          "summary"
+        ]
+      },
+      "OperationLogPageDto": {
+        "type": "object",
+        "properties": {
+          "module": {
+            "type": "string",
+            "description": "业务模块编码：user/role/resource/value-set"
+          },
+          "operationType": {
+            "type": "string",
+            "description": "操作类型：CREATE/UPDATE/DELETE/ENABLE/DISABLE/ASSIGN/RESET_PWD"
+          },
+          "logLevel": {
+            "type": "number",
+            "description": "日志级别：1-INFO，2-WARN，3-ERROR"
+          },
+          "operatorName": {
+            "type": "string",
+            "description": "操作人用户名（模糊匹配）"
+          },
+          "keyword": {
+            "type": "string",
+            "description": "业务对象关键字（businessText 模糊匹配），如 王五"
+          },
+          "createdStart": {
+            "type": "string",
+            "description": "开始时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss"
+          },
+          "createdEnd": {
+            "type": "string",
+            "description": "结束时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss"
+          },
+          "page": {
+            "type": "number",
+            "description": "页码"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "每页条数"
+          }
+        }
+      },
+      "OperationLogDetailRespDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "操作日志id"
+          },
+          "logLevel": {
+            "type": "number",
+            "description": "日志级别：1-INFO，2-WARN，3-ERROR"
+          },
+          "logLevelText": {
+            "type": "string",
+            "description": "日志级别中文：信息/警告/错误"
+          },
+          "module": {
+            "type": "string",
+            "description": "业务模块编码"
+          },
+          "moduleText": {
+            "type": "string",
+            "description": "业务模块名称"
+          },
+          "businessId": {
+            "type": "number",
+            "description": "业务对象id"
+          },
+          "businessText": {
+            "type": "string",
+            "description": "业务对象描述"
+          },
+          "operationType": {
+            "type": "string",
+            "description": "操作类型"
+          },
+          "operationText": {
+            "type": "string",
+            "description": "操作类型中文"
+          },
+          "operatorId": {
+            "type": "number",
+            "description": "操作人id"
+          },
+          "operatorName": {
+            "type": "string",
+            "description": "操作人用户名"
+          },
+          "operatorIp": {
+            "type": "string",
+            "description": "操作人IP"
+          },
+          "summary": {
+            "type": "string",
+            "description": "摘要"
+          },
+          "requestUri": {
+            "type": "string",
+            "description": "请求路径"
+          },
+          "requestMethod": {
+            "type": "string",
+            "description": "请求方法"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间"
+          },
+          "detailJson": {
+            "type": "array",
+            "description": "字段级变更明细：[{field, fieldText, oldValue, newValue, oldText, newText}]"
+          }
+        },
+        "required": [
+          "id",
+          "logLevel",
+          "module",
+          "moduleText",
+          "businessText",
+          "operationType",
+          "operationText",
+          "operatorId",
+          "operatorName",
+          "summary"
+        ]
+      },
+      "OperationLogCleanDto": {
+        "type": "object",
+        "properties": {
+          "logLevel": {
+            "type": "number",
+            "description": "仅清理该级别：1-INFO，2-WARN，3-ERROR；缺省按各级别默认保留策略"
+          },
+          "beforeDate": {
+            "type": "string",
+            "description": "清理该日期(不含)之前的日志，yyyy-MM-dd；缺省按保留策略自动计算"
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "仅预览不执行，返回将删除数量",
+            "default": false
+          }
+        }
       },
       "ValueSetPageRespDto": {
         "type": "object",

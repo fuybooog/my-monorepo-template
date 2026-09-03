@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common'
 import {
   AuthModule,
+  ExcelModule,
   FileModule,
+  OperationLogModule,
   UserModule,
   ValueSetModule,
   ResourceModule,
@@ -10,8 +12,10 @@ import {
 } from '@/modules'
 
 const SHARED_MODULES = [
+  ExcelModule,
   AuthModule,
   FileModule,
+  OperationLogModule,
   UserModule,
   ValueSetModule,
   ResourceModule,

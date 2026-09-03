@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Space, Button, Popconfirm } from 'antd'
 import { DeleteOutlined, PlusOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons'
 import { SmartTableColumnSettings } from './SmartTableColumnSettings'
 import { SmartTableToolbarProps } from './smart-types'
+import { useAuthStore } from '@/store/authStore'
+import { saveBlob } from '@/utils'
+import { EXCEL_MESSAGE } from '@/constants'
 
 export function SmartTableToolbar<T>({
   selectedRowKeys,
@@ -16,8 +19,34 @@ export function SmartTableToolbar<T>({
   onCheckedKeysChange,
   onCreate,
   onBatchDelete,
+  excel,
+  onImportClick,
 }: SmartTableToolbarProps<T>) {
   const hasSelected = selectedRowKeys.length > 0
+  const [exportLoading, setExportLoading] = useState(false)
+
+  // 导出/导入:需同时满足「已配置能力」与「权限」才展示按钮
+  const canExport =
+    !!excel?.exportData &&
+    (!excel.exportPermission || useAuthStore.getState().hasPermission([excel.exportPermission]))
+  const canImport =
+    !!excel?.importFile &&
+    (!excel.importPermission || useAuthStore.getState().hasPermission([excel.importPermission]))
+
+  const handleExport = async () => {
+    if (!excel?.exportData || exportLoading) return
+    setExportLoading(true)
+    try {
+      const payload = await excel.exportData()
+      if (payload) {
+        saveBlob(payload.blob, payload.filename || EXCEL_MESSAGE.EXPORT_FILE_DEFAULT)
+      }
+    } catch (error) {
+      console.error('导出失败', error)
+    } finally {
+      setExportLoading(false)
+    }
+  }
 
   const builtInActionsMap: Record<string, React.ReactNode> = {
     create: (
@@ -37,16 +66,21 @@ export function SmartTableToolbar<T>({
         </Button>
       </Popconfirm>
     ),
-    export: (
-      <Button key="export" icon={<DownloadOutlined />}>
-        导出
+    export: canExport ? (
+      <Button
+        key="export"
+        icon={<DownloadOutlined />}
+        loading={exportLoading}
+        onClick={handleExport}
+      >
+        {EXCEL_MESSAGE.EXPORT_BUTTON}
       </Button>
-    ),
-    import: (
-      <Button key="import" icon={<UploadOutlined />}>
-        导入
+    ) : null,
+    import: canImport ? (
+      <Button key="import" icon={<UploadOutlined />} onClick={onImportClick}>
+        {EXCEL_MESSAGE.IMPORT_BUTTON}
       </Button>
-    ),
+    ) : null,
     clearSelection: hasSelected ? (
       <Button
         key="clearSelection"

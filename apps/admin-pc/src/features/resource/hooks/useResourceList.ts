@@ -96,6 +96,7 @@ export function useResourceList() {
         getMessage().success(SUCCESS_MESSAGE.DELETE)
       }
       refreshTable()
+      smartTable.current?.clearSelection()
     }
   }
 

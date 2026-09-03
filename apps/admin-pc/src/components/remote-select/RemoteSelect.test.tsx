@@ -16,7 +16,7 @@ describe('RemoteSelect 测试套件', () => {
   const mockOnChange = vi.fn()
 
   beforeEach(() => {
-    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   // 1. 基础渲染
@@ -33,7 +33,9 @@ describe('RemoteSelect 测试套件', () => {
     })
 
     it('展开下拉框时，如果无数据应触发首次加载', async () => {
-      mockFetchApi.mockResolvedValueOnce({
+      // 用持久 mock(而非 Once):组件挂载会防抖预载一次,打开下拉若判定无数据会再触发一次,
+      // 两次请求都应返回同一结果,避免竞态下第二次请求把已渲染数据覆盖为空
+      mockFetchApi.mockResolvedValue({
         list: [{ id: 1, name: '张三' }],
         total: 1,
       })

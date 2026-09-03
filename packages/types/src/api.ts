@@ -442,7 +442,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 导入用户数据 */
+    /** 导入用户数据（上传 .xlsx） */
     post: operations['UserController_importUser']
     delete?: never
     options?: never
@@ -459,7 +459,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** 导出用户数据 */
+    /** 导出用户数据（按查询条件全量导出） */
     post: operations['UserController_exportUser']
     delete?: never
     options?: never
@@ -1134,6 +1134,94 @@ export interface paths {
     get?: never
     put?: never
     post: operations['FileController_writeData']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/operation-log/page': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 分页查询操作日志 */
+    get: operations['OperationLogController_pageLog']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/operation-log/schema-generator-holder-page-operation-log': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * 请勿调用，用于生成前端DTO
+     * @deprecated
+     */
+    post: operations['OperationLogController__pageOperationLog']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/operation-log/detail/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 查询操作日志详情（含字段级变更明细） */
+    get: operations['OperationLogController_findLogById']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/operation-log/export': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 按查询条件导出操作日志 */
+    post: operations['OperationLogController_exportLogs']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/operation-log/clean': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 清理操作日志（支持 dryRun 预览） */
+    post: operations['OperationLogController_cleanLogs']
     delete?: never
     options?: never
     head?: never
@@ -1922,6 +2010,40 @@ export interface components {
        */
       status: 1 | 0
     }
+    ImportFailedRowDto: {
+      /**
+       * @description Excel 行号（表头下一行计为 2）
+       * @example 2
+       */
+      rowNo: number
+      /**
+       * @description 错误信息：中文列名 -> 错误原因
+       * @example {
+       *       "用户名": "用户名「admin」与系统中已有数据重复",
+       *       "角色": "角色「super」不存在"
+       *     }
+       */
+      errors: Record<string, never>
+    }
+    ImportResultDto: {
+      /**
+       * @description 文件数据总行数
+       * @example 100
+       */
+      total: number
+      /**
+       * @description 成功导入行数
+       * @example 98
+       */
+      successCount: number
+      /**
+       * @description 失败行数
+       * @example 2
+       */
+      failCount: number
+      /** @description 失败行明细（空数组表示全部成功） */
+      failedRows?: components['schemas']['ImportFailedRowDto'][]
+    }
     AdminResetPasswordDto: {
       /** @description 解密id */
       keyId: string
@@ -2318,6 +2440,107 @@ export interface components {
       list: components['schemas']['ResourcePartialDto'][]
     }
     UpdateFileDto: Record<string, never>
+    OperationLogPageRespDto: {
+      /** @description 操作日志id */
+      id: number
+      /** @description 日志级别：1-INFO，2-WARN，3-ERROR */
+      logLevel: number
+      /** @description 日志级别中文：信息/警告/错误 */
+      logLevelText?: string
+      /** @description 业务模块编码 */
+      module: string
+      /** @description 业务模块名称 */
+      moduleText: string
+      /** @description 业务对象id */
+      businessId?: number
+      /** @description 业务对象描述 */
+      businessText: string
+      /** @description 操作类型 */
+      operationType: string
+      /** @description 操作类型中文 */
+      operationText: string
+      /** @description 操作人id */
+      operatorId: number
+      /** @description 操作人用户名 */
+      operatorName: string
+      /** @description 操作人IP */
+      operatorIp?: string
+      /** @description 摘要 */
+      summary: string
+      /** @description 请求路径 */
+      requestUri?: string
+      /** @description 请求方法 */
+      requestMethod?: string
+      /** @description 创建时间 */
+      createdAt?: string
+    }
+    OperationLogPageDto: {
+      /** @description 业务模块编码：user/role/resource/value-set */
+      module?: string
+      /** @description 操作类型：CREATE/UPDATE/DELETE/ENABLE/DISABLE/ASSIGN/RESET_PWD */
+      operationType?: string
+      /** @description 日志级别：1-INFO，2-WARN，3-ERROR */
+      logLevel?: number
+      /** @description 操作人用户名（模糊匹配） */
+      operatorName?: string
+      /** @description 业务对象关键字（businessText 模糊匹配），如 王五 */
+      keyword?: string
+      /** @description 开始时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss */
+      createdStart?: string
+      /** @description 结束时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss */
+      createdEnd?: string
+      /** @description 页码 */
+      page?: number
+      /** @description 每页条数 */
+      pageSize?: number
+    }
+    OperationLogDetailRespDto: {
+      /** @description 操作日志id */
+      id: number
+      /** @description 日志级别：1-INFO，2-WARN，3-ERROR */
+      logLevel: number
+      /** @description 日志级别中文：信息/警告/错误 */
+      logLevelText?: string
+      /** @description 业务模块编码 */
+      module: string
+      /** @description 业务模块名称 */
+      moduleText: string
+      /** @description 业务对象id */
+      businessId?: number
+      /** @description 业务对象描述 */
+      businessText: string
+      /** @description 操作类型 */
+      operationType: string
+      /** @description 操作类型中文 */
+      operationText: string
+      /** @description 操作人id */
+      operatorId: number
+      /** @description 操作人用户名 */
+      operatorName: string
+      /** @description 操作人IP */
+      operatorIp?: string
+      /** @description 摘要 */
+      summary: string
+      /** @description 请求路径 */
+      requestUri?: string
+      /** @description 请求方法 */
+      requestMethod?: string
+      /** @description 创建时间 */
+      createdAt?: string
+      /** @description 字段级变更明细：[{field, fieldText, oldValue, newValue, oldText, newText}] */
+      detailJson?: unknown[]
+    }
+    OperationLogCleanDto: {
+      /** @description 仅清理该级别：1-INFO，2-WARN，3-ERROR；缺省按各级别默认保留策略 */
+      logLevel?: number
+      /** @description 清理该日期(不含)之前的日志，yyyy-MM-dd；缺省按保留策略自动计算 */
+      beforeDate?: string
+      /**
+       * @description 仅预览不执行，返回将删除数量
+       * @default false
+       */
+      dryRun: boolean
+    }
     ValueSetPageRespDto: {
       /** @description 字典id */
       id: number
@@ -3297,16 +3520,12 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
-          }
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': string
         }
       }
     }
@@ -3318,7 +3537,15 @@ export interface operations {
       path?: never
       cookie?: never
     }
-    requestBody?: never
+    /** @description Excel 文件（.xlsx） */
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          file?: string
+        }
+      }
+    }
     responses: {
       /** @description 成功响应 */
       200: {
@@ -3327,8 +3554,7 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
+            data: components['schemas']['ImportResultDto']
           }
         }
       }
@@ -3336,23 +3562,76 @@ export interface operations {
   }
   UserController_exportUser: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description 昵称 */
+        nickName?: string
+        /** @description 性别代码 */
+        gender?: string
+        /** @description 性别名称 */
+        genderName?: string
+        /** @description 生日 */
+        birth?: string
+        /** @description 手机号 */
+        mobile?: string
+        /** @description 地址 */
+        address?: string
+        /** @description 地址详情 */
+        addressDetail?: string
+        /** @description 婚姻状况代码 */
+        maritalStatus?: string
+        /** @description 婚姻状况名称 */
+        maritalStatusName?: string
+        /** @description 邮箱 */
+        email?: string
+        /** @description 状态：0-禁用，1-启用 */
+        status?: number
+        /** @description 创建时间 */
+        createdAt?: string
+        /** @description 修改时间 */
+        updatedAt?: string
+        /** @description 删除时间 */
+        deletedAt?: string
+        /** @description 全拼 */
+        pinyin?: string
+        /** @description 拼音首字母 */
+        py?: string
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 关键词 */
+        keyword?: string
+        /** @description 用户名 */
+        userName?: string
+        /** @description 生日日期开始 */
+        birthStart?: string
+        /** @description 生日日期结束 */
+        birthEnd?: string
+        /** @description 创建日期开始 */
+        createdAtStart?: string
+        /** @description 创建日期结束 */
+        createdAtEnd?: string
+        /** @description 开始 */
+        updatedAtStart?: string
+        /** @description 结束 */
+        updatedAtEnd?: string
+        /** @description 排序对象 */
+        sort?: {
+          [key: string]: string
+        }
+      }
       header?: never
       path?: never
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
-          }
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': string
         }
       }
     }
@@ -3813,17 +4092,11 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
-          }
-        }
+        content?: never
       }
     }
   }
@@ -3836,40 +4109,57 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
-          }
+          'application/json': components['schemas']['ImportResultDto']
         }
       }
     }
   }
   RoleController_exportRole: {
     parameters: {
-      query?: never
+      query: {
+        /** @description 角色名称 */
+        roleName: string
+        /** @description 角色编码 */
+        roleCode: string
+        /** @description 角色等级 */
+        level: number
+        /** @description 状态：0-禁用，1-启用 */
+        status?: number
+        /** @description 创建时间 */
+        createdAt?: string
+        /** @description 修改时间 */
+        updatedAt?: string
+        /** @description 删除时间 */
+        deletedAt?: string
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 创建时间开始 */
+        createdAtStart?: string
+        /** @description 创建时间结束 */
+        createdAtEnd?: string
+        /** @description 修改时间开始 */
+        updatedAtStart?: string
+        /** @description 修改时间结束 */
+        updatedAtEnd?: string
+      }
       header?: never
       path?: never
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
-          }
-        }
+        content?: never
       }
     }
   }
@@ -4403,17 +4693,11 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
-          }
-        }
+        content?: never
       }
     }
   }
@@ -4426,40 +4710,65 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
-          }
+          'application/json': components['schemas']['ImportResultDto']
         }
       }
     }
   }
   ResourceController_exportResource: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description 资源名称 */
+        label?: string
+        /** @description 唯一编码 */
+        uniqueProp?: string
+        /** @description 唯一父编码 */
+        parentUniqueProp?: string
+        /** @description 状态：0-禁用，1-启用 */
+        status?: number
+        /** @description 资源类型：0-目录 1-页面 2-按钮 3-列 */
+        type?: number
+        /** @description 是否在菜单中显示：0-显示，1-不显示 */
+        notInMenu?: number
+        /** @description 排序号 */
+        sortNumber?: number
+        /** @description 菜单路径 */
+        menuPath?: string
+        /** @description 创建时间 */
+        createdAt?: string
+        /** @description 修改时间 */
+        updatedAt?: string
+        /** @description 删除时间 */
+        deletedAt?: string
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 创建时间开始 */
+        createdAtStart?: string
+        /** @description 创建时间结束 */
+        createdAtEnd?: string
+        /** @description 修改时间开始 */
+        updatedAtStart?: string
+        /** @description 修改时间结束 */
+        updatedAtEnd?: string
+      }
       header?: never
       path?: never
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
-          }
-        }
+        content?: never
       }
     }
   }
@@ -4498,6 +4807,173 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  OperationLogController_pageLog: {
+    parameters: {
+      query?: {
+        /** @description 业务模块编码：user/role/resource/value-set */
+        module?: string
+        /** @description 操作类型：CREATE/UPDATE/DELETE/ENABLE/DISABLE/ASSIGN/RESET_PWD */
+        operationType?: string
+        /** @description 日志级别：1-INFO，2-WARN，3-ERROR */
+        logLevel?: number
+        /** @description 操作人用户名（模糊匹配） */
+        operatorName?: string
+        /** @description 业务对象关键字（businessText 模糊匹配），如 王五 */
+        keyword?: string
+        /** @description 开始时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss */
+        createdStart?: string
+        /** @description 结束时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss */
+        createdEnd?: string
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 分页成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['PaginatedResult'] & {
+              /**
+               * @description 总条数
+               * @example 100
+               */
+              total: number
+              /**
+               * @description 当前页码
+               * @example 1
+               */
+              page: number
+              /**
+               * @description 每页条数
+               * @example 10
+               */
+              pageSize: number
+              list: components['schemas']['OperationLogPageRespDto'][]
+            }
+          }
+        }
+      }
+    }
+  }
+  OperationLogController__pageOperationLog: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OperationLogPageDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OperationLogController_findLogById: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            data: components['schemas']['OperationLogDetailRespDto']
+          }
+        }
+      }
+    }
+  }
+  OperationLogController_exportLogs: {
+    parameters: {
+      query?: {
+        /** @description 业务模块编码：user/role/resource/value-set */
+        module?: string
+        /** @description 操作类型：CREATE/UPDATE/DELETE/ENABLE/DISABLE/ASSIGN/RESET_PWD */
+        operationType?: string
+        /** @description 日志级别：1-INFO，2-WARN，3-ERROR */
+        logLevel?: number
+        /** @description 操作人用户名（模糊匹配） */
+        operatorName?: string
+        /** @description 业务对象关键字（businessText 模糊匹配），如 王五 */
+        keyword?: string
+        /** @description 开始时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss */
+        createdStart?: string
+        /** @description 结束时间（含），yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss */
+        createdEnd?: string
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description xlsx 文件流 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OperationLogController_cleanLogs: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OperationLogCleanDto']
+      }
+    }
+    responses: {
+      /** @description 成功响应 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApiResponseDto'] & {
+            /** @default null */
+            data: null | null
+          }
+        }
       }
     }
   }
@@ -5014,17 +5490,11 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
-          }
-        }
+        content?: never
       }
     }
   }
@@ -5037,40 +5507,73 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
-          }
+          'application/json': components['schemas']['ImportResultDto']
         }
       }
     }
   }
   ValueSetController_exportValueSet: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description 父编码 */
+        parentSetCode?: string
+        /** @description 父名称 */
+        parentSetName?: string
+        /** @description 状态：0-禁用，1-启用 */
+        status?: number
+        /** @description 排序号 */
+        sortNumber?: number
+        /** @description 创建时间 */
+        createdAt?: string
+        /** @description 修改时间 */
+        updatedAt?: string
+        /** @description 创建人id */
+        createdUserId?: number
+        /** @description 创建人名称 */
+        createdUserName?: string
+        /** @description 修改人id */
+        updatedUserId?: number
+        /** @description 修改人姓名 */
+        updatedUserName?: string
+        /** @description 删除时间 */
+        deletedAt?: string
+        /** @description 页码 */
+        page?: number
+        /** @description 每页条数 */
+        pageSize?: number
+        /** @description 集CODE */
+        setCode?: string
+        /** @description 集NAME */
+        setName?: string
+        /** @description 值CODE */
+        code?: string
+        /** @description 值NAME */
+        name?: string
+        /** @description 创建时间开始 */
+        createdAtStart?: string
+        /** @description 创建时间结束 */
+        createdAtEnd?: string
+        /** @description 修改时间开始 */
+        updatedAtStart?: string
+        /** @description 修改时间结束 */
+        updatedAtEnd?: string
+      }
       header?: never
       path?: never
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description 成功响应 */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': components['schemas']['ApiResponseDto'] & {
-            /** @default null */
-            data: null | null
-          }
-        }
+        content?: never
       }
     }
   }

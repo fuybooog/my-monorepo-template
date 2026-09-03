@@ -1,4 +1,17 @@
-import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { ResourceService } from '@/modules/resource/resource.service'
 import { ResourcePageRespDto } from '@/modules/resource/dto/resource.page.resp.dto'
 import { ResourcePageDto } from '@/modules/resource/dto/resource.page.dto'
@@ -11,7 +24,7 @@ import {
   ResourceUpdateDto,
 } from '@/modules/resource/dto/resource.update.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
-import { ApiOperation } from '@nestjs/swagger'
+import { ApiConsumes, ApiOkResponse, ApiOperation, ApiProduces } from '@nestjs/swagger'
 import {
   ApiSuccessListResponse,
   ApiSuccessPageResponse,
@@ -24,6 +37,8 @@ import { CurrentLoginResponseDto } from '../auth/auth.dto'
 import { ListResp } from '@/dto/base.dto'
 import { RequirePermissions } from '@/decorators/require-permissions.decorator'
 import { PERMISSIONS } from '@repo/shared'
+import { EXCEL_CONTENT_TYPE, ExcelUploadFile } from '@/modules/excel/excel.types'
+import { ImportResultDto } from '@/modules/excel/dto/import-result.dto'
 
 @Controller('resource')
 export class ResourceController {
@@ -174,24 +189,28 @@ export class ResourceController {
   @Post('template')
   @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_IMPORT)
   @ApiOperation({ summary: '下载导入资源模板' })
-  @ApiSuccessResponse()
-  async downloadResourceTemplate() {
+  @ApiProduces(EXCEL_CONTENT_TYPE)
+  async downloadResourceTemplate(): Promise<StreamableFile> {
     return await this.resourceService.downloadTemplate()
   }
 
   @Post('import')
   @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_IMPORT)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: '导入资源数据' })
-  @ApiSuccessResponse()
-  async importResource() {
-    return await this.resourceService.importResource()
+  @ApiOkResponse({ type: ImportResultDto })
+  async importResource(
+    @UploadedFile() file: ExcelUploadFile | undefined,
+  ): Promise<ImportResultDto> {
+    return await this.resourceService.importResource(file)
   }
 
   @Post('export')
   @RequirePermissions(PERMISSIONS.SYS_RESOURCE_LIST_EXPORT)
   @ApiOperation({ summary: '导出资源数据' })
-  @ApiSuccessResponse()
-  async exportResource() {
-    return await this.resourceService.exportResource()
+  @ApiProduces(EXCEL_CONTENT_TYPE)
+  async exportResource(@Query() query: ResourcePageDto): Promise<StreamableFile> {
+    return await this.resourceService.exportResource(query)
   }
 }

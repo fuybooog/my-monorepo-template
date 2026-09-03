@@ -44,6 +44,7 @@ export function useRoleList() {
         getMessage().success(SUCCESS_MESSAGE.DELETE)
       }
       refreshTable()
+      smartTable.current?.clearSelection()
     }
   }
 

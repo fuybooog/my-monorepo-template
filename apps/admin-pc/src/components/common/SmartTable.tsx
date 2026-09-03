@@ -10,11 +10,12 @@ import React, {
 } from 'react'
 import { Table, TableProps } from 'antd'
 import { SorterResult } from 'antd/es/table/interface'
-import { formatMessage } from '@/constants'
+import { formatMessage, EXCEL_MESSAGE } from '@/constants'
 import { isEqual } from 'lodash'
 import { SmartTableInstance, SmartTableProps } from './smart-types'
 import { SmartTableToolbar } from './SmartTableToolbar'
 import { SmartTableButtons } from './SmartTableButtons'
+import { ExcelImportModal } from './ExcelImportModal'
 import { formatSortParams } from '@/utils'
 import { getColumnKey, serializeFormValues } from './smart-utils'
 import { SmartTableSortableWrapper } from './SmartTableSortableWrapper'
@@ -241,6 +242,7 @@ const SmartTableInner = <RecordType extends object>(
     isDragSortable = false,
     handleOrderChange,
     treeConfig,
+    excel,
     ...restAntdProps
   } = props
 
@@ -250,6 +252,7 @@ const SmartTableInner = <RecordType extends object>(
   }
 
   const [loading, setLoading] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
   const [dataSource, setDataSource] = useState<RecordType[]>([])
   const [idNodeMap, setIdNodeMap] = useState<Map<string | number, RecordType> | undefined>()
   const [parentMap, setParentMap] = useState<Map<string | number, RecordType> | undefined>()
@@ -372,7 +375,9 @@ const SmartTableInner = <RecordType extends object>(
         }
       }
       return rawRowSelection
-    }, [rawRowSelection])
+      // selectedRowKeys 必须参与依赖:否则勾选只更新 state、不重建受控对象,
+      // 导致 checkbox 视觉不随选中变化(旧闭包捕获首轮 [] )
+    }, [rawRowSelection, selectedRowKeys])
 
     const commonProps: TableProps<RecordType> = {
       ...restAntdProps,
@@ -435,16 +440,30 @@ const SmartTableInner = <RecordType extends object>(
   return (
     <div>
       {toolbar !== false && (
-        <SmartTableToolbar<RecordType>
-          {...toolbar}
-          selectedRowKeys={selectedRowKeys}
-          selectedRows={selectedRows}
-          onClearSelection={clearSelection}
-          rawColumns={columns}
-          checkedKeys={checkedKeys}
-          onCheckedKeysChange={handleCheckedKeysChange}
-          hideSettings={!storageKey || toolbar?.hideSettings}
-        />
+        <>
+          <SmartTableToolbar<RecordType>
+            {...toolbar}
+            selectedRowKeys={selectedRowKeys}
+            selectedRows={selectedRows}
+            onClearSelection={clearSelection}
+            rawColumns={columns}
+            checkedKeys={checkedKeys}
+            onCheckedKeysChange={handleCheckedKeysChange}
+            hideSettings={!storageKey || toolbar?.hideSettings}
+            excel={excel}
+            onImportClick={() => setImportOpen(true)}
+          />
+          {excel?.importFile && (
+            <ExcelImportModal
+              open={importOpen}
+              importTitle={excel.importTitle || EXCEL_MESSAGE.IMPORT_TITLE}
+              downloadTemplate={excel.downloadTemplate}
+              importFile={excel.importFile}
+              onImportSuccess={excel.onImportSuccess}
+              onClose={() => setImportOpen(false)}
+            />
+          )}
+        </>
       )}
       {renderFinalTable()}
     </div>

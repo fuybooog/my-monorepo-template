@@ -35,13 +35,6 @@ export class SystemValueSet {
   })
   parentSetName: string | null
 
-  @Column('int', {
-    name: 'status',
-    comment: '状态：0-禁用，1-启用',
-    default: () => "'1'",
-  })
-  status: number
-
   @Column('datetime', {
     name: 'created_at',
     nullable: true,
@@ -94,4 +87,14 @@ export class SystemValueSet {
     comment: '删除时间',
   })
   deletedAt: Date | null
+
+  @Column('int', {
+    name: 'status',
+    comment: '状态：0-禁用，1-启用',
+    default: () => "'1'",
+  })
+  status: number
+
+  @Column('int', { name: 'sort_number', nullable: true, comment: '排序号' })
+  sortNumber: number | null
 }

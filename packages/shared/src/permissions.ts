@@ -41,4 +41,11 @@ export const PERMISSIONS = {
   SYS_VALUE_SET_LIST_EXPORT: 'sys:value-set-list:export',
   SYS_VALUE_SET_LIST_IMPORT: 'sys:value-set-list:import',
   SYS_VALUE_SET_LIST_VIEW: 'sys:value-set-list:view',
+
+  // 操作日志
+  SYS_OPERATION_LOG_DIR: 'sys:operation-log:dir',
+  SYS_OPERATION_LOG_LIST_PAGE: 'sys:operation-log-list:page',
+  SYS_OPERATION_LOG_LIST_VIEW: 'sys:operation-log-list:view',
+  SYS_OPERATION_LOG_LIST_EXPORT: 'sys:operation-log-list:export',
+  SYS_OPERATION_LOG_LIST_CLEAN: 'sys:operation-log-list:clean',
 } as const

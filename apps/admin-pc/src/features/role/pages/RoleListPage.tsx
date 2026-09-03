@@ -7,6 +7,7 @@ import { RoleFormContainer } from '../components/RoleFormContainer'
 import { roleSearchSchema, getRoleColumns } from '../model'
 import { useDrawer } from '@/hooks/useDrawer'
 import { useRoleList } from '../hooks/useRoleList'
+import { useRoleExcel } from '../hooks/useRoleExcel'
 import roleApi from '../api/role'
 import { PERMISSIONS } from '@repo/shared'
 
@@ -24,6 +25,8 @@ export function RoleListPage() {
 
   const { drawerVisible, formMode, openDrawer, closeDrawer, drawerData } =
     useDrawer<Backend.RolePageRespDto>()
+
+  const excel = useRoleExcel(searchParams, refreshTable)
 
   const [form] = Form.useForm()
 
@@ -90,10 +93,17 @@ export function RoleListPage() {
         schema={roleSearchSchema}
         request={handleFetchData}
         columns={columns}
+        rowSelection={{
+          // 与行内编辑/删除一致,内置 admin 角色不可勾选删除
+          getCheckboxProps: (record: Backend.RolePageRespDto) => ({
+            disabled: record.roleCode === 'admin',
+          }),
+        }}
         toolbar={{
           onCreate,
           onBatchDelete,
         }}
+        excel={excel}
         actionColumn={{
           buttons: (record) => [editButton(record), deleteButton(record)],
         }}

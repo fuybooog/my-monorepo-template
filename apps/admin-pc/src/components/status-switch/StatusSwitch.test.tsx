@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { StatusSwitch } from './StatusSwitch'
 
@@ -30,6 +30,10 @@ describe('StatusSwitch', () => {
     vi.clearAllMocks()
   })
 
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('value 等于 activeVal 时 Switch 处于选中态', () => {
     renderSwitch()
     const sw = screen.getByRole('switch')
@@ -51,11 +55,14 @@ describe('StatusSwitch', () => {
   })
 
   it('onStatusChange 失败时不提示成功、不刷新列表', async () => {
+    // 静音组件 catch 分支的兜底日志,避免污染测试输出;顺带断言失败已被记录
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     const { props } = renderSwitch({
       onStatusChange: vi.fn().mockRejectedValue(new Error('fail')),
     })
     fireEvent.click(screen.getByRole('switch'))
     await waitFor(() => expect(props.onStatusChange).toHaveBeenCalled())
+    await waitFor(() => expect(errorSpy).toHaveBeenCalledWith('更新状态失败', expect.any(Error)))
     expect(mocks.message.success).not.toHaveBeenCalled()
     expect(props.refreshList).not.toHaveBeenCalled()
   })

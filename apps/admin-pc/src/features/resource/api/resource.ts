@@ -1,6 +1,13 @@
 import http from '@/api/http'
-import { Backend } from '@repo/types'
+import { Backend, ExcelImportResult } from '@repo/types'
 import { AxiosRequestConfig } from 'axios'
+
+/** 二进制文件响应(模板/导出)。成功时 data 为 Blob;业务失败返回 { head } 包装(拦截器已提示) */
+export interface FileResponse {
+  data: Blob
+  /** 仅声明实际用到的响应头,避免 any */
+  headers?: { 'content-disposition'?: string | null }
+}
 
 const resourceApi = {
   page(
@@ -48,6 +55,33 @@ const resourceApi = {
   },
   resetSort() {
     return http.post('/resource/resetSort')
+  },
+  // ---- Excel 模板 / 导入 / 导出 ----
+  /** 下载导入模板(.xlsx) */
+  downloadResourceTemplate(config?: AxiosRequestConfig): Promise<FileResponse> {
+    return http.post('/resource/template', undefined, { responseType: 'blob', ...config })
+  },
+  /** 导入资源(部分成功语义:成功行已落库,失败行在 data.failedRows) */
+  importResourceFile(
+    file: File,
+  ): Promise<{ head: Backend.ResponseHeadDto; data: ExcelImportResult | null }> {
+    const formData = new FormData()
+    formData.append('file', file)
+    return http.post('/resource/import', formData)
+  },
+  /** 按查询条件导出资源(查询条件走 query,与列表保持一致) */
+  exportResource(
+    params: Backend.ResourcePageDto,
+    config?: AxiosRequestConfig,
+  ): Promise<FileResponse> {
+    const cleanParams = Object.fromEntries(
+      Object.entries(params).filter(([, value]) => value !== null && value !== undefined),
+    )
+    return http.post('/resource/export', undefined, {
+      params: cleanParams,
+      responseType: 'blob',
+      ...config,
+    })
   },
 }
 export default resourceApi

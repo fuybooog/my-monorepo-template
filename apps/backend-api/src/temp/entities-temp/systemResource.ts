@@ -33,20 +33,6 @@ export class SystemResource {
   })
   parentUniqueProp: string | null
 
-  @Column('int', {
-    name: 'status',
-    comment: '状态：0-禁用，1-启用',
-    default: () => "'1'",
-  })
-  status: number
-
-  @Column('int', {
-    name: 'type',
-    comment: '资源类型：0-目录 1-页面 2-按钮 3-列',
-    default: () => "'0'",
-  })
-  type: number
-
   @Column('int', { name: 'sort_number', nullable: true, comment: '排序号' })
   sortNumber: number | null
 
@@ -73,13 +59,6 @@ export class SystemResource {
   })
   deletedAt: Date | null
 
-  @Column('int', {
-    name: 'not_in_menu',
-    comment: '是否在菜单中显示：0-显示，1-不显示',
-    default: () => "'0'",
-  })
-  notInMenu: number
-
   @Column('varchar', {
     name: 'menu_path',
     nullable: true,
@@ -87,4 +66,19 @@ export class SystemResource {
     length: 100,
   })
   menuPath: string | null
+
+  @Column('int', { name: 'status', comment: '状态：0-禁用，1-启用' })
+  status: number
+
+  @Column('int', {
+    name: 'type',
+    comment: '资源类型：0-目录 1-页面 2-按钮 3-列',
+  })
+  type: number
+
+  @Column('int', {
+    name: 'not_in_menu',
+    comment: '是否在菜单中显示：0-显示，1-不显示',
+  })
+  notInMenu: number
 }

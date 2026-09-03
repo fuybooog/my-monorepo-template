@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { TransformInterceptor } from './transform.interceptor'
+import { OperationLogContextInterceptor } from './modules/operation-log/operation-log.interceptor'
 import { HttpExceptionFilter } from './exceptions/http-exception.filter'
 import { ValidationPipe } from '@nestjs/common'
 import cookieParser from 'cookie-parser'
@@ -65,7 +66,8 @@ async function bootstrap() {
       whitelist: true,
     }),
   )
-  app.useGlobalInterceptors(new TransformInterceptor())
+  // 先写入操作人上下文（AsyncLocalStorage），再交由响应转换拦截器处理
+  app.useGlobalInterceptors(new OperationLogContextInterceptor(), new TransformInterceptor())
   app.useGlobalFilters(new HttpExceptionFilter())
 
   const config = new DocumentBuilder()

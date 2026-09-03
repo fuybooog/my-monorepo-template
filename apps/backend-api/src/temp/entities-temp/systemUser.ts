@@ -95,13 +95,6 @@ export class SystemUser {
   })
   email: string | null
 
-  @Column('int', {
-    name: 'status',
-    comment: '状态：0-禁用，1-启用',
-    default: () => "'0'",
-  })
-  status: number
-
   @Column('datetime', {
     name: 'created_at',
     nullable: true,
@@ -140,4 +133,7 @@ export class SystemUser {
     length: 10,
   })
   py: string | null
+
+  @Column('int', { name: 'status', comment: '状态：0-禁用，1-启用' })
+  status: number
 }

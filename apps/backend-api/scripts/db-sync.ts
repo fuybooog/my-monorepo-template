@@ -9,6 +9,7 @@ const MODULE_MAPPING: Record<string, string> = {
   system_user: 'user',
   system_role: 'role',
   system_resource: 'resource',
+  system_operation_log: 'operation-log',
   system_user_role: '',
   system_role_resource: '',
 }

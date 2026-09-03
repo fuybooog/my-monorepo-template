@@ -1,4 +1,17 @@
-import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { RoleService } from '@/modules/role/role.service'
 import { RolePageRespDto } from '@/modules/role/dto/role.page.resp.dto'
 import { RolePageDto } from '@/modules/role/dto/role.page.dto'
@@ -8,7 +21,7 @@ import { RoleListRespDto } from '@/modules/role/dto/role.list.resp.dto'
 import { RoleCreateDto } from '@/modules/role/dto/role.create.dto'
 import { RoleUpdateDto } from '@/modules/role/dto/role.update.dto'
 import { PaginatedResult } from '@/dto/pagination-response.dto'
-import { ApiOperation } from '@nestjs/swagger'
+import { ApiConsumes, ApiOkResponse, ApiOperation, ApiProduces } from '@nestjs/swagger'
 import { ApiSuccessPageResponse, ApiSuccessResponse } from '@/decorators/api-response.decorator'
 import { BatchDto, BatchRespDto, BatchUpdateStatusDto } from '@/dto/batch.dto'
 import { UpdateStatusDto } from '@/dto/update-status.dto'
@@ -16,6 +29,8 @@ import { CurrentUser } from '@/decorators/current-user.decorator'
 import { CurrentLoginResponseDto } from '@/modules/auth/auth.dto'
 import { RequirePermissions } from '@/decorators/require-permissions.decorator'
 import { PERMISSIONS } from '@repo/shared'
+import { EXCEL_CONTENT_TYPE, ExcelUploadFile } from '@/modules/excel/excel.types'
+import { ImportResultDto } from '@/modules/excel/dto/import-result.dto'
 
 @Controller('role')
 export class RoleController {
@@ -142,24 +157,32 @@ export class RoleController {
   @Post('template')
   @RequirePermissions(PERMISSIONS.SYS_ROLE_LIST_IMPORT)
   @ApiOperation({ summary: '下载导入角色模板' })
-  @ApiSuccessResponse()
-  async downloadRoleTemplate() {
+  @ApiProduces(EXCEL_CONTENT_TYPE)
+  async downloadRoleTemplate(): Promise<StreamableFile> {
     return await this.roleService.downloadTemplate()
   }
 
   @Post('import')
   @RequirePermissions(PERMISSIONS.SYS_ROLE_LIST_IMPORT)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: '导入角色数据' })
-  @ApiSuccessResponse()
-  async importRole() {
-    return await this.roleService.importRole()
+  @ApiOkResponse({ type: ImportResultDto })
+  async importRole(
+    @UploadedFile() file: ExcelUploadFile | undefined,
+    @CurrentUser() user: CurrentLoginResponseDto,
+  ): Promise<ImportResultDto> {
+    return await this.roleService.importRole(file, user.maxLevel)
   }
 
   @Post('export')
   @RequirePermissions(PERMISSIONS.SYS_ROLE_LIST_EXPORT)
   @ApiOperation({ summary: '导出角色数据' })
-  @ApiSuccessResponse()
-  async exportRole() {
-    return await this.roleService.exportRole()
+  @ApiProduces(EXCEL_CONTENT_TYPE)
+  async exportRole(
+    @Query() query: RolePageDto,
+    @CurrentUser() user: CurrentLoginResponseDto,
+  ): Promise<StreamableFile> {
+    return await this.roleService.exportRole(query, user.maxLevel)
   }
 }

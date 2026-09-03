@@ -278,3 +278,98 @@ const onEdit = (record) => openDrawer('edit', record.id)
 - **编辑时只改部分字段，后端 UpdateDto 必须让未编辑字段可选**。不要直接 `OmitType(BaseDto, ['id'])`（会把 `code`/`name` 等也设为必填，导致「code,name 必填」报错）。正确做法：用 `IntersectionType(OmitType(Base, ['id']), OptionalDto)` 把本次不提交的字段（`code`/`name` 等）显式标 `@IsOptional()`，需要提交的字段（如 `setCode`/`setName`）保持必填。
 - **聚合列表（集列表）的状态列**：聚合查询用 `MAX(valueSet.status) AS status`（有任一值启用即视为启用）返回 `status`，响应 DTO 增加该字段；前端用 `createStatusRender({ onStatusChange, refreshList, permission })` 渲染（与 user 模块一致）。`onStatusChange` 作用于整集时，先按聚合键拉取全部明细 id，再调用 `batchUpdateStatus(ids.join(), status)`。
 - 切换/删除整集时，明细 id 拉取逻辑抽成可复用的导出函数（如 `fetchSetValueIds(setCode)`），供 `onDelete` / `onBatchDelete` / `onStatusChange` 共用。
+
+## 13. 代码完成自检（每次交付前必跑 lint）
+
+每次完成/修改 `apps/admin-pc` 下任何代码后，**必须先自检再交付**：在 `apps/admin-pc` 目录下运行 lint，确认 **0 error 且尽量 0 warning** 才算完成：
+
+```bash
+cd apps/admin-pc && pnpm run lint
+```
+
+lint 报告的 warning 不得遗留，须按下述指引修复：
+
+### 13.1 常见 warning 与修复
+
+**① `react-hooks/set-state-in-effect`（禁止在 effect 内同步 setState）**
+
+典型场景：「modal / drawer 的 `open` 由外变 true 时，需同步重置内部表单/结果状态」。
+
+❌ 错误写法（会触发级联渲染告警）：
+
+```tsx
+useEffect(() => {
+  if (open) {
+    setFile(null)
+    setResult(null)
+  }
+}, [open])
+```
+
+✅ 正确写法：用 React 官方的 **previous-render 模式**，在**渲染期间**依据上一次渲染的值有条件地调整 state（有 `if` 条件保护且能收敛，React 允许，不会级联）：
+
+```tsx
+// 记录上一次的 open，open 从 false→true 那一帧完成重置
+const [prevOpen, setPrevOpen] = useState(open)
+if (open !== prevOpen) {
+  setPrevOpen(open)
+  if (open) {
+    setFile(null)
+    setResult(null)
+  }
+}
+```
+
+> 先例：`ExcelImportModal.tsx` 打开时重置 `file/result/importing/downloading` 即采用此模式。
+
+**② `@typescript-eslint/no-explicit-any`（禁止局部 any）**
+
+不要给局部类型、函数入参、接口字段写 `any`。做法：声明**最小契约**具名类型，需要跨文件复用时 `export`，在 hooks/组件里 import 复用：
+
+```ts
+// api/user.ts 中定义并导出
+export interface FileResponse {
+  data: Blob
+  headers?: { 'content-disposition'?: string | null } // 只声明实际用到的响应头
+}
+```
+
+```ts
+// hooks/useUserExcel.ts 中复用，入参不用 any
+import userApi, { type FileResponse } from '../api/user'
+function resolveFileResponse(res: FileResponse) { ... }
+```
+
+> 注：`@repo/api` 的 `HttpClient` 泛型默认 `T = any` 是库侧约定，业务方法只需显式标注返回类型（如 `Promise<FileResponse>`），无需（也不应）再写 `any`。
+
+## 14. 提交代码前必须跑双端测试
+
+**提交前门禁**：任何代码提交之前，必须先运行 **backend-api** 与 **admin-pc** 两边的测试，**两者全部通过后才能继续提交**：
+
+```bash
+# 1) 后端
+cd apps/backend-api && pnpm run test
+# 2) 前端
+cd apps/admin-pc && env -u NODE_ENV pnpm run test
+```
+
+要点与坑位：
+
+- **admin-pc 必须 `env -u NODE_ENV`**：若执行环境带有 `NODE_ENV=production`，react@19 会加载生产构建（`cjs/react.production.js` **不导出 `act`**），导致大量组件/hook 用例报 `React.act is not a function`（约 21 个用例整片失败）。vitest 只在 NODE_ENV 未设置时才默认置为 `test`，因此跑测试前务必剥离该变量。
+- **偶发 flaky 的处理**：若某用例间歇性失败，不要直接略过。先定位竞态根因再修。既有先例：`RemoteSelect.test.tsx`「展开下拉框无数据触发首次加载」用例——组件挂载防抖(300ms)预载与展开时立即加载会重复请求，原 `mockResolvedValueOnce` 只供一次 mock，第二次请求拿到空结果把已渲染数据清空导致 `findByText` 超时。修复方式：改 `mockResolvedValue`（接口始终返回同一结果），并把 `beforeEach` 用 `vi.resetAllMocks()` 防持久实现泄漏。修完需连续多次（≥3）跑全量确认稳定。
+- lint 自检（第 13 节）与双端测试都通过，才算完成一次可提交的改动。
+
+## 15. 新模块接入 Excel 导入导出（后端 checklist）
+
+系统 excel 能力是**共享引擎**（`backend-api/src/modules/excel/`，ExcelModule 为 @Global，无需在各业务模块 imports 重复声明）。user / role / resource / value-set 已接入。给新模块接入时照此步骤：
+
+1. **新建 `<module>.import-export.ts`**：声明 `ImportDefinition`（moduleType/fileName/sheetName/fields）与 `ExportColumnSpec[]` + 导出行 interface；只声明列与格式规则，模板生成/解析/公共校验交给 excel.service。
+2. **service**：
+   - constructor 注入 `private readonly excelService: ExcelService`
+   - `downloadTemplate()` → `buildImportTemplate(def)` → 私有 `toExcelStream(buffer, fileName)`
+   - `importXxx(file)` → `parseImportFile(def, buffer)` → headerErrors/rows → **业务校验**（文件内重复 + 库内重复、父级/引用存在性，逐行写 `row.errors['中文表头'] = 文案`）→ `dataSource.transaction` 内 `manager.create(Entity, {...})` 逐行保存（**部分成功语义**，catch 里标 `row.errors['保存']`）→ 组装 `ImportResultDto`（total/successCount/failCount/failedRows）
+   - `exportXxx(query)` → 复用 repository 列表查询**循环翻页全量**（分页 DTO pageSize 上限 500，禁止传大 pageSize）→ `buildExportBuffer` → toExcelStream
+   - 坑：Excel 解析值类型是 `string|number|boolean`，落库前须收窄（如 `status: row.values.status === 0 ? 0 : 1`），否则 `manager.create` 会因类型不匹配解析到数组重载而 TS 报错。
+3. **controller**：三个路由已约定 `POST <模块>/template|import|export` + 权限码 `SYS_XXX_LIST_IMPORT/EXPORT`。若脚手架预置了空壳方法，只需补齐参数：template 无参；import 带 `@UploadedFile() file: ExcelUploadFile | undefined` + `FileInterceptor('file')`；export 带 `@Query() query: XxxPageDto`。需要等级权限的（如 role）额外注入 `@CurrentUser()` 的 maxLevel 传给 service。
+4. **前端**：api 文件加 `FileResponse`（导出）+ 三个方法（模板 `http.post('/xxx/template', undefined, {responseType:'blob'})`、导入 FormData append `file`、导出参数走 params）；新建 `useXxxExcel.ts`（模板/导入/导出三回调 + `resolveFileResponse` + 权限码 + 兜底文件名常量在 message.ts EXCEL_MESSAGE 里按 `XXX_IMPORT_TITLE` 等命名）；列表页 `<SmartTable excel={...} />` 一行接入。
+5. **验证**：backend-api `tsc --noEmit` + eslint、admin-pc lint + 两端 test（第 13/14 节）全绿。

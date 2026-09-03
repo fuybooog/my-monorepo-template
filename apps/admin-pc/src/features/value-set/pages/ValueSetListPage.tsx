@@ -6,6 +6,7 @@ import { SmartTable, SmartForm, SmartFormEditMode } from '@/components/common'
 import { Backend } from '@repo/types'
 import { valueSetSearchGroupSchema, getValueSetGroupColumns } from '../model'
 import { useValueSetList, fetchSetValueIds } from '../hooks/useValueSetList'
+import { useValueSetExcel } from '../hooks/useValueSetExcel'
 import { useDrawer } from '@/hooks/useDrawer'
 import { ValueSetFormContainer } from '../components/ValueSetFormContainer'
 import valueSetApi from '../api/value-set'
@@ -22,6 +23,9 @@ export function ValueSetListPage() {
     onDelete,
     onBatchDelete,
   } = useValueSetList()
+
+  // 集列表不限定单集,不传 setCode:导出按集列表筛选(setCode/setCode、setName)透传,导入成功后刷新集列表
+  const excel = useValueSetExcel(searchParams, undefined, refreshTable)
 
   const {
     drawerVisible,
@@ -85,6 +89,8 @@ export function ValueSetListPage() {
         schema={valueSetSearchGroupSchema}
         request={handleFetchData}
         columns={columns}
+        rowSelection={{}}
+        excel={excel}
         toolbar={{
           onCreate,
           onBatchDelete,

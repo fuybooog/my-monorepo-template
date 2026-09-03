@@ -44,6 +44,7 @@ export function useUserList() {
         getMessage().success(SUCCESS_MESSAGE.DELETE)
       }
       refreshTable()
+      smartTable.current?.clearSelection()
     }
   }
 

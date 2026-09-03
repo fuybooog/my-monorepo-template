@@ -32,6 +32,8 @@ export namespace Backend {
   export type BatchDto = components['schemas']['BatchDto']
   export type UpdateStatusDto = components['schemas']['UpdateStatusDto']
   export type BatchUpdateStatusDto = components['schemas']['BatchUpdateStatusDto']
+  export type ImportFailedRowDto = components['schemas']['ImportFailedRowDto']
+  export type ImportResultDto = components['schemas']['ImportResultDto']
   export type AdminResetPasswordDto = components['schemas']['AdminResetPasswordDto']
   export type ResetPasswordDto = components['schemas']['ResetPasswordDto']
   export type RolePageRespDto = components['schemas']['RolePageRespDto']
@@ -52,6 +54,10 @@ export namespace Backend {
   export type ResourcePartialDto = components['schemas']['ResourcePartialDto']
   export type ResourceBatchUpdateDto = components['schemas']['ResourceBatchUpdateDto']
   export type UpdateFileDto = components['schemas']['UpdateFileDto']
+  export type OperationLogPageRespDto = components['schemas']['OperationLogPageRespDto']
+  export type OperationLogPageDto = components['schemas']['OperationLogPageDto']
+  export type OperationLogDetailRespDto = components['schemas']['OperationLogDetailRespDto']
+  export type OperationLogCleanDto = components['schemas']['OperationLogCleanDto']
   export type ValueSetPageRespDto = components['schemas']['ValueSetPageRespDto']
   export type ValueSetPageDto = components['schemas']['ValueSetPageDto']
   export type ValueSetGroupPageRespDto = components['schemas']['ValueSetGroupPageRespDto']
@@ -753,6 +759,58 @@ export namespace Backend {
   }
     ? R
     : operations['FileController_writeData']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type PageLogRes = operations['OperationLogController_pageLog']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['OperationLogController_pageLog']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type _pageOperationLogRes =
+    operations['OperationLogController__pageOperationLog']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['OperationLogController__pageOperationLog']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type FindLogByIdRes =
+    operations['OperationLogController_findLogById']['responses'] extends {
+      '200': { content: { 'application/json': infer R } }
+    }
+      ? R
+      : operations['OperationLogController_findLogById']['responses'] extends {
+            '201': { content: { 'application/json': infer R } }
+          }
+        ? R
+        : unknown
+
+  export type ExportLogsRes = operations['OperationLogController_exportLogs']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['OperationLogController_exportLogs']['responses'] extends {
+          '201': { content: { 'application/json': infer R } }
+        }
+      ? R
+      : unknown
+
+  export type CleanLogsRes = operations['OperationLogController_cleanLogs']['responses'] extends {
+    '200': { content: { 'application/json': infer R } }
+  }
+    ? R
+    : operations['OperationLogController_cleanLogs']['responses'] extends {
           '201': { content: { 'application/json': infer R } }
         }
       ? R

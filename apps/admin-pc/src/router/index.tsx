@@ -8,6 +8,7 @@ import { ResetPasswordPage } from '@/features/auth/pages/ResetPassword'
 import { UserListPage } from '@/features/user/pages/UserListPage'
 import { ResourceListPage } from '@/features/resource/pages/ResourceListPage'
 import { RoleListPage } from '@/features/role/pages/RoleListPage'
+import { OperationLogListPage } from '@/features/operation-log/pages/OperationLogListPage'
 import { ValueSetListPage } from '@/features/value-set/pages/ValueSetListPage'
 import { ValueSetDetailPage } from '@/features/value-set/pages/ValueSetDetailPage'
 import { PERMISSIONS } from '@repo/shared'
@@ -50,6 +51,11 @@ const routeConfig = [
             path: 'role/list',
             element: <RoleListPage />,
             permission: [PERMISSIONS.SYS_ROLE_LIST_PAGE],
+          },
+          {
+            path: 'operation-log/list',
+            element: <OperationLogListPage />,
+            permission: [PERMISSIONS.SYS_OPERATION_LOG_LIST_PAGE],
           },
           {
             path: 'value-set/list',

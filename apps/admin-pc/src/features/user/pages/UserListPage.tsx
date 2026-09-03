@@ -7,9 +7,11 @@ import { UserFormContainer } from '../components/UserFormContainer'
 import { userSearchSchema, getUserColumns } from '../model'
 import { useDrawer } from '@/hooks/useDrawer'
 import { useUserList } from '../hooks/useUserList'
+import { useUserExcel } from '../hooks/useUserExcel'
 import userApi from '../api/user'
 import { useAuthStore } from '@/store/authStore'
 import { PERMISSIONS } from '@repo/shared'
+import { ADMIN_USER_NAME } from '@/constants'
 import { ResetPasswordDrawer } from '@/features/user/components/ResetPasswordDrawer'
 import { AssignRolesDrawer } from '@/features/user/components/AssignRolesDrawer'
 
@@ -32,6 +34,8 @@ export function UserListPage() {
     closeDrawer,
     drawerData: currentId,
   } = useDrawer<Backend.UserPageRespDto>()
+
+  const excel = useUserExcel(searchParams, refreshTable)
 
   const [form] = Form.useForm()
   const [resetVisible, setResetVisible] = useState<boolean>(false)
@@ -96,6 +100,13 @@ export function UserListPage() {
     }
   }
 
+  const deleteButton = (record: Backend.UserPageRespDto): ActionItem<Backend.UserPageRespDto> => ({
+    key: 'delete',
+    label: '删除',
+    onClick: () => onDelete(record),
+    permission: [PERMISSIONS.SYS_USER_LIST_DELETE],
+  })
+
   return (
     <PageLayout>
       <SmartForm
@@ -112,14 +123,24 @@ export function UserListPage() {
         schema={userSearchSchema}
         request={handleFetchData}
         columns={columns}
+        rowSelection={{
+          // 与行内删除一致,内置 admin 账号不可勾选删除（全选时也会自动排除）
+          getCheckboxProps: (record: Backend.UserPageRespDto) => ({
+            disabled: record.userName === ADMIN_USER_NAME,
+          }),
+        }}
         toolbar={{
           onCreate,
           onBatchDelete,
         }}
+        excel={excel}
         actionColumn={{
-          buttons: () => ['edit', resetPasswordButton(), assignRolesButton(), 'delete'],
+          // 内置 admin 账号为系统账号,操作列所有操作(编辑/重置密码/分配角色/删除)均不展示
+          buttons: (record) =>
+            record.userName === ADMIN_USER_NAME
+              ? []
+              : ['edit', resetPasswordButton(), assignRolesButton(), deleteButton(record)],
           onEdit,
-          onDelete,
         }}
         scroll={{ x: 'max-content' }}
       />

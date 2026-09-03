@@ -49,6 +49,7 @@ export function useValueSetDetailList(setCode: string) {
       if (res.head.errCode === 0) {
         getMessage().success(SUCCESS_MESSAGE.DELETE)
         refreshTable()
+        smartTable.current?.clearSelection()
       } else {
         getMessage().error(ERROR_MESSAGE.DELETE)
       }

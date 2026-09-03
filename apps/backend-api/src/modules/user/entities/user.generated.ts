@@ -109,12 +109,6 @@ export class UserGenerated {
   })
   email: string | null
 
-  @Column('int', {
-    name: 'status',
-    comment: '状态：0-禁用，1-启用',
-  })
-  status: number
-
   @CreateDateColumn({ name: 'created_at', comment: '创建时间', nullable: true })
   createdAt: Date | null
 
@@ -139,4 +133,7 @@ export class UserGenerated {
     length: 10,
   })
   py: string | null
+
+  @Column('int', { name: 'status', comment: '状态：0-禁用，1-启用' })
+  status: number
 }
