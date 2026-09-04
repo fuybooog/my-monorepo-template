@@ -182,7 +182,6 @@ export class AuthService {
     const pw = exist ? user.password : ''
 
     const isPasswordValid = await this.validatePassword(decrypted, pw || '')
-    console.log('校验密码：', isPasswordValid, decrypted, pw)
     if (!exist || !isPasswordValid) {
       throw new UnauthorizedException('用户名或密码错误')
     }
@@ -310,10 +309,18 @@ export class AuthService {
 
     const userId = Number(payload.sub)
 
-    // Redis 校验：仅最新签发的 refresh token 有效（复用单点登录/踢下线语义）
-    // 注意：key 不存在（已登出/被踢下线）同样视为失效，严格拒绝
-    const redisRefresh = await this.redisService.get(`auth:refresh:${userId}`)
-    if (redisRefresh !== refreshToken) {
+    // refresh token 轮换 + 防重放：原子消费（GETDEL）Redis 中保存的旧 token，
+    // 同一 token 只能成功消费一次 —— 并发刷新时后到者直接失败，杜绝"双发竞态"
+    const storedRefresh = await this.redisService.getdel(`auth:refresh:${userId}`)
+    if (storedRefresh === null) {
+      // key 不存在：会话已失效（已登出/被踢下线/已被并发刷新消费）
+      throw new UnauthorizedException('登录状态已过期，请重新登录')
+    }
+    if (storedRefresh !== refreshToken) {
+      // 重放检测：Redis 中已是更新 token，本次携带的是旧 token —— 判定 refresh token
+      // 泄露/重用，作废该用户全部会话（含最新 access/refresh），强制重新登录
+      await this.redisService.del(`auth:token:${userId}`)
+      this.logger.warn(`检测到 refresh token 重用，已作废该用户全部会话 userId=${userId}`)
       throw new UnauthorizedException('登录状态已过期，请重新登录')
     }
 

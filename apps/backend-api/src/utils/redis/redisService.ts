@@ -21,4 +21,17 @@ export class RedisService {
   async del(key: string): Promise<number> {
     return this.client.del(key)
   }
+
+  // GETDEL 语义：原子取出并删除一个 key（兼容任意 Redis 版本，无需 6.2+）
+  // 并发下仅第一个调用能取到旧值，用于 refresh token 轮换消费/防重放
+  async getdel(key: string): Promise<string | null> {
+    const script = `
+      local value = redis.call('GET', KEYS[1])
+      if value then
+        redis.call('DEL', KEYS[1])
+      end
+      return value
+    `
+    return (await this.client.eval(script, 1, key)) as string | null
+  }
 }

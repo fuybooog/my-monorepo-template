@@ -40,7 +40,7 @@ const mockRes = () => ({ cookie: jest.fn() }) as unknown as Response
 describe('AuthService', () => {
   let service: AuthService
   let jwtService: jest.Mocked<Pick<JwtService, 'sign' | 'verifyAsync'>>
-  let redisService: jest.Mocked<Pick<RedisService, 'get' | 'set' | 'del'>>
+  let redisService: jest.Mocked<Pick<RedisService, 'get' | 'getdel' | 'set' | 'del'>>
   let userService: jest.Mocked<
     Pick<UserService, 'findUserById' | 'findUserWithPasswordByEmail' | 'updateUserPassword'>
   >
@@ -58,6 +58,7 @@ describe('AuthService', () => {
     }
     redisService = {
       get: jest.fn().mockResolvedValue('refresh-token'),
+      getdel: jest.fn().mockResolvedValue('refresh-token'),
       set: jest.fn().mockResolvedValue('OK'),
       del: jest.fn().mockResolvedValue(1),
     }
@@ -110,18 +111,21 @@ describe('AuthService', () => {
       )
     })
 
-    it('Redis 中无会话记录时拒绝（已登出/被踢下线）', async () => {
-      redisService.get.mockResolvedValue(null)
+    it('Redis 中无会话记录时拒绝（已登出/被踢下线/已被并发消费）', async () => {
+      redisService.getdel.mockResolvedValue(null)
       await expect(service.refresh('refresh-token', mockRes())).rejects.toThrow(
         UnauthorizedException,
       )
+      expect(redisService.del).not.toHaveBeenCalled()
     })
 
-    it('Redis 中的 token 与当前不一致时拒绝（旧 token）', async () => {
-      redisService.get.mockResolvedValue('newer-refresh-token')
+    it('Redis 中的 token 与当前不一致时拒绝并作废全部会话（旧 token 重放）', async () => {
+      redisService.getdel.mockResolvedValue('newer-refresh-token')
       await expect(service.refresh('refresh-token', mockRes())).rejects.toThrow(
         UnauthorizedException,
       )
+      // 判定 refresh token 泄露：删除 access token 使会话整体失效，强制重新登录
+      expect(redisService.del).toHaveBeenCalledWith('auth:token:1')
     })
 
     it('用户已被删除时拒绝', async () => {
@@ -149,6 +153,9 @@ describe('AuthService', () => {
         userName: 'admin',
         nickName: '管理员',
       })
+
+      // 轮换语义：先原子消费 Redis 中的旧 refresh token，后续 issueTokenPair 再写回新值
+      expect(redisService.getdel).toHaveBeenCalledWith('auth:refresh:1')
 
       // 签发了 access + refresh 两个 token（access 的 payload 不含 type 字段）
       expect(jwtService.sign).toHaveBeenCalledTimes(2)
