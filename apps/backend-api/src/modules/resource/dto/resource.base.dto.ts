@@ -1,5 +1,13 @@
+import { Transform } from 'class-transformer'
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger'
 import { IsInt, IsOptional, IsString } from 'class-validator'
+
+/** 兼容 query/form 传参：'0'/'1' 等字符串数字转为 number，空串/空值视为未传 */
+const toOptionalNumber = ({ value }: { value: unknown }) => {
+  if (value === undefined || value === null || value === '') return undefined
+  return Number(value)
+}
+
 export class ResourceBaseDto {
   @ApiProperty({ description: '资源id', type: Number })
   @IsInt()
@@ -21,11 +29,13 @@ export class ResourceBaseDto {
   parentUniqueProp?: string | null
 
   @ApiPropertyOptional({ description: '状态：0-禁用，1-启用', type: Number })
+  @Transform(toOptionalNumber)
   @IsInt()
   @IsOptional()
   status?: number
 
   @ApiPropertyOptional({ description: '资源类型：0-目录 1-页面 2-按钮 3-列', type: Number })
+  @Transform(toOptionalNumber)
   @IsInt()
   @IsOptional()
   type?: number
@@ -34,6 +44,7 @@ export class ResourceBaseDto {
     description: '是否在菜单中显示：0-显示，1-不显示',
     type: Number,
   })
+  @Transform(toOptionalNumber)
   @IsInt()
   @IsOptional()
   notInMenu?: number

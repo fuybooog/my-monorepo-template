@@ -1,5 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
+import { ForbiddenPage } from '@/features/exception/pages/ForbiddenPage'
+import { NotFoundPage } from '@/features/exception/pages/NotFoundPage'
 import { rootLoader } from '@/router/rootLoader'
 import { protectedLoader } from '@/features/layout/router/protectedLoader'
 import { LoginGard } from '@/features/auth/router/LoginGard'
@@ -27,6 +29,14 @@ const routeConfig = [
       {
         path: 'resetPassword',
         element: <ResetPasswordPage />,
+      },
+      {
+        path: '403',
+        element: <ForbiddenPage />,
+      },
+      {
+        path: '404',
+        element: <NotFoundPage />,
       },
       {
         path: '',
@@ -69,13 +79,13 @@ const routeConfig = [
           },
           {
             path: '*',
-            element: <Navigate to={'/dashboard'} replace />,
+            element: <Navigate to={'/404'} replace />,
           },
         ],
       },
       {
         path: '*',
-        element: <Navigate to={'/login'} replace />,
+        element: <Navigate to={'/404'} replace />,
       },
     ],
   },

@@ -13,6 +13,8 @@ import { RoleService } from '@/modules/role/role.service'
 import { RoleRepository } from '@/modules/role/role.repository'
 import { MAX_ROLE_LEVEL } from '@/constants'
 import { BaseStatusEnum } from '@/enum/base-status.enum'
+import { OperationLogService } from '@/modules/operation-log/operation-log.service'
+import { OperationLogAction, OperationLogLevel } from '@/modules/operation-log/operation-log.types'
 
 @Injectable()
 export class AuthInitService implements OnModuleInit {
@@ -22,6 +24,7 @@ export class AuthInitService implements OnModuleInit {
     private readonly userService: UserService,
     private readonly roleService: RoleService,
     private readonly roleRepository: RoleRepository,
+    private readonly operationLogService: OperationLogService,
   ) {}
 
   onModuleInit() {
@@ -109,5 +112,15 @@ export class AuthInitService implements OnModuleInit {
     } else {
       this.logger.log(`超级管理员角色与用户 admin 已关联`)
     }
+
+    // 系统初始化留痕（一次性引导操作，无登录态，操作人为系统）
+    await this.operationLogService.record({
+      module: 'auth',
+      businessId: adminEntity!.id!,
+      businessText: `系统初始化 admin 账号`,
+      operationType: OperationLogAction.OTHER,
+      level: OperationLogLevel.WARN,
+      summary: '初始化系统：创建/校验 admin 账号、admin 角色与授权',
+    })
   }
 }

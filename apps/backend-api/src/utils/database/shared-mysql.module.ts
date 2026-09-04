@@ -18,7 +18,9 @@ import { TypeOrmModule } from '@nestjs/typeorm'
           database: configService.get<string>('DB_DATABASE'),
 
           autoLoadEntities: true,
-          synchronize: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test',
+          // test 环境也开启 synchronize：e2e 使用独立测试库 mydb_test，
+          // 每次启动自动对齐实体结构（新增表/字段无需手动初始化测试库）
+          synchronize: process.env.NODE_ENV !== 'production',
           logging:
             process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test'
               ? ['query', 'error']

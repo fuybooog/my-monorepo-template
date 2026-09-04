@@ -15,9 +15,9 @@ describe('RoleController(E2E)', () => {
     const roleRepository = dataSource.getRepository(Role)
     await roleRepository.clear()
     await roleRepository.save([
-      { roleName: 'test_role_1', password: 'hashed_password_1', status: 1 },
-      { roleName: 'test_role_2', password: 'hashed_password_2', status: 0 },
-      { roleName: 'test_role_3', password: 'hashed_password_3', status: 1 },
+      { roleName: 'test_role_1', roleCode: 'test_role_code_1', level: 1, status: 1 },
+      { roleName: 'test_role_2', roleCode: 'test_role_code_2', level: 2, status: 0 },
+      { roleName: 'test_role_3', roleCode: 'test_role_code_3', level: 3, status: 1 },
     ])
   })
 
@@ -33,6 +33,9 @@ describe('RoleController(E2E)', () => {
       .post('/api/role/create')
       .send({
         roleName: 'add_test_role_name',
+        roleCode: 'add_test_role_code',
+        level: 4,
+        status: 1,
       })
       .expect(201)
 
@@ -42,6 +45,7 @@ describe('RoleController(E2E)', () => {
     expect(data).toStrictEqual(
       expect.objectContaining({
         roleName: 'add_test_role_name',
+        roleCode: 'add_test_role_code',
       }),
     )
 

@@ -7,7 +7,8 @@ import { arrayToTree, arrayToTreeWithMeta, getMessage } from '@/utils'
 import { ResourcePageRespDto } from '../types'
 
 export function useResourceList() {
-  const [searchParams, setSearchParams] = useState<Backend.ResourcePageDto>({})
+  // 默认只查询「在菜单中展示」的资源(notInMenu=0)，与左侧菜单保持一致
+  const [searchParams, setSearchParams] = useState<Backend.ResourcePageDto>({ notInMenu: 0 })
   const [originList, setOriginList] = useState<Backend.ResourcePageRespDto[]>([])
   const [resourceTree, setResourceTree] = useState<ResourcePageRespDto[]>([])
   const [resourceNodeMap, setResourceNodeMap] = useState<Map<string | number, ResourcePageRespDto>>(

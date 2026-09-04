@@ -15,9 +15,9 @@ describe('ValueSetController(E2E)', () => {
     const valueSetRepository = dataSource.getRepository(ValueSet)
     await valueSetRepository.clear()
     await valueSetRepository.save([
-      { valueSetName: 'test_value_set_1', password: 'hashed_password_1', status: 1 },
-      { valueSetName: 'test_value_set_2', password: 'hashed_password_2', status: 0 },
-      { valueSetName: 'test_value_set_3', password: 'hashed_password_3', status: 1 },
+      { setCode: 'e2e_set_1', setName: 'E2E集1', code: 'e2e_code_1', name: 'E2E项1', status: 1 },
+      { setCode: 'e2e_set_2', setName: 'E2E集2', code: 'e2e_code_2', name: 'E2E项2', status: 0 },
+      { setCode: 'e2e_set_3', setName: 'E2E集3', code: 'e2e_code_3', name: 'E2E项3', status: 1 },
     ])
   })
 
@@ -32,7 +32,10 @@ describe('ValueSetController(E2E)', () => {
     const response = await request(app.getHttpServer())
       .post('/api/value-set/create')
       .send({
-        valueSetName: 'add_test_value_set_name',
+        setCode: 'e2e_add_set',
+        setName: 'E2E新增集',
+        code: 'e2e_add_code',
+        name: 'E2E新增项',
       })
       .expect(201)
 
@@ -41,7 +44,8 @@ describe('ValueSetController(E2E)', () => {
     expect(head.errCode).toBe(0)
     expect(data).toStrictEqual(
       expect.objectContaining({
-        valueSetName: 'add_test_value_set_name',
+        setName: 'E2E新增集',
+        code: 'e2e_add_code',
       }),
     )
 
@@ -90,7 +94,10 @@ describe('ValueSetController(E2E)', () => {
     const response = await request(app.getHttpServer())
       .post(`/api/value-set/update/${valueSetId}`)
       .send({
-        valueSetName: 'update_test_value_set_name',
+        setCode: 'e2e_add_set',
+        setName: 'E2E新增集',
+        code: 'e2e_add_code',
+        name: 'update_test_name',
       })
       .expect(201)
 

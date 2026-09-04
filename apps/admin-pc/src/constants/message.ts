@@ -45,6 +45,12 @@ export const SUCCESS_MESSAGE = {
   FORGOT_RESET_DONE: '密码重置成功，请使用新密码登录',
   /** 操作日志清理成功 */
   OPERATION_LOG_CLEAN: '日志清理完成',
+  /** 待办新增成功 */
+  TODO_ADDED: '待办已添加',
+  /** 待办删除成功 */
+  TODO_DELETED: '待办已删除',
+  /** 已清除全部已完成待办 */
+  TODO_CLEARED: '已清除全部已完成待办',
 }
 
 /** 失败 / 错误类提示 */
@@ -66,7 +72,10 @@ export const ERROR_MESSAGE = {
 }
 
 /** 警告类提示 */
-export const WARNING_MESSAGE = {}
+export const WARNING_MESSAGE = {
+  /** 登录态校验通过但会话数据残缺（无角色/无有效用户信息），需重新登录 */
+  SESSION_INVALID: '登录状态已失效，请重新登录',
+}
 
 /** 信息类提示 */
 export const INFO_MESSAGE = {}
@@ -88,6 +97,10 @@ export const CONFIRM_MESSAGE = {
   OPERATION_LOG_CLEAN_TITLE: '清理操作日志',
   /** 日志清理预览提示 */
   OPERATION_LOG_CLEAN_PREVIEW_HINT: '请先点击「预览清理」查看命中数量，确认无误后再执行清理。',
+  /** 删除单条待办确认 */
+  TODO_DELETE: '确定要删除这条待办吗？',
+  /** 清除全部已完成待办确认 */
+  TODO_CLEAR_ALL: '确定要清除全部已完成的待办吗？',
 }
 
 /** Excel 导入导出相关文案 */

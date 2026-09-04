@@ -29,6 +29,8 @@ import { HelperService } from '@/modules/shared/helper.service'
 import { ConfigService } from '@nestjs/config'
 import { BaseStatusEnum } from '@/enum/base-status.enum'
 import { MailService } from '@/modules/mail/mail.service'
+import { OperationLogService } from '@/modules/operation-log/operation-log.service'
+import { OperationLogAction, OperationLogLevel } from '@/modules/operation-log/operation-log.types'
 
 const DUMMY_HASH = '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6L6s5gG73aG2W2O2'
 
@@ -57,6 +59,7 @@ export class AuthService {
     private readonly helperService: HelperService,
     private readonly configService: ConfigService,
     private readonly mailService: MailService,
+    private readonly operationLogService: OperationLogService,
   ) {}
 
   async validatePassword(rawPassword: string, dbHashPassword?: string) {
@@ -189,6 +192,19 @@ export class AuthService {
     }
 
     const { roleCodes } = await this.issueTokenPair(user, res)
+
+    // 登录成功留痕（登录接口无登录态，需显式指定操作人）
+    await this.operationLogService.record({
+      module: 'auth',
+      businessId: user!.id as number,
+      businessText: `用户 #${user!.id} ${user!.userName}`,
+      operationType: OperationLogAction.LOGIN,
+      actor: {
+        userId: user!.id as number,
+        userName: user!.userName as string,
+        operatorIp: req.ip,
+      },
+    })
 
     return {
       roleCodes,
@@ -334,7 +350,23 @@ export class AuthService {
       name: 'testName',
     }
   }
-  async logout(user: CurrentLoginResponseDto, res: Response) {
+  async logout(user: CurrentLoginResponseDto, req: Request, res: Response) {
+    let actor: { userId?: number; userName?: string; operatorIp?: string | null } | undefined
+    if (user) {
+      actor = { userId: user.id, userName: user.userName, operatorIp: req.ip }
+    } else {
+      // logout 接口为 @Public，AuthGuard 不解析登录态；从 cookie 解码 token 兜底获取操作人
+      const accessToken = req.cookies?.['access_token']
+      const payload = accessToken ? this.jwtService.decode(accessToken) : null
+      if (payload && typeof payload === 'object') {
+        actor = {
+          userId: payload.sub ? Number(payload.sub) : undefined,
+          userName: (payload as JwtPayload).userName,
+          operatorIp: req.ip,
+        }
+      }
+    }
+
     if (user) {
       // 清除对应的redis
       const redisKey = `auth:token:${user.id}`
@@ -354,6 +386,15 @@ export class AuthService {
       sameSite: 'lax',
       maxAge: 0,
       path: '/',
+    })
+
+    // 退出登录留痕
+    await this.operationLogService.record({
+      module: 'auth',
+      businessId: actor?.userId,
+      businessText: actor?.userName ? `用户 #${actor.userId ?? '-'} ${actor.userName}` : '退出登录',
+      operationType: OperationLogAction.LOGOUT,
+      actor,
     })
     return null
   }
@@ -380,6 +421,16 @@ export class AuthService {
       // 发送失败仅记录错误日志，保持响应一致，防止邮箱枚举
       void this.mailService.sendVerificationCode(dto.email, code).catch((error) => {
         this.logger.error(`验证码邮件发送失败 email=${dto.email}`, error)
+      })
+
+      // 找回密码-发送验证码留痕（账号不存在时不做任何提示，也不记录）
+      await this.operationLogService.record({
+        module: 'auth',
+        businessId: user.id ?? undefined,
+        businessText: `用户邮箱 ${dto.email}`,
+        operationType: OperationLogAction.OTHER,
+        summary: `找回密码：向 ${dto.email} 发送验证码`,
+        actor: { operatorIp: req.ip },
       })
     }
 
@@ -431,6 +482,17 @@ export class AuthService {
     await this.userService.updateUserPassword(user.id, passwordHash)
     await this.redisService.del(`auth:token:${user.id}`)
     await this.redisService.del(`auth:refresh:${user.id}`)
+
+    // 找回密码-重置密码留痕（安全敏感操作，按警告级记录）
+    await this.operationLogService.record({
+      module: 'auth',
+      businessId: user.id,
+      businessText: `用户邮箱 ${dto.email}`,
+      operationType: OperationLogAction.RESET_PWD,
+      level: OperationLogLevel.WARN,
+      summary: `通过邮箱验证码重置密码：${dto.email}`,
+      actor: { operatorIp: req.ip },
+    })
 
     return null
   }

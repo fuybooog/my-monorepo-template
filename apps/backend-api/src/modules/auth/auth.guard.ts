@@ -64,8 +64,8 @@ export class AuthGuard implements CanActivate {
         userName: payload.userName,
         nickName: payload.nickName,
         maxLevel: Number(payload.maxLevel),
-        roleCodes: payload.roleCodes?.split(',') || [],
-        permissions: payload.permissions?.split(',') || [],
+        roleCodes: (payload.roleCodes || '').split(',').filter(Boolean),
+        permissions: (payload.permissions || '').split(',').filter(Boolean),
       }
 
       return true

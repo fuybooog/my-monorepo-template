@@ -47,6 +47,7 @@ describe('AuthService', () => {
   let roleService: jest.Mocked<Pick<RoleService, 'findRoleListByIds' | 'getResourceIdsByRoleIds'>>
   let mailService: jest.Mocked<Pick<MailService, 'sendVerificationCode'>>
   let configService: { get: jest.Mock }
+  let operationLogService: { record: jest.Mock }
 
   beforeEach(() => {
     jwtService = {
@@ -77,6 +78,7 @@ describe('AuthService', () => {
       sendVerificationCode: jest.fn().mockResolvedValue(undefined),
     }
     configService = { get: jest.fn().mockReturnValue(undefined) }
+    operationLogService = { record: jest.fn().mockResolvedValue(undefined) }
 
     service = new AuthService(
       jwtService as any,
@@ -86,6 +88,7 @@ describe('AuthService', () => {
       {} as any,
       configService as any,
       mailService as any,
+      operationLogService as any,
     )
   })
 
@@ -208,7 +211,8 @@ describe('AuthService', () => {
   describe('logout', () => {
     it('清理 access/refresh 两个 Redis key 并清空两个 cookie', async () => {
       const res = mockRes()
-      await service.logout({ id: 1 } as any, res)
+      const req = { cookies: {} } as any
+      await service.logout({ id: 1, userName: 'admin' } as any, req, res)
 
       expect(redisService.del).toHaveBeenCalledTimes(2)
       expect(redisService.del).toHaveBeenCalledWith('auth:token:1')
@@ -227,9 +231,10 @@ describe('AuthService', () => {
       )
     })
 
-    it('无用户信息时仅清空 cookie 不报错', async () => {
+    it('无用户信息时清空 cookie 并从 cookie 解码兜底留痕，不报错', async () => {
       const res = mockRes()
-      await expect(service.logout(null as any, res)).resolves.toBeNull()
+      const req = { cookies: {} } as any
+      await expect(service.logout(null as any, req, res)).resolves.toBeNull()
       expect(redisService.del).not.toHaveBeenCalled()
       expect(res.cookie).toHaveBeenCalledTimes(2)
     })

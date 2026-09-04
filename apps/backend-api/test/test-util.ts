@@ -4,14 +4,18 @@ import { ValidationPipe } from '@nestjs/common'
 import { AppModule } from '../src/app.module'
 import { TransformInterceptor } from '../src/transform.interceptor'
 import { AuthGuard } from '../src/modules/auth/auth.guard'
+import { PermissionsGuard } from '../src/modules/auth/auth-permission.guard'
 import { DataSource } from 'typeorm'
+import cookieParser from 'cookie-parser'
 
 export async function createTestApp() {
   jest.spyOn(AuthGuard.prototype, 'canActivate').mockImplementation(async (context) => {
     const req = context.switchToHttp().getRequest()
-    req.user = { id: 1, userName: 'test_user_1' }
+    req.user = { id: 1, userName: 'test_user_1', maxLevel: 100 }
     return true
   })
+  // 与 AuthGuard 一致：跳过权限点校验（CRUD spec 聚焦接口/业务行为本身）
+  jest.spyOn(PermissionsGuard.prototype, 'canActivate').mockReturnValue(true)
 
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
@@ -25,6 +29,8 @@ export async function createTestApp() {
       whitelist: true,
     }),
   )
+  // 与 main.ts 对齐：解析 cookie（logout 等 @Public 接口需从 cookie 中解码操作人）
+  app.use(cookieParser())
   app.useGlobalInterceptors(new TransformInterceptor())
   await app.init()
 

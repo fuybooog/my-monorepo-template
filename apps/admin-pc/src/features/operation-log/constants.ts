@@ -6,6 +6,7 @@
 
 /** 业务模块编码 -> 中文名 */
 export const LOG_MODULES: Record<string, string> = {
+  auth: '认证管理',
   user: '用户管理',
   role: '角色管理',
   resource: '资源管理',
@@ -22,6 +23,8 @@ export const LOG_LEVEL_TEXT: Record<number, string> = {
 
 /** 操作类型 -> 中文名 */
 export const LOG_ACTION_TEXT: Record<string, string> = {
+  LOGIN: '登录',
+  LOGOUT: '退出登录',
   CREATE: '新增',
   UPDATE: '修改',
   DELETE: '删除',

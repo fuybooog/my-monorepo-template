@@ -22,6 +22,15 @@ export function LoginCard({ className }: LoginCardProps) {
       setCaptchaKey(res.data.captchaKey)
     }
   }, [])
+
+  const init = async () => {
+    await handleRefreshCaptcha()
+    const publicKeyRes = await authApi.getPublicKey()
+    if (publicKeyRes.head.errCode === 0) {
+      setPublicKey(publicKeyRes.data.publicKey)
+      setKeyId(publicKeyRes.data.keyId)
+    }
+  }
   const loginFormSchema: SmartSchema = {
     userName: {
       title: '用户名',
@@ -53,7 +62,7 @@ export function LoginCard({ className }: LoginCardProps) {
                 src={captchaImg}
                 alt="captcha"
                 className={'ml-[10px] align-middle cursor-pointer'}
-                onClick={handleRefreshCaptcha}
+                onClick={init}
               />
             ) : (
               '加载中...'
@@ -64,17 +73,10 @@ export function LoginCard({ className }: LoginCardProps) {
     },
   }
   const navigate = useNavigate()
+
   useEffect(() => {
-    const init = async () => {
-      await handleRefreshCaptcha()
-      const publicKeyRes = await authApi.getPublicKey()
-      if (publicKeyRes.head.errCode === 0) {
-        setPublicKey(publicKeyRes.data.publicKey)
-        setKeyId(publicKeyRes.data.keyId)
-      }
-    }
     init()
-  }, [handleRefreshCaptcha])
+  }, [])
 
   async function handleLogin() {
     const res = await authApi.passwordLogin({

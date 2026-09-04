@@ -308,6 +308,7 @@ export function ResourceListPage() {
         form={form}
         schema={resourceSearchSchema}
         layout="inline"
+        initialValues={searchParams}
         onFinish={searchTable}
         style={{ marginBottom: 16 }}
       ></SmartForm>

@@ -1,4 +1,10 @@
-import { DataSource, EntityManager, getMetadataArgsStorage, Repository } from 'typeorm'
+import {
+  DataSource,
+  EntityManager,
+  getMetadataArgsStorage,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm'
 import { Injectable } from '@nestjs/common'
 import { Resource } from '@/modules/resource/entities/resource.entity'
 import { ResourcePageDto } from '@/modules/resource/dto/resource.page.dto'
@@ -14,10 +20,35 @@ export class ResourceRepository extends Repository<Resource> {
     super(Resource, dataSource.createEntityManager())
   }
 
+  /** 通用资源查询条件组装：供列表 / 分页 / 导出复用 */
+  private applySearchFilters(qb: SelectQueryBuilder<Resource>, query: ResourcePageDto) {
+    const { label, uniqueProp, menuPath, status, type, notInMenu } = query
+
+    if (label) {
+      qb.andWhere('resource.label LIKE :label', { label: `%${label}%` })
+    }
+    if (uniqueProp) {
+      qb.andWhere('resource.uniqueProp LIKE :uniqueProp', { uniqueProp: `%${uniqueProp}%` })
+    }
+    if (menuPath) {
+      qb.andWhere('resource.menuPath LIKE :menuPath', { menuPath: `%${menuPath}%` })
+    }
+    if (status !== undefined && status !== null) {
+      qb.andWhere('resource.status = :status', { status })
+    }
+    if (type !== undefined && type !== null) {
+      qb.andWhere('resource.type = :type', { type })
+    }
+    if (notInMenu !== undefined && notInMenu !== null) {
+      qb.andWhere('resource.notInMenu = :notInMenu', { notInMenu })
+    }
+  }
+
   async searchResourcesByPage(query: ResourcePageDto) {
     const { page = 1, pageSize = 10 } = query
 
     const qb = this.createQueryBuilder('resource')
+    this.applySearchFilters(qb, query)
 
     // todo 排序应该从前端传入
     qb.orderBy('resource.createdAt', 'DESC')
@@ -28,6 +59,7 @@ export class ResourceRepository extends Repository<Resource> {
   }
   async searchResources(query: ResourcePageDto) {
     const qb = this.createQueryBuilder('resource')
+    this.applySearchFilters(qb, query)
 
     // todo 排序应该从前端传入
     qb.orderBy('resource.createdAt', 'DESC')

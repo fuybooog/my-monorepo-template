@@ -109,7 +109,13 @@ export class UserService {
     if (!userEntity) {
       throw new NotFoundException(`未找到id为${id}的用户`)
     }
-    return plainToInstance(UserRespDto, userEntity, { excludeExtraneousValues: true })
+    // 与 findUserByUserName 保持一致：附带角色关联，供 auth 刷新令牌重建角色/权限 payload
+    const result = plainToInstance(UserRespDto, userEntity, { excludeExtraneousValues: true })
+    const roles = await this.userRepository.searchRoleIdsByUserId(id)
+    return {
+      ...result,
+      roleIds: roles,
+    }
   }
   async findUserByUserName(userName: string): Promise<UserRespDto | null> {
     const userEntity = await this.findUserWithPasswordByUserName(userName)
@@ -210,7 +216,6 @@ export class UserService {
     }
   }
   async createUser(userCreateDto: UserCreateDto): Promise<UserRespDto | null> {
-    // todo 检查用户名，手机号是否唯一
     const userNameCheck = await this.checkUserFieldUnique({
       field: 'userName',
       value: userCreateDto.userName,
@@ -237,9 +242,11 @@ export class UserService {
         throw new BusinessException('邮箱重复！')
       }
     }
+    // status 缺省时默认启用（数据库列无默认值，避免 INSERT 报错）
+    const userCreateInput = { ...userCreateDto, status: userCreateDto.status ?? 1 }
     return await this.dataSource
       .transaction(async (manager) => {
-        const userEntity = await this.userRepository.createUser(userCreateDto, manager)
+        const userEntity = await this.userRepository.createUser(userCreateInput, manager)
         // todo 添加用户角色
         return userEntity
       })
@@ -264,6 +271,37 @@ export class UserService {
     })
     if (!userEntity) {
       throw new BusinessException(`未找到id为${id}的用户`)
+    }
+    // 唯一性预检：修改到其它用户已占用的 userName/mobile/email 时给出友好提示（与 createUser 策略一致，数据库唯一索引仅兜底）
+    if (userUpdateDto.userName && userUpdateDto.userName !== userEntity.userName) {
+      const check = await this.checkUserFieldUnique({
+        field: 'userName',
+        value: userUpdateDto.userName,
+        id,
+      })
+      if (!check) {
+        throw new BusinessException('用户名重复！')
+      }
+    }
+    if (userUpdateDto.mobile && userUpdateDto.mobile !== userEntity.mobile) {
+      const check = await this.checkUserFieldUnique({
+        field: 'mobile',
+        value: userUpdateDto.mobile,
+        id,
+      })
+      if (!check) {
+        throw new BusinessException('手机号重复！')
+      }
+    }
+    if (userUpdateDto.email && userUpdateDto.email !== userEntity.email) {
+      const check = await this.checkUserFieldUnique({
+        field: 'email',
+        value: userUpdateDto.email,
+        id,
+      })
+      if (!check) {
+        throw new BusinessException('邮箱重复！')
+      }
     }
     const updateUserEntity = await this.dataSource.transaction(async (manager) => {
       const updatedUserEntity = await this.userRepository.updateUser(

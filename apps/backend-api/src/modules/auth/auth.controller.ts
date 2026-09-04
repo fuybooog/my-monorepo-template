@@ -72,9 +72,10 @@ export class AuthController {
   @ApiSuccessResponse()
   async logout(
     @CurrentUser() user: CurrentLoginResponseDto,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return await this.authService.logout(user, res)
+    return await this.authService.logout(user, req, res)
   }
 
   @Get('publicKey')

@@ -23,6 +23,8 @@ export const OPERATION_LOG_LEVEL_TEXT: Record<number, string> = {
 
 /** 操作类型（存字符串编码，便于直接检索） */
 export enum OperationLogAction {
+  LOGIN = 'LOGIN',
+  LOGOUT = 'LOGOUT',
   CREATE = 'CREATE',
   UPDATE = 'UPDATE',
   DELETE = 'DELETE',
@@ -36,6 +38,8 @@ export enum OperationLogAction {
 }
 
 export const OPERATION_LOG_ACTION_TEXT: Record<string, string> = {
+  [OperationLogAction.LOGIN]: '登录',
+  [OperationLogAction.LOGOUT]: '退出登录',
   [OperationLogAction.CREATE]: '新增',
   [OperationLogAction.UPDATE]: '修改',
   [OperationLogAction.DELETE]: '删除',
@@ -50,6 +54,7 @@ export const OPERATION_LOG_ACTION_TEXT: Record<string, string> = {
 
 /** 业务模块注册表：编码 -> 中文名（moduleText 取值来源，新增业务模块需在此登记） */
 export const OPERATION_LOG_MODULES: Record<string, string> = {
+  auth: '认证管理',
   user: '用户管理',
   role: '角色管理',
   resource: '资源管理',

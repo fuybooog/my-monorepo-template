@@ -151,6 +151,12 @@ export class OperationLogService {
       logs.map((log) => mapOperationLogToExportRow(log)),
     )
     const fileName = `操作日志_${dayjs().format('YYYYMMDDHHmmss')}.xlsx`
+    // 导出留痕（失败不阻塞文件下载）
+    try {
+      await this.recordLogAction(`导出操作日志：共 ${logs.length} 条`, OperationLogAction.EXPORT)
+    } catch (error) {
+      this.logger.error('操作日志导出留痕失败', error)
+    }
     return { buffer, fileName }
   }
 
@@ -222,6 +228,18 @@ export class OperationLogService {
     }
 
     this.logger.log(`操作日志清理完成：共删除 ${deleted} 条，归档文件 ${archivePath}`)
+    // 清理完成后自身留痕（保证删除动作可审计；失败不影响主流程）
+    if (deleted > 0) {
+      try {
+        await this.recordLogAction(
+          `操作日志清理：共删除 ${deleted} 条，归档文件 ${archivePath}`,
+          OperationLogAction.DELETE,
+          OperationLogLevel.WARN,
+        )
+      } catch (error) {
+        this.logger.error('操作日志清理后留痕失败', error)
+      }
+    }
     return { dryRun: false, willDelete, deleted, archivedFile: archivePath }
   }
 

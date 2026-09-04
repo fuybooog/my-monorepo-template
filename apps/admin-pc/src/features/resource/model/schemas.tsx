@@ -1,7 +1,7 @@
 import { SmartSchema } from '@/components/common'
 import { Radio, Select } from 'antd'
 import { defaultStatusList } from '@/constants'
-import { notInMenuList, typeList } from './model'
+import { menuResourceList, notInMenuList, typeList } from './model'
 
 export const resourceSearchSchema: SmartSchema = {
   label: {
@@ -18,6 +18,13 @@ export const resourceSearchSchema: SmartSchema = {
     widget: Select,
     props: {
       options: defaultStatusList,
+    },
+  },
+  notInMenu: {
+    title: '菜单资源',
+    widget: Select,
+    props: {
+      options: menuResourceList,
     },
   },
 }

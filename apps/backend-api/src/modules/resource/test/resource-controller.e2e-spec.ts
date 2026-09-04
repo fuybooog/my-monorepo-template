@@ -15,9 +15,27 @@ describe('ResourceController(E2E)', () => {
     const resourceRepository = dataSource.getRepository(Resource)
     await resourceRepository.clear()
     await resourceRepository.save([
-      { resourceName: 'test_resource_1', password: 'hashed_password_1', status: 1 },
-      { resourceName: 'test_resource_2', password: 'hashed_password_2', status: 0 },
-      { resourceName: 'test_resource_3', password: 'hashed_password_3', status: 1 },
+      {
+        label: 'test_resource_1',
+        uniqueProp: 'test_unique_prop_1',
+        type: 1,
+        notInMenu: 0,
+        status: 1,
+      },
+      {
+        label: 'test_resource_2',
+        uniqueProp: 'test_unique_prop_2',
+        type: 2,
+        notInMenu: 0,
+        status: 0,
+      },
+      {
+        label: 'test_resource_3',
+        uniqueProp: 'test_unique_prop_3',
+        type: 2,
+        notInMenu: 1,
+        status: 1,
+      },
     ])
   })
 
@@ -32,7 +50,11 @@ describe('ResourceController(E2E)', () => {
     const response = await request(app.getHttpServer())
       .post('/api/resource/create')
       .send({
-        resourceName: 'add_test_resource_name',
+        label: 'add_test_resource_label',
+        uniqueProp: 'add_test_unique_prop',
+        type: 1,
+        notInMenu: 0,
+        status: 1,
       })
       .expect(201)
 
@@ -41,7 +63,8 @@ describe('ResourceController(E2E)', () => {
     expect(head.errCode).toBe(0)
     expect(data).toStrictEqual(
       expect.objectContaining({
-        resourceName: 'add_test_resource_name',
+        label: 'add_test_resource_label',
+        uniqueProp: 'add_test_unique_prop',
       }),
     )
 
@@ -90,7 +113,7 @@ describe('ResourceController(E2E)', () => {
     const response = await request(app.getHttpServer())
       .post(`/api/resource/update/${resourceId}`)
       .send({
-        resourceName: 'update_test_resource_name',
+        label: 'update_test_resource_label',
       })
       .expect(201)
 

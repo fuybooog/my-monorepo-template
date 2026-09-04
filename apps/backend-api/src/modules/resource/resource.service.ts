@@ -386,10 +386,17 @@ export class ResourceService {
   }
 
   async resetResourceListSort() {
-    return await this.dataSource.transaction(async (manager) => {
+    const result = await this.dataSource.transaction(async (manager) => {
       await this.resourceRepository.resetSortNumber(manager)
       return null
     })
+    // 重置排序留痕
+    await this.operationLogService.record({
+      module: 'resource',
+      businessText: '重置资源列表排序',
+      operationType: OperationLogAction.UPDATE,
+    })
+    return result
   }
 
   /** 下载资源导入模板 */
