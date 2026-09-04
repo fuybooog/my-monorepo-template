@@ -12,21 +12,15 @@ export function IsUserFields(validationOptions?: ValidationOptions) {
       options: validationOptions,
       validator: {
         validate(value: string) {
-          console.log('user-fileds:value', value)
-
           if (!value.includes('id')) return false
 
           const storage = getMetadataArgsStorage()
-
-          console.log('storage.columns', storage.columns)
 
           const columns = storage.columns
             .filter((col) => isTargetOrParent(col.target, User))
             .map((col) => col.propertyName)
 
           const allowedFields = Array.from(new Set([...columns]))
-
-          console.log('user-fileds:value2', value, allowedFields)
           return value.split(',').every((field) => allowedFields.includes(field))
         },
         defaultMessage(args: ValidationArguments) {

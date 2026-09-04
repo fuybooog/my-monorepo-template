@@ -47,7 +47,6 @@ describe('UserController(E2E)', () => {
 
     // 赋值给共享变量
     userId = data.id
-    console.log('userId', userId)
     expect(userId).toBeTruthy() // 确保获取到了 ID，否则后续测试无意义
   })
 

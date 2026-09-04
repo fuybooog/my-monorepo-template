@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   StreamableFile,
   UnauthorizedException,
@@ -39,6 +40,7 @@ import {
 @Injectable()
 export class RoleService {
   static readonly SEARCHABLE_FIELDS = ['roleName, roleCode']
+  private readonly logger = new Logger(RoleService.name)
   constructor(
     private readonly roleRepository: RoleRepository,
     private readonly dataSource: DataSource,
@@ -166,7 +168,7 @@ export class RoleService {
           }
           return roleEntity
         } catch (e) {
-          console.log('创建角色失败', e)
+          this.logger.error('创建角色失败', e)
           throw e
         }
       })

@@ -1,9 +1,18 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common'
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common'
 import { Response } from 'express'
 import { BusinessException } from '@/exceptions/business-exception'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(HttpExceptionFilter.name)
+
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse<Response>()
@@ -24,7 +33,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       errCode = status === HttpStatus.UNAUTHORIZED ? -2 : status
     } else {
-      console.error('Unhandled System Exception:', exception)
+      this.logger.error('Unhandled System Exception', exception)
       errMsg =
         process.env.NODE_ENV === 'production'
           ? '服务器开小差了，请稍后再试'
