@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# dotenv environment variable files (keep only .env.example as template)
+.env
+.env.*
+!.env.example
+
 # TypeScript incremental build cache
 *.tsbuildinfo
 
