@@ -31,6 +31,8 @@ import { BaseStatusEnum } from '@/enum/base-status.enum'
 import { MailService } from '@/modules/mail/mail.service'
 import { OperationLogService } from '@/modules/operation-log/operation-log.service'
 import { OperationLogAction, OperationLogLevel } from '@/modules/operation-log/operation-log.types'
+import { LoginProtectionService } from '@/security/login-protection.service'
+import { isLoopbackAddress, resolveClientIp } from '@/security/client-ip'
 
 const DUMMY_HASH = '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6L6s5gG73aG2W2O2'
 
@@ -60,7 +62,28 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly mailService: MailService,
     private readonly operationLogService: OperationLogService,
+    private readonly loginProtection: LoginProtectionService,
   ) {}
+
+  /**
+   * 是否允许开发环境旁路：跳过图形验证码、密码以明文传输。
+   *
+   * 需同时满足四个条件，缺一不可：
+   * 1. 显式设置 ALLOW_DEV_LOGIN_BYPASS=true（默认关闭）；
+   * 2. NODE_ENV=development；
+   * 3. 请求带 x-req-method: httpClient 标记；
+   * 4. 来源为本机回环地址。
+   *
+   * 只靠请求头判断时，攻击者只要伪造一个头就能绕过验证码与传输层加密，等同于公网明文口令通道。
+   */
+  private isDevBypassAllowed(req: Request): boolean {
+    return (
+      this.configService.get('ALLOW_DEV_LOGIN_BYPASS') === 'true' &&
+      this.configService.get('NODE_ENV') === 'development' &&
+      req.headers?.['x-req-method'] === 'httpClient' &&
+      isLoopbackAddress(resolveClientIp(req))
+    )
+  }
 
   async validatePassword(rawPassword: string, dbHashPassword?: string) {
     const isPasswordValid = await bcrypt.compare(rawPassword, dbHashPassword || DUMMY_HASH)
@@ -150,11 +173,14 @@ export class AuthService {
     res: Response,
     req: Request,
   ): Promise<LoginResponseDto> {
-    const isHttpClient = req.headers['x-req-method'] === 'httpClient'
-    const isDev = this.configService.get('NODE_ENV') === 'development' && isHttpClient
+    const clientIp = resolveClientIp(req)
+    const devBypass = this.isDevBypassAllowed(req)
     const { userName, password, captchaKey, captchaCode, keyId } = loginDto
 
-    if (!isDev) {
+    // 0. 撞库防护：先查锁定态，避免在已锁定时仍消耗验证码/解密开销
+    await this.loginProtection.assertNotLocked(userName, clientIp)
+
+    if (!devBypass) {
       if (!captchaKey || !captchaCode) {
         throw new UnauthorizedException('验证码错误')
       }
@@ -166,7 +192,7 @@ export class AuthService {
     }
 
     let decrypted
-    if (isDev) {
+    if (devBypass) {
       decrypted = password
     } else {
       if (!keyId) {
@@ -183,12 +209,19 @@ export class AuthService {
 
     const isPasswordValid = await this.validatePassword(decrypted, pw || '')
     if (!exist || !isPasswordValid) {
+      await this.loginProtection.recordFailure(userName, clientIp)
+      this.logger.warn(`登录失败：userName=${userName} ip=${clientIp || '-'}`)
       throw new UnauthorizedException('用户名或密码错误')
     }
 
+    // 禁用账号同样计入失败次数，避免被用来探测口令正确性
     if (user.status === BaseStatusEnum.DISABLE) {
+      await this.loginProtection.recordFailure(userName, clientIp)
       throw new UnauthorizedException('用户已被禁用')
     }
+
+    // 校验通过：清空该账号的失败计数（IP 计数保留，仅靠 TTL 衰减，防止撞库计数被成功登录重置）
+    await this.loginProtection.clearUserFailures(userName)
 
     const { roleCodes } = await this.issueTokenPair(user, res)
 
@@ -411,8 +444,7 @@ export class AuthService {
    * 无论账号是否存在都返回成功，防止枚举已注册邮箱
    */
   async forgotPassword(dto: ForgotPasswordDto, req: Request): Promise<ForgotPasswordRespDto> {
-    const isHttpClient = req.headers['x-req-method'] === 'httpClient'
-    const isDev = this.configService.get('NODE_ENV') === 'development' && isHttpClient
+    const devBypass = this.isDevBypassAllowed(req)
     const user = await this.userService.findUserWithPasswordByEmail(dto.email)
 
     // 生成 6 位数字验证码
@@ -444,15 +476,14 @@ export class AuthService {
     this.logger.log(
       `[forgotPassword] email=${dto.email}, code=${codeToStore}, ttl=${this.FORGOT_CODE_EXPIRE}s`,
     )
-    return isDev ? { devCode: codeToStore } : {}
+    return devBypass ? { devCode: codeToStore } : {}
   }
 
   /**
    * 找回密码：校验邮箱验证码并重置密码，同时踢掉该用户所有已登录会话
    */
   async forgotResetPassword(dto: ForgotPasswordResetDto, req: Request): Promise<null> {
-    const isHttpClient = req.headers['x-req-method'] === 'httpClient'
-    const isDev = this.configService.get('NODE_ENV') === 'development' && isHttpClient
+    const devBypass = this.isDevBypassAllowed(req)
 
     // 1. 校验验证码（一次性：无论成败立即销毁）
     const redisKey = `${this.FORGOT_CODE_PREFIX}${dto.email}`
@@ -472,7 +503,7 @@ export class AuthService {
 
     // 3. 解密新密码（开发环境直传明文），解密后校验明文长度（6-32 位，与前端校验一致）
     let plainPassword: string
-    if (isDev) {
+    if (devBypass) {
       plainPassword = dto.newPassword
     } else {
       if (!dto.keyId) {

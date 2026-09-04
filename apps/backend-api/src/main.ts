@@ -5,15 +5,21 @@ import { OperationLogContextInterceptor } from './modules/operation-log/operatio
 import { HttpExceptionFilter } from './exceptions/http-exception.filter'
 import { ValidationPipe } from '@nestjs/common'
 import cookieParser from 'cookie-parser'
+import helmet from 'helmet'
 import { ConfigService } from '@nestjs/config'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import qs from 'qs'
+import type { NextFunction, Request, Response } from 'express'
+import { csrfTokenMiddleware } from './security/csrf.middleware'
+import { securityConfig } from './security/security.constants'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   const expressApp = app.getHttpAdapter().getInstance()
   expressApp.set('query parser', (str: string) => qs.parse(str))
+  // 限流/登录锁定按客户端 IP 计数，必须正确解析反代传递的 X-Forwarded-For
+  expressApp.set('trust proxy', securityConfig.trustProxy)
 
   app.setGlobalPrefix('api')
   const configService = app.get(ConfigService)
@@ -59,7 +65,17 @@ async function bootstrap() {
     },
     credentials: true,
   })
+  const swaggerEnabled = securityConfig.swaggerEnabled
+
+  // 安全响应头：Swagger 页面依赖内联脚本与样式，需对其放宽 CSP，其余路径启用完整策略
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const relaxCsp = swaggerEnabled && req.path.startsWith('/api-docs')
+    return helmet({ contentSecurityPolicy: relaxCsp ? false : undefined })(req, res, next)
+  })
+
   app.use(cookieParser())
+  // 必须在 cookieParser 之后：读取/下发 CSRF 令牌 Cookie
+  app.use(csrfTokenMiddleware)
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -70,20 +86,24 @@ async function bootstrap() {
   app.useGlobalInterceptors(new OperationLogContextInterceptor(), new TransformInterceptor())
   app.useGlobalFilters(new HttpExceptionFilter())
 
-  const config = new DocumentBuilder()
-    .setTitle('管理系统 - API 文档')
-    .setDescription('接口文档')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build()
+  // 默认拒绝：仅当 securityConfig.swaggerEnabled 为真时才挂载 /api-docs。
+  // 生产环境（NODE_ENV 未显式开放或 ENABLE_SWAGGER 未开启）一律不暴露文档路由。
+  if (swaggerEnabled) {
+    const config = new DocumentBuilder()
+      .setTitle('管理系统 - API 文档')
+      .setDescription('接口文档')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build()
 
-  const document = SwaggerModule.createDocument(app, config)
+    const document = SwaggerModule.createDocument(app, config)
 
-  SwaggerModule.setup('api-docs', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  })
+    SwaggerModule.setup('api-docs', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    })
+  }
   await app.listen(process.env.PORT ?? 3000)
 }
 bootstrap()

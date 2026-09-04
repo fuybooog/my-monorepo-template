@@ -17,6 +17,16 @@ const safeCleanParams = (obj: any) => {
   return newObj
 }
 
+/** 读取非 httpOnly 的 CSRF 令牌 Cookie，用于双提交 Cookie 校验 */
+const getCsrfToken = (): string => {
+  if (typeof document === 'undefined') return ''
+  const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)
+  return match ? decodeURIComponent(match[1]) : ''
+}
+
+/** 需要携带 CSRF 令牌的状态变更方法 */
+const CSRF_UNSAFE_METHODS = new Set(['post', 'put', 'patch', 'delete'])
+
 // --- 1. 类型定义扩展 ---
 
 export interface RequestMetaData {
@@ -365,6 +375,16 @@ export class HttpClient {
         if (token && config.headers) {
           config.headers['Authorization'] = `Bearer ${token}`
         }
+
+        // CSRF（双提交 Cookie）：把 csrf_token Cookie 原样回放到自定义请求头。
+        // 跨站脚本读不到本站 Cookie，因此无法伪造该头。
+        if (config.headers && CSRF_UNSAFE_METHODS.has(method ?? '')) {
+          const csrfToken = getCsrfToken()
+          if (csrfToken) {
+            config.headers['X-CSRF-Token'] = csrfToken
+          }
+        }
+
         return config
       },
       (error) => Promise.reject(this.normalizeError(error)),

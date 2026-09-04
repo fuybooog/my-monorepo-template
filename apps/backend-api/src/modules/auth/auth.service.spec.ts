@@ -1,4 +1,17 @@
-import { BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common'
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common'
+
+/** 登录锁定期返回的异常（429） */
+class LoginLockedException extends HttpException {
+  constructor(message: string) {
+    super(message, HttpStatus.TOO_MANY_REQUESTS)
+  }
+}
 import { JwtService } from '@nestjs/jwt'
 
 // uuid@14 为 ESM-only 包，jest(CJS) 无法加载，mock 掉
@@ -42,12 +55,24 @@ describe('AuthService', () => {
   let jwtService: jest.Mocked<Pick<JwtService, 'sign' | 'verifyAsync'>>
   let redisService: jest.Mocked<Pick<RedisService, 'get' | 'getdel' | 'set' | 'del'>>
   let userService: jest.Mocked<
-    Pick<UserService, 'findUserById' | 'findUserWithPasswordByEmail' | 'updateUserPassword'>
+    Pick<
+      UserService,
+      | 'findUserById'
+      | 'findUserWithPasswordByEmail'
+      | 'findUserWithPasswordByUserName'
+      | 'updateUserPassword'
+    >
   >
+  let helperService: { decryptPassword: jest.Mock }
   let roleService: jest.Mocked<Pick<RoleService, 'findRoleListByIds' | 'getResourceIdsByRoleIds'>>
   let mailService: jest.Mocked<Pick<MailService, 'sendVerificationCode'>>
   let configService: { get: jest.Mock }
   let operationLogService: { record: jest.Mock }
+  let loginProtection: {
+    assertNotLocked: jest.Mock
+    recordFailure: jest.Mock
+    clearUserFailures: jest.Mock
+  }
 
   beforeEach(() => {
     jwtService = {
@@ -70,7 +95,12 @@ describe('AuthService', () => {
         password: null,
       }),
       updateUserPassword: jest.fn().mockResolvedValue(undefined),
+      findUserWithPasswordByUserName: jest.fn().mockResolvedValue({
+        ...activeUser,
+        password: '$2b$10$testhash',
+      }),
     }
+    helperService = { decryptPassword: jest.fn().mockResolvedValue('plain-pwd') }
     roleService = {
       findRoleListByIds: jest.fn().mockResolvedValue(roleList),
       getResourceIdsByRoleIds: jest.fn().mockResolvedValue(['*:*:*']),
@@ -80,18 +110,31 @@ describe('AuthService', () => {
     }
     configService = { get: jest.fn().mockReturnValue(undefined) }
     operationLogService = { record: jest.fn().mockResolvedValue(undefined) }
+    loginProtection = {
+      assertNotLocked: jest.fn().mockResolvedValue(undefined),
+      recordFailure: jest.fn().mockResolvedValue(undefined),
+      clearUserFailures: jest.fn().mockResolvedValue(undefined),
+    }
 
     service = new AuthService(
       jwtService as any,
       redisService as any,
       userService as any,
       roleService as any,
-      {} as any,
+      helperService as any,
       configService as any,
       mailService as any,
       operationLogService as any,
+      loginProtection as any,
     )
   })
+
+  /** 让 configService 返回「开发环境 + 已开启调试旁路」，用于验证 dev 分支 */
+  const useDevEnv = () => {
+    configService.get.mockImplementation((key: string) =>
+      key === 'NODE_ENV' ? 'development' : key === 'ALLOW_DEV_LOGIN_BYPASS' ? 'true' : undefined,
+    )
+  }
 
   describe('refresh', () => {
     it('缺少 refresh token 时拒绝', async () => {
@@ -247,10 +290,110 @@ describe('AuthService', () => {
     })
   })
 
+  describe('passwordLogin', () => {
+    const req = { headers: {}, ip: '203.0.113.9' } as any
+
+    beforeEach(() => {
+      redisService.get.mockResolvedValue('abcd')
+      redisService.del.mockResolvedValue(1)
+      helperService.decryptPassword.mockResolvedValue('plain-pwd')
+      jest.spyOn(service, 'validatePassword').mockResolvedValue(true)
+    })
+
+    it('密码错误时记录失败次数并拒绝', async () => {
+      jest.spyOn(service, 'validatePassword').mockResolvedValue(false)
+
+      await expect(
+        service.passwordLogin(
+          {
+            userName: 'admin',
+            password: 'cipher',
+            captchaKey: 'k',
+            captchaCode: 'abcd',
+            keyId: '1',
+          },
+          mockRes(),
+          req,
+        ),
+      ).rejects.toThrow(UnauthorizedException)
+
+      expect(loginProtection.recordFailure).toHaveBeenCalledWith('admin', '203.0.113.9')
+      expect(loginProtection.clearUserFailures).not.toHaveBeenCalled()
+    })
+
+    it('登录成功时清空该账号的失败计数', async () => {
+      await service.passwordLogin(
+        { userName: 'admin', password: 'cipher', captchaKey: 'k', captchaCode: 'abcd', keyId: '1' },
+        mockRes(),
+        req,
+      )
+
+      expect(loginProtection.clearUserFailures).toHaveBeenCalledWith('admin')
+      expect(loginProtection.recordFailure).not.toHaveBeenCalled()
+    })
+
+    it('账号处于锁定期时直接拒绝，且不再查询用户/校验密码', async () => {
+      loginProtection.assertNotLocked.mockRejectedValue(
+        new LoginLockedException('账号因连续登录失败已被临时锁定'),
+      )
+
+      await expect(
+        service.passwordLogin(
+          {
+            userName: 'admin',
+            password: 'cipher',
+            captchaKey: 'k',
+            captchaCode: 'abcd',
+            keyId: '1',
+          },
+          mockRes(),
+          req,
+        ),
+      ).rejects.toThrow(LoginLockedException)
+
+      expect(userService.findUserWithPasswordByUserName).not.toHaveBeenCalled()
+    })
+
+    it('用户被禁用时同样计入失败次数', async () => {
+      userService.findUserWithPasswordByUserName.mockResolvedValue({
+        ...activeUser,
+        status: 0,
+      } as any)
+
+      await expect(
+        service.passwordLogin(
+          {
+            userName: 'admin',
+            password: 'cipher',
+            captchaKey: 'k',
+            captchaCode: 'abcd',
+            keyId: '1',
+          },
+          mockRes(),
+          req,
+        ),
+      ).rejects.toThrow('用户已被禁用')
+
+      expect(loginProtection.recordFailure).toHaveBeenCalledWith('admin', '203.0.113.9')
+    })
+
+    it('未开启 dev 旁路时缺少 keyId 直接拒绝（不解密）', async () => {
+      await expect(
+        service.passwordLogin(
+          { userName: 'admin', password: 'cipher', captchaKey: 'k', captchaCode: 'abcd' },
+          mockRes(),
+          req,
+        ),
+      ).rejects.toThrow('验证不通过')
+
+      expect(helperService.decryptPassword).not.toHaveBeenCalled()
+    })
+  })
+
   describe('forgotPassword', () => {
-    /** httpClient 请求头（dev 环境判断依据） */
-    const devReq = { headers: { 'x-req-method': 'httpClient' } } as any
-    const prodReq = { headers: {} } as any
+    /** 完整的 dev 旁路请求：httpClient 标记 + 回环来源 IP */
+    const devReq = { headers: { 'x-req-method': 'httpClient' }, ip: '127.0.0.1' } as any
+    const prodReq = { headers: {}, ip: '10.0.0.1' } as any
 
     it('账号存在时写入 6 位验证码（10 分钟 TTL）并真实发送邮件，非 dev 环境不返回验证码', async () => {
       const result = await service.forgotPassword({ email: 'admin@example.com' }, prodReq)
@@ -308,16 +451,33 @@ describe('AuthService', () => {
       resolveSend()
     })
 
-    it('dev 环境（httpClient）回显验证码便于联调', async () => {
-      configService.get.mockReturnValue('development')
+    it('dev 旁路（开关已开 + development + httpClient + 回环 IP）回显验证码便于联调', async () => {
+      useDevEnv()
       const result = await service.forgotPassword({ email: 'admin@example.com' }, devReq)
 
       expect(result.devCode).toMatch(/^\d{6}$/)
     })
+
+    it('未显式开启 ALLOW_DEV_LOGIN_BYPASS 时，即使 development + httpClient 也不回显验证码', async () => {
+      configService.get.mockImplementation((key: string) =>
+        key === 'NODE_ENV' ? 'development' : undefined,
+      )
+      const result = await service.forgotPassword({ email: 'admin@example.com' }, devReq)
+
+      expect(result).toEqual({})
+    })
+
+    it('dev 旁路不生效于非回环来源（伪造请求头无法绕过）', async () => {
+      useDevEnv()
+      const remoteReq = { headers: { 'x-req-method': 'httpClient' }, ip: '8.8.8.8' } as any
+      const result = await service.forgotPassword({ email: 'admin@example.com' }, remoteReq)
+
+      expect(result).toEqual({})
+    })
   })
 
   describe('forgotResetPassword', () => {
-    const devReq = { headers: { 'x-req-method': 'httpClient' } } as any
+    const devReq = { headers: { 'x-req-method': 'httpClient' }, ip: '127.0.0.1' } as any
 
     it('验证码错误时拒绝', async () => {
       redisService.get.mockResolvedValue('123456')
@@ -353,7 +513,7 @@ describe('AuthService', () => {
     })
 
     it('dev 环境直传明文，重置密码并踢掉旧会话', async () => {
-      configService.get.mockReturnValue('development')
+      useDevEnv()
       redisService.get.mockResolvedValue('123456')
 
       await service.forgotResetPassword(
@@ -385,7 +545,7 @@ describe('AuthService', () => {
     })
 
     it('解密后的明文密码不满足 6-32 位长度要求时拒绝（密文长度校验在明文上进行）', async () => {
-      configService.get.mockReturnValue('development')
+      useDevEnv()
       redisService.get.mockResolvedValue('123456')
 
       await expect(

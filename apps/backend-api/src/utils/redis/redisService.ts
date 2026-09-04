@@ -6,6 +6,11 @@ import Redis from 'ioredis'
 export class RedisService {
   constructor(@InjectRedis() private readonly client: Redis) {}
 
+  /** 暴露底层 ioredis 实例，供限流存储等基础设施复用（业务代码请勿直接使用） */
+  getClient(): Redis {
+    return this.client
+  }
+
   // 封装常用的统一方法，加入全局通用前缀或日志监控
   async set(key: string, value: string, ttl?: number): Promise<'OK'> {
     if (ttl) {
@@ -20,6 +25,19 @@ export class RedisService {
 
   async del(key: string): Promise<number> {
     return this.client.del(key)
+  }
+
+  async incr(key: string): Promise<number> {
+    return this.client.incr(key)
+  }
+
+  async expire(key: string, seconds: number): Promise<number> {
+    return this.client.expire(key, seconds)
+  }
+
+  /** 剩余过期时间（秒）：-2 表示 key 不存在，-1 表示未设置过期时间 */
+  async ttl(key: string): Promise<number> {
+    return this.client.ttl(key)
   }
 
   // GETDEL 语义：原子取出并删除一个 key（兼容任意 Redis 版本，无需 6.2+）

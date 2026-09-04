@@ -19,6 +19,23 @@ import { ApiSuccessResponse } from '@/decorators/api-response.decorator'
 
 import { AuthInitService } from '@/modules/auth/auth-init.service'
 import { AuthInitGuard } from '@/modules/auth/auth-init.guard'
+import { Throttle } from '@nestjs/throttler'
+import { securityConfig } from '@/security/security.constants'
+
+/** 登录类接口：覆盖全局默认限流，按 IP 严格限制 */
+const LoginThrottle = () =>
+  Throttle({
+    default: { limit: securityConfig.loginThrottleLimit, ttl: securityConfig.loginThrottleTtl },
+  })
+
+/** 凭证下发类接口（公钥/验证码）：RSA 密钥生成 CPU 开销高，是低成本 DoS 点 */
+const CredentialThrottle = () =>
+  Throttle({
+    default: {
+      limit: securityConfig.credentialThrottleLimit,
+      ttl: securityConfig.credentialThrottleTtl,
+    },
+  })
 
 @ApiTags('鉴权模块')
 @Controller('auth')
@@ -30,6 +47,7 @@ export class AuthController {
 
   @Post('passwordLogin')
   @Public()
+  @LoginThrottle()
   @ApiOperation({ summary: '密码登录' })
   @ApiSuccessResponse(LoginResponseDto)
   async passwordLogin(
@@ -42,6 +60,7 @@ export class AuthController {
 
   @Post('phoneLogin')
   @Public()
+  @LoginThrottle()
   async phoneLogin(@Body() body: PhoneLoginDto, @Res({ passthrough: true }) res: Response) {
     return await this.authService.phoneLogin(body, res)
   }
@@ -80,6 +99,7 @@ export class AuthController {
 
   @Get('publicKey')
   @Public()
+  @CredentialThrottle()
   @ApiOperation({ summary: '获取公钥' })
   @ApiSuccessResponse(PublicKeyRespDto)
   async getPublicKey() {
@@ -88,6 +108,7 @@ export class AuthController {
 
   @Get('captcha')
   @Public()
+  @CredentialThrottle()
   @ApiOperation({ summary: '获取图形验证码' })
   @ApiSuccessResponse(CaptchaResponseDto)
   async createCaptcha() {
@@ -104,6 +125,7 @@ export class AuthController {
 
   @Post('forgotPassword')
   @Public()
+  @LoginThrottle()
   @ApiOperation({ summary: '找回密码：发送邮箱验证码' })
   @ApiSuccessResponse(ForgotPasswordRespDto)
   async forgotPassword(
@@ -115,6 +137,7 @@ export class AuthController {
 
   @Post('forgotResetPassword')
   @Public()
+  @LoginThrottle()
   @ApiOperation({ summary: '找回密码：校验验证码并重置密码' })
   @ApiSuccessResponse()
   async forgotResetPassword(
